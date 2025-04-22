@@ -27,7 +27,7 @@
                                 </td>
                                 <td class="py-4 px-4 border-b border-gray-200">{{ $menu->name }}</td>
                                 <td class="py-4 px-4 border-b border-gray-200">{{ $menu->category->name }}</td>
-                                <td class="py-4 px-4 border-b border-gray-200">${{ number_format($menu->price, 2) }}</td>
+                                <td class="py-4 px-4 border-b border-gray-200">Rp{{ number_format($menu->price, 2) }}</td>
                                 <td class="py-4 px-4 border-b border-gray-200">
                                     <div class="flex space-x-2">
                                         <a href="{{ route('admin.menus.edit', $menu) }}" class="text-blue-600 hover:text-blue-900">Edit</a>

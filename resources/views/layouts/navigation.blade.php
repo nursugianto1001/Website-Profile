@@ -1,125 +1,69 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
-    <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex">
-                <!-- Logo -->
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ route('admin.dashboard') }}">
-                        <x-application-logo class="block h-10 w-auto fill-current text-gray-600" />
-                    </a>
-                </div>
-
-                <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('admin.categories.index')" :active="request()->routeIs('admin.categories.*')">
-                        {{ __('Categories') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('admin.menus.index')" :active="request()->routeIs('admin.menus.*')">
-                        {{ __('Menu Items') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('admin.outlets.index')" :active="request()->routeIs('admin.outlets.*')">
-                        {{ __('Outlets') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('admin.facilities.index')" :active="request()->routeIs('admin.facilities.*')">
-                        {{ __('Facilities') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('admin.careers.index')" :active="request()->routeIs('admin.careers.*')">
-                        {{ __('Careers') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('home')" target="_blank">
-                        {{ __('View Site') }}
-                    </x-nav-link>
-                </div>
-            </div>
-
-            <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ml-6">
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
-                            <div>{{ Auth::user()->name }}</div>
-
-                            <div class="ml-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </button>
-                    </x-slot>
-
-                    <x-slot name="content">
-                        <!-- Authentication -->
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-
-                            <x-dropdown-link :href="route('logout')"
-                                onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
-                        </form>
-                    </x-slot>
-                </x-dropdown>
-            </div>
-
-            <!-- Hamburger -->
-            <div class="-mr-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
-                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
+<div class="sidebar fixed top-0 bottom-0 lg:left-0 p-2 w-[300px] overflow-y-auto text-center bg-gray-900 shadow-lg lg:block hidden">
+    <div class="text-gray-100 text-xl">
+        <div class="p-2.5 mt-1 flex items-center">
+            <h1 class="font-bold text-gray-200 text-xl ml-3">Admin Panel</h1>
+            <i class="bi bi-x cursor-pointer ml-28 lg:hidden" onclick="openSidebar()"></i>
         </div>
+        <div class="my-2 bg-gray-600 h-[1px]"></div>
     </div>
-
-    <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('admin.categories.index')" :active="request()->routeIs('admin.categories.*')">
-                {{ __('Categories') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('admin.menus.index')" :active="request()->routeIs('admin.menus.*')">
-                {{ __('Menu Items') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('admin.outlets.index')" :active="request()->routeIs('admin.outlets.*')">
-                {{ __('Outlets') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('admin.facilities.index')" :active="request()->routeIs('admin.facilities.*')">
-                {{ __('Facilities') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('admin.careers.index')" :active="request()->routeIs('admin.careers.*')">
-                {{ __('Careers') }}
-            </x-responsive-nav-link>
-        </div>
-
-        <!-- Responsive Settings Options -->
-        <div class="pt-4 pb-1 border-t border-gray-200">
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+    
+    <a href="{{ route('admin.dashboard') }}" class="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer {{ request()->routeIs('admin.dashboard') ? 'bg-blue-600' : 'hover:bg-blue-600' }} text-white">
+        <i class="bi bi-house-door-fill"></i>
+        <span class="text-[15px] ml-4 text-gray-200 font-bold">Dashboard</span>
+    </a>
+    
+    <a href="{{ route('admin.categories.index') }}" class="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer {{ request()->routeIs('admin.categories.*') ? 'bg-blue-600' : 'hover:bg-blue-600' }} text-white">
+        <i class="bi bi-collection"></i>
+        <span class="text-[15px] ml-4 text-gray-200 font-bold">Categories</span>
+    </a>
+    
+    <a href="{{ route('admin.menus.index') }}" class="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer {{ request()->routeIs('admin.menus.*') ? 'bg-blue-600' : 'hover:bg-blue-600' }} text-white">
+        <i class="bi bi-menu-button"></i>
+        <span class="text-[15px] ml-4 text-gray-200 font-bold">Menu Items</span>
+    </a>
+    
+    <a href="{{ route('admin.outlets.index') }}" class="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer {{ request()->routeIs('admin.outlets.*') ? 'bg-blue-600' : 'hover:bg-blue-600' }} text-white">
+        <i class="bi bi-shop"></i>
+        <span class="text-[15px] ml-4 text-gray-200 font-bold">Outlets</span>
+    </a>
+    
+    <a href="{{ route('admin.facilities.index') }}" class="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer {{ request()->routeIs('admin.facilities.*') ? 'bg-blue-600' : 'hover:bg-blue-600' }} text-white">
+        <i class="bi bi-building"></i>
+        <span class="text-[15px] ml-4 text-gray-200 font-bold">Facilities</span>
+    </a>
+    
+    <a href="{{ route('admin.careers.index') }}" class="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer {{ request()->routeIs('admin.careers.*') ? 'bg-blue-600' : 'hover:bg-blue-600' }} text-white">
+        <i class="bi bi-briefcase"></i>
+        <span class="text-[15px] ml-4 text-gray-200 font-bold">Careers</span>
+    </a>
+    
+    <div class="my-4 bg-gray-600 h-[1px]"></div>
+    
+    <a href="{{ route('home') }}" target="_blank" class="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white">
+        <i class="bi bi-globe"></i>
+        <span class="text-[15px] ml-4 text-gray-200 font-bold">View Site</span>
+    </a>
+    
+    <div class="fixed bottom-0 left-0 w-[300px] p-2 bg-gray-900">
+        <div class="my-2 bg-gray-600 h-[1px]"></div>
+        <div class="flex items-center p-2.5">
+            <div class="flex-shrink-0">
+                <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-gray-700 text-white">
+                    {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
+                </span>
             </div>
-
-            <div class="mt-3 space-y-1">
-                <!-- Authentication -->
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-
-                    <x-responsive-nav-link :href="route('logout')"
-                        onclick="event.preventDefault();
-                                        this.closest('form').submit();">
-                        {{ __('Log Out') }}
-                    </x-responsive-nav-link>
-                </form>
+            <div class="ml-3 text-left">
+                <p class="text-sm font-medium text-gray-200">{{ Auth::user()->name ?? 'User' }}</p>
+                <p class="text-xs text-gray-400 truncate">{{ Auth::user()->email ?? 'email@example.com' }}</p>
             </div>
         </div>
+        
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" class="w-full p-2.5 mt-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-red-600 text-white">
+                <i class="bi bi-box-arrow-right"></i>
+                <span class="text-[15px] ml-4 text-gray-200 font-bold">Logout</span>
+            </button>
+        </form>
     </div>
-</nav>
+</div>

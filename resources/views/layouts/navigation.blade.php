@@ -1,68 +1,44 @@
-<div class="sidebar fixed top-0 bottom-0 lg:left-0 p-2 w-[300px] overflow-y-auto text-center bg-gray-900 shadow-lg lg:block hidden">
-    <div class="text-gray-100 text-xl">
-        <div class="p-2.5 mt-1 flex items-center">
-            <h1 class="font-bold text-gray-200 text-xl ml-3">Admin Panel</h1>
-            <i class="bi bi-x cursor-pointer ml-28 lg:hidden" onclick="openSidebar()"></i>
+<div class="sidebar fixed top-0 bottom-0 lg:left-0 p-4 w-[320px] bg-gray-900 text-white shadow-xl lg:block hidden transition-all duration-300">
+    <div class="mb-6">
+        <div class="flex items-center justify-between">
+            <h1 class="text-2xl font-semibold tracking-wide text-white">Admin Panel</h1>
+            <i class="bi bi-x cursor-pointer text-gray-400 hover:text-white lg:hidden" onclick="openSidebar()"></i>
         </div>
-        <div class="my-2 bg-gray-600 h-[1px]"></div>
+        <hr class="my-4 border-gray-700">
     </div>
-    
-    <a href="{{ route('admin.dashboard') }}" class="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer {{ request()->routeIs('admin.dashboard') ? 'bg-blue-600' : 'hover:bg-blue-600' }} text-white">
-        <i class="bi bi-house-door-fill"></i>
-        <span class="text-[15px] ml-4 text-gray-200 font-bold">Dashboard</span>
+
+    <nav class="space-y-1">
+        <x-sidebar-link route="admin.dashboard" icon="bi-house-door-fill" label="Dashboard" />
+        <x-sidebar-link route="admin.categories.index" icon="bi-collection" label="Categories" match="admin.categories.*" />
+        <x-sidebar-link route="admin.menus.index" icon="bi-menu-button" label="Menu Items" match="admin.menus.*" />
+        <x-sidebar-link route="admin.outlets.index" icon="bi-shop" label="Outlets" match="admin.outlets.*" />
+        <x-sidebar-link route="admin.facilities.index" icon="bi-building" label="Facilities" match="admin.facilities.*" />
+        <x-sidebar-link route="admin.careers.index" icon="bi-briefcase" label="Careers" match="admin.careers.*" />
+    </nav>
+
+    <hr class="my-6 border-gray-700">
+
+    <a href="{{ route('home') }}" target="_blank" class="flex items-center p-3 rounded-md text-sm font-medium hover:bg-blue-600 transition">
+        <i class="bi bi-globe text-lg"></i>
+        <span class="ml-3">View Site</span>
     </a>
-    
-    <a href="{{ route('admin.categories.index') }}" class="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer {{ request()->routeIs('admin.categories.*') ? 'bg-blue-600' : 'hover:bg-blue-600' }} text-white">
-        <i class="bi bi-collection"></i>
-        <span class="text-[15px] ml-4 text-gray-200 font-bold">Categories</span>
-    </a>
-    
-    <a href="{{ route('admin.menus.index') }}" class="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer {{ request()->routeIs('admin.menus.*') ? 'bg-blue-600' : 'hover:bg-blue-600' }} text-white">
-        <i class="bi bi-menu-button"></i>
-        <span class="text-[15px] ml-4 text-gray-200 font-bold">Menu Items</span>
-    </a>
-    
-    <a href="{{ route('admin.outlets.index') }}" class="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer {{ request()->routeIs('admin.outlets.*') ? 'bg-blue-600' : 'hover:bg-blue-600' }} text-white">
-        <i class="bi bi-shop"></i>
-        <span class="text-[15px] ml-4 text-gray-200 font-bold">Outlets</span>
-    </a>
-    
-    <a href="{{ route('admin.facilities.index') }}" class="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer {{ request()->routeIs('admin.facilities.*') ? 'bg-blue-600' : 'hover:bg-blue-600' }} text-white">
-        <i class="bi bi-building"></i>
-        <span class="text-[15px] ml-4 text-gray-200 font-bold">Facilities</span>
-    </a>
-    
-    <a href="{{ route('admin.careers.index') }}" class="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer {{ request()->routeIs('admin.careers.*') ? 'bg-blue-600' : 'hover:bg-blue-600' }} text-white">
-        <i class="bi bi-briefcase"></i>
-        <span class="text-[15px] ml-4 text-gray-200 font-bold">Careers</span>
-    </a>
-    
-    <div class="my-4 bg-gray-600 h-[1px]"></div>
-    
-    <a href="{{ route('home') }}" target="_blank" class="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white">
-        <i class="bi bi-globe"></i>
-        <span class="text-[15px] ml-4 text-gray-200 font-bold">View Site</span>
-    </a>
-    
-    <div class="fixed bottom-0 left-0 w-[300px] p-2 bg-gray-900">
-        <div class="my-2 bg-gray-600 h-[1px]"></div>
-        <div class="flex items-center p-2.5">
-            <div class="flex-shrink-0">
-                <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-gray-700 text-white">
-                    {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
-                </span>
+
+    <div class="absolute bottom-0 left-0 w-full p-4 bg-gray-900 border-t border-gray-700">
+        <div class="flex items-center space-x-3">
+            <div class="h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center font-semibold text-white">
+                {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
             </div>
-            <div class="ml-3 text-left">
-                <p class="text-sm font-medium text-gray-200">{{ Auth::user()->name ?? 'User' }}</p>
-                <p class="text-xs text-gray-400 truncate">{{ Auth::user()->email ?? 'email@example.com' }}</p>
+            <div class="text-sm">
+                <p class="font-medium">{{ Auth::user()->name ?? 'User' }}</p>
+                <p class="text-gray-400 text-xs">{{ Auth::user()->email ?? 'email@example.com' }}</p>
             </div>
         </div>
-        
-        <form method="POST" action="{{ route('logout') }}">
+
+        <form method="POST" action="{{ route('logout') }}" class="mt-4">
             @csrf
-            <button type="submit" class="w-full p-2.5 mt-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-red-600 text-white">
-                <i class="bi bi-box-arrow-right"></i>
-                <span class="text-[15px] ml-4 text-gray-200 font-bold">Logout</span>
+            <button type="submit" class="flex items-center w-full p-3 rounded-md hover:bg-red-600 text-left transition">
+                <i class="bi bi-box-arrow-right text-lg"></i>
+                <span class="ml-3 font-medium">Logout</span>
             </button>
         </form>
     </div>

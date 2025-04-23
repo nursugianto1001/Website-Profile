@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+    <div class="bg-white p-8 rounded-lg shadow-md ml-24">
         <div class="p-6 bg-white border-b border-gray-200">
             <div class="mb-6">
                 <h2 class="text-2xl font-semibold">Create Menu Item</h2>

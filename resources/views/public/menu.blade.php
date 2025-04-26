@@ -4,7 +4,7 @@
 
 @section('content')
 <!-- Full-screen Parallax Background -->
-<div class="fixed inset-0 bg-cover bg-center z-0" style="background-image: url('https://placehold.co/1920x1080');">
+<div class="fixed inset-0 bg-cover bg-center z-0" style="background-image: url('{{ Vite::asset('resources/images/copicop.jpg') }}');">
     <!-- Semi-transparent overlay for better text readability -->
     <div class="absolute inset-0 bg-black opacity-40"></div>
 </div>

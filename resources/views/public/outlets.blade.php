@@ -4,29 +4,29 @@
 
 @section('content')
     <!-- Full-screen Parallax Background -->
-    <div class="fixed inset-0 bg-cover bg-center z-0" style="background-image: url('https://placehold.co/1920x1080');">
+    <div class="fixed inset-0 bg-cover bg-center z-0" style="background-image: url('{{ Vite::asset('resources/images/copicop.jpg') }}');">
         <!-- Semi-transparent overlay for better text readability -->
         <div class="absolute inset-0 bg-black opacity-40"></div>
     </div>
-    
+
     <!-- Main Content - With proper spacing for the fixed header -->
     <div class="relative z-10 pt-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <h1 class="text-4xl font-bold mb-8 text-center text-white">Our Outlets</h1>
-            
+
             <div class="mb-8" data-aos="fade-up" data-aos-duration="800">
                 <p class="text-center text-white max-w-3xl mx-auto">
                     Visit us at any of our convenient locations. Each cafe offers the same quality and service you've come to expect from us,
                     with unique atmospheres that reflect the neighborhoods they serve.
                 </p>
             </div>
-            
+
             <div class="bg-white bg-opacity-80 backdrop-blur-md p-8 rounded-lg shadow-lg" data-aos="fade-up" data-aos-duration="800">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     @foreach($outlets as $index => $outlet)
-                    <div class="bg-white shadow-lg rounded-lg overflow-hidden transition transform hover:scale-105" 
-                         data-aos="fade-up" 
-                         data-aos-duration="800" 
+                    <div class="bg-white shadow-lg rounded-lg overflow-hidden transition transform hover:scale-105"
+                         data-aos="fade-up"
+                         data-aos-duration="800"
                          data-aos-delay="{{ $index * 100 }}">
                         <img src="{{ asset('storage/' . $outlet->image_path) }}" alt="{{ $outlet->name }}" class="w-full h-64 object-cover">
                         <div class="p-6">
@@ -67,7 +67,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- AOS Library Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />

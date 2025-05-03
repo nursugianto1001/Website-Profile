@@ -9,12 +9,7 @@
 
     <nav class="space-y-1 px-4">
         <x-sidebar-link route="admin.dashboard" icon="bi-house-door-fill" label="Dashboard" />
-        <x-sidebar-link route="admin.categories.index" icon="bi-collection" label="Categories" match="admin.categories.*" />
-        <x-sidebar-link route="admin.menus.index" icon="bi-menu-button" label="Menu Items" match="admin.menus.*" />
-        <x-sidebar-link route="admin.outlets.index" icon="bi-shop" label="Outlets" match="admin.outlets.*" />
-        <x-sidebar-link route="admin.facilities.index" icon="bi-building" label="Facilities" match="admin.facilities.*" />
-        <x-sidebar-link route="admin.careers.index" icon="bi-briefcase" label="Careers" match="admin.careers.*" />
-    </nav>
+        </nav>
 
     <hr class="my-6 border-gray-700 mx-4">
 

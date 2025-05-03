@@ -86,10 +86,6 @@
                 <div id="desktopMenu" class="space-x-8">
                     <a href="{{ route('home') }}" class="menu_links">Home</a>
                     <a href="{{ route('about') }}" class="menu_links">About</a>
-                    <a href="{{ route('menu') }}" class="menu_links">Menu</a>
-                    <a href="{{ route('outlets') }}" class="menu_links">Outlets</a>
-                    <a href="{{ route('facilities') }}" class="menu_links">Facilities</a>
-                    <a href="{{ route('careers') }}" class="menu_links">Careers</a>
                     <a href="{{ route('contact') }}" class="menu_links">Contact</a>
                 </div>
 
@@ -108,10 +104,6 @@
                 <div class="px-2 pt-2 pb-3 space-y-1">
                     <a href="{{ route('home') }}" class="mobile_links">Home</a>
                     <a href="{{ route('about') }}" class="mobile_links">About</a>
-                    <a href="{{ route('menu') }}" class="mobile_links">Menu</a>
-                    <a href="{{ route('outlets') }}" class="mobile_links">Outlets</a>
-                    <a href="{{ route('facilities') }}" class="mobile_links">Facilities</a>
-                    <a href="{{ route('careers') }}" class="mobile_links">Careers</a>
                     <a href="{{ route('contact') }}" class="mobile_links">Contact</a>
                 </div>
             </div>

@@ -300,7 +300,7 @@
                 </div>
 
                 <div class="mt-6 border-t border-[#d4af37] pt-6 text-center">
-                    <p class="text-off-white text-sm">
+                    <p class="text-white text-sm">
                         &copy; {{ date('Y') }} Cafe. All rights reserved.
                     </p>
                 </div>

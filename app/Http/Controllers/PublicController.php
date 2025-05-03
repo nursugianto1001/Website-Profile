@@ -9,7 +9,8 @@ class PublicController extends Controller
 {
     public function home()
     {
-        return view('public.home');
+        $facilities = Facility::all(); // atau query lain sesuai kebutuhan
+        return view('public.home', compact('facilities'));
     }
 
     public function about()

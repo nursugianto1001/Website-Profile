@@ -19,207 +19,244 @@
 
     <!-- Custom Styles with Mobile Fixes -->
     <style>
-      /* Color variables */
-      :root {
-        --semi-gold: #d4af37;
-        --semi-gold-lighter: #e5c76b;
-        --semi-gold-darker: #b8941e;
-        --white: #ffffff;
-        --off-white: #f8f8f8;
-      }
-
-      /* Added box-sizing reset to prevent overflow issues */
-      *, *::before, *::after {
-        box-sizing: border-box;
-      }
-
-      /* Fixed body styling to prevent overflow issues */
-      body {
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        overflow-x: hidden;
-        width: 100%;
-        position: relative;
-        margin: 0;
-        padding: 0;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        background-color: #ffffff;
-      }
-
-      /* Tailwind classes */
-      .menu_links {
-        color: var(--white);
-        padding: 0.5rem 0.75rem;
-        border-radius: 0.375rem;
-        font-size: 0.875rem;
-        font-weight: 700;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-        transition: color 0.3s ease;
-        display: inline-block; /* Added to fix IE compatibility */
-      }
-      .menu_links:hover {
-        color: var(--semi-gold);
-      }
-      .mobile_links {
-        color: var(--white);
-        display: block;
-        width: 100%; /* Added to ensure links take full width */
-        padding: 0.75rem; /* Increased padding for better touch targets */
-        border-radius: 0.375rem;
-        font-size: 1rem;
-        font-weight: 700;
-        transition: color 0.3s ease, background-color 0.3s ease;
-      }
-      .mobile_links:hover {
-        color: var(--semi-gold);
-        background-color: rgba(55, 65, 81, 0.7);
-      }
-      .social_icon {
-        color: #d1d5db;
-        transition: color 0.3s ease;
-        display: inline-flex; /* Better for touch targets */
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-      }
-      .social_icon:hover {
-        color: var(--semi-gold);
-      }
-
-      /* Book Now Button with improved mobile styling */
-      .book-now-btn {
-        background-color: var(--semi-gold);
-        color: #1a1a1a;
-        padding: 0.5rem 1.25rem;
-        border-radius: 0.375rem;
-        font-size: 0.875rem;
-        font-weight: 700;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-block;
-        border: 2px solid var(--semi-gold);
-        text-align: center;
-      }
-      .book-now-btn:hover {
-        background-color: transparent;
-        color: var(--semi-gold);
-      }
-
-      /* Improved mobile menu styling */
-      #mobileMenu {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        width: 100%;
-        z-index: 50;
-        background-color: rgba(0, 0, 0, 0.9);
-        border-radius: 0 0 0.375rem 0.375rem;
-        padding: 0.5rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      }
-
-      #mobileMenu.show {
-        display: block;
-      }
-
-      /* Site logo */
-      .site-logo {
-        font-weight: 700;
-        color: var(--white);
-        transition: color 0.3s ease;
-        font-size: 1.25rem; /* Base size */
-      }
-      .site-logo:hover {
-        color: var(--semi-gold);
-      }
-
-      /* Fixed header styling */
-      #main-header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        z-index: 50;
-        background-color: #1a1a1a;
-        transition: background-color 0.3s ease, box-shadow 0.3s ease;
-      }
-
-      /* Added explicit margin-top to main content to account for fixed header */
-      main {
-        margin-top: 70px; /* Adjust based on your header height */
-        flex-grow: 1;
-        width: 100%;
-      }
-
-      /* Footer styles */
-      footer {
-        width: 100%;
-        margin-top: auto;
-      }
-
-      /* Improved media queries with more precise breakpoints */
-      /* Mobile first approach */
-      #desktopMenu {
-        display: none;
-      }
-
-      #mobileMenuButton {
-        display: flex;
-      }
-
-      .book-now-mobile {
-        display: block;
-        margin-top: 0.5rem;
-        text-align: center;
-        width: 100%;
-      }
-
-      /* Tablet and above */
-      @media (min-width: 768px) {
-        #desktopMenu {
-          display: flex;
-          justify-content: center;
+        /* Color variables */
+        :root {
+            --semi-gold: #BF9264;
+            --semi-gold-lighter: #e5c76b;
+            --semi-gold-darker: #b8941e;
+            --white: #ffffff;
+            --off-white: #f8f8f8;
         }
 
-        #mobileMenuButton {
-          display: none;
+        /* Added box-sizing reset to prevent overflow issues */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
         }
 
-        .book-now-mobile {
-          display: none;
+        /* Fixed body styling to prevent overflow issues */
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            overflow-x: hidden;
+            width: 100%;
+            position: relative;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff;
         }
 
-        .site-logo {
-          font-size: 1.5rem;
+        /* Tailwind classes */
+        .menu_links {
+            color: var(--white);
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            transition: color 0.3s ease;
+            display: inline-block;
+            /* Added to fix IE compatibility */
         }
 
-        main {
-          margin-top: 80px; /* Slightly larger margin for desktop */
-        }
-      }
-
-      /* Added explicit styles for different screen sizes */
-      @media (max-width: 320px) {
-        /* Extra small devices */
-        .site-logo {
-          font-size: 1.1rem;
+        .menu_links:hover {
+            color: var(--semi-gold);
         }
 
         .mobile_links {
-          padding: 0.5rem;
+            color: var(--white);
+            display: block;
+            width: 100%;
+            /* Added to ensure links take full width */
+            padding: 0.75rem;
+            /* Increased padding for better touch targets */
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            font-weight: 700;
+            transition: color 0.3s ease, background-color 0.3s ease;
         }
-      }
 
-      @media (min-width: 321px) and (max-width: 480px) {
-        /* Small devices */
-        .site-logo {
-          font-size: 1.2rem;
+        .mobile_links:hover {
+            color: var(--semi-gold);
+            background-color: rgba(55, 65, 81, 0.7);
         }
-      }
+
+        .social_icon {
+            color: #d1d5db;
+            transition: color 0.3s ease;
+            display: inline-flex;
+            /* Better for touch targets */
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        .social_icon:hover {
+            color: var(--semi-gold);
+        }
+
+        /* Book Now Button with improved mobile styling */
+        .book-now-btn {
+            background-color: var(--semi-gold);
+            color: #ffffff;
+            padding: 0.5rem 1.25rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            border: 2px solid var(--semi-gold);
+            text-align: center;
+        }
+
+        .book-now-btn:hover {
+            background-color: transparent;
+            color: var(--semi-gold);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            position: relative;
+        }
+
+        .logo-text {
+            color: #ffffff;
+            /* White color */
+            font-weight: 900;
+            margin-left: 10px;
+            /* Space between logo and text */
+            position: absolute;
+            right: -60px;
+            /* Position text to the right of the logo */
+            white-space: nowrap;
+        }
+
+        /* Improved mobile menu styling */
+        #mobileMenu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 50;
+            background-color: rgba(0, 0, 0, 0.9);
+            border-radius: 0 0 0.375rem 0.375rem;
+            padding: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        #mobileMenu.show {
+            display: block;
+        }
+
+        /* Site logo */
+        .site-logo {
+            font-weight: 700;
+            color: var(--white);
+            transition: color 0.3s ease;
+            font-size: 1.25rem;
+            /* Base size */
+        }
+
+        .site-logo:hover {
+            color: var(--semi-gold);
+        }
+
+        /* Fixed header styling */
+        #main-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 50;
+            background-color: #1a1a1a;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Added explicit margin-top to main content to account for fixed header */
+        main {
+            margin-top: 70px;
+            /* Adjust based on your header height */
+            flex-grow: 1;
+            width: 100%;
+        }
+
+        /* Footer styles */
+        footer {
+            width: 100%;
+            margin-top: auto;
+        }
+
+        /* Improved media queries with more precise breakpoints */
+        /* Mobile first approach */
+        #desktopMenu {
+            display: none;
+        }
+
+        #mobileMenuButton {
+            display: flex;
+        }
+
+        .book-now-mobile {
+            display: block;
+            margin-top: 0.5rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        /* Tablet and above */
+        @media (min-width: 768px) {
+            #desktopMenu {
+                display: flex;
+                justify-content: center;
+            }
+
+            #mobileMenuButton {
+                display: none;
+            }
+
+            .book-now-mobile {
+                display: none;
+            }
+
+            .site-logo {
+                font-size: 1.5rem;
+            }
+
+            main {
+                margin-top: 80px;
+                /* Slightly larger margin for desktop */
+            }
+        }
+
+        /* Added explicit styles for different screen sizes */
+        @media (max-width: 320px) {
+
+            /* Extra small devices */
+            .site-logo {
+                font-size: 1.1rem;
+            }
+
+            .mobile_links {
+                padding: 0.5rem;
+            }
+        }
+
+        @media (min-width: 321px) and (max-width: 480px) {
+
+            /* Small devices */
+            .site-logo {
+                font-size: 1.2rem;
+            }
+        }
     </style>
 </head>
 
@@ -229,15 +266,17 @@
         <nav class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8" aria-label="Top">
             <div class="w-full py-4 flex items-center justify-between">
                 <!-- Logo (left side) -->
-                <div class="flex-shrink-0">
-                    <a href="{{ route('home') }}" class="site-logo">Karvin</a>
+                <div class="flex-shrink-0 logo-container">
+                        <img src="{{ Vite::asset(asset: 'resources/images/Karvin.png') }}" alt="Karvin Logo"class="h-10 w-auto">
+                        <span class="italic logo-text">Karvin</span>
+                    </a>
                 </div>
 
                 <!-- Desktop Navigation Links (centered) -->
                 <div id="desktopMenu" class="flex-grow flex justify-center space-x-6">
                     <a href="{{ route('home') }}" class="menu_links">Home</a>
                     <a href="{{ route('about') }}" class="menu_links">About</a>
-                    <a href="{{ route('facilities') }}" class="menu_links">Facilities</a>
+                    <a href="{{ route('facilities') }}" class="menu_links">Facility</a>
                     <a href="{{ route('contact') }}" class="menu_links">Contact</a>
                 </div>
 
@@ -248,8 +287,11 @@
 
                 <!-- Mobile Menu Button (right side on mobile) -->
                 <div id="mobileMenuButton">
-                    <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-white hover:text-[#d4af37]" onclick="toggleMobileMenu()">
-                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+                    <button type="button"
+                        class="inline-flex items-center justify-center p-2 rounded-md text-white hover:text-[#d4af37]"
+                        onclick="toggleMobileMenu()">
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke-width="2" stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                     </button>
@@ -261,9 +303,10 @@
                 <div class="px-2 pt-2 pb-3 space-y-1">
                     <a href="{{ route('home') }}" class="mobile_links">Home</a>
                     <a href="{{ route('about') }}" class="mobile_links">About</a>
-                    <a href="{{ route('facilities') }}" class="mobile_links">Facilities</a>
+                    <a href="{{ route('facilities') }}" class="mobile_links">Facility</a>
                     <a href="{{ route('contact') }}" class="mobile_links">Contact</a>
-                    <a href="#" class="mobile_links book-now-mobile"><span class="book-now-btn w-full inline-block">Book Now</span></a>
+                    <a href="#" class="mobile_links book-now-mobile"><span
+                            class="book-now-btn w-full inline-block">Book Now</span></a>
                 </div>
             </div>
         </nav>
@@ -314,13 +357,10 @@
         function updateHeaderBackground() {
             const header = document.getElementById('main-header');
             if (window.scrollY > 50) {
-                header.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-                header.style.backdropFilter = 'blur(4px)';
-                header.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+                header.style.backgroundColor = '#000';
             } else {
-                header.style.backgroundColor = '#1a1a1a';
+                header.style.backgroundColor = 'transparent';
                 header.style.backdropFilter = 'none';
-                header.style.boxShadow = 'none';
             }
         }
 
@@ -352,7 +392,9 @@
                 if (e.target === document.body) {
                     e.preventDefault();
                 }
-            }, { passive: false });
+            }, {
+                passive: false
+            });
         });
     </script>
 </body>

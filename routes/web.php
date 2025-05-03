@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\FacilityController;
 use App\Http\Controllers\PublicController;
+use App\Http\Controllers\Admin\BackgroundVideoController;
 
 Route::get('/', [PublicController::class, 'home'])->name('home');
 Route::get('/about', [PublicController::class, 'about'])->name('about');
@@ -16,6 +17,10 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     })->name('dashboard');
 
     Route::resource('facilities', FacilityController::class);
+
+    Route::resource('background-videos', BackgroundVideoController::class);
+    Route::post('background-videos/{backgroundVideo}/set-active', [BackgroundVideoController::class, 'setActive'])
+        ->name('background-videos.set-active');
 
 });
 

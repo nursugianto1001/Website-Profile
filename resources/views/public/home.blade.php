@@ -3,8 +3,22 @@
 @section('title', 'Home')
 
 @section('content')
-    <!-- Full-screen Parallax Background -->
-    <div class="fixed inset-0 bg-cover bg-center z-0" style="background-image: url('{{ Vite::asset('resources/images/copicop.jpg') }}');">
+    <!-- Full-screen Video Background -->
+    <div class="fixed inset-0 z-0 overflow-hidden">
+        @php
+            $backgroundVideo = \App\Models\BackgroundVideo::getActive();
+        @endphp
+        
+        @if($backgroundVideo)
+            <video autoplay muted loop class="absolute min-w-full min-h-full object-cover">
+                <source src="{{ Storage::url($backgroundVideo->path) }}" type="{{ $backgroundVideo->mime_type }}">
+                Your browser does not support the video tag.
+            </video>
+        @else
+            <!-- Fallback to image if no video is active -->
+            <div class="bg-cover bg-center absolute inset-0" style="background-image: url('{{ Vite::asset('resources/images/copicop.jpg') }}');"></div>
+        @endif
+        
         <!-- Semi-transparent overlay for better text readability -->
         <div class="absolute inset-0 bg-black opacity-40"></div>
     </div>
@@ -22,6 +36,7 @@
         </div>
     </div>
 
+    <!-- Rest of the content remains the same -->
     <!-- About Section - Semi-transparent Layer -->
     <div class="relative z-10">
         <div class="bg-white bg-opacity-80 backdrop-blur-md py-20">
@@ -41,7 +56,7 @@
                         </a>
                     </div>
                     <div class="rounded-lg overflow-hidden shadow-xl" data-aos="fade-left" data-aos-duration="1000">
-                        <img src="{{ Vite::asset(asset: 'resources/images/copicop.jpg') }}" alt="About Us" class="w-full h-full object-cover">
+                        <img src="{{ Vite::asset('resources/images/copicop.jpg') }}" alt="About Us" class="w-full h-full object-cover">
                     </div>
                 </div>
             </div>

@@ -3,8 +3,22 @@
 @section('title', 'Contact Us')
 
 @section('content')
-    <!-- Full-screen Parallax Background -->
-    <div class="fixed inset-0 bg-cover bg-center z-0" style="background-image: url('{{ Vite::asset('resources/images/copicop.jpg') }}')">
+    <!-- Full-screen Video Background -->
+    <div class="fixed inset-0 z-0 overflow-hidden">
+        @php
+            $backgroundVideo = \App\Models\BackgroundVideo::getActive();
+        @endphp
+        
+        @if($backgroundVideo)
+            <video autoplay muted loop class="absolute min-w-full min-h-full object-cover">
+                <source src="{{ Storage::url($backgroundVideo->path) }}" type="{{ $backgroundVideo->mime_type }}">
+                Your browser does not support the video tag.
+            </video>
+        @else
+            <!-- Fallback to image if no video is active -->
+            <div class="bg-cover bg-center absolute inset-0" style="background-image: url('{{ Vite::asset('resources/images/copicop.jpg') }}');"></div>
+        @endif
+        
         <!-- Semi-transparent overlay for better text readability -->
         <div class="absolute inset-0 bg-black opacity-40"></div>
     </div>

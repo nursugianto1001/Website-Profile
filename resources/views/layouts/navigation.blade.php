@@ -12,7 +12,8 @@
         <nav class="space-y-1 px-4">
             <x-sidebar-link route="admin.dashboard" icon="bi-house-door-fill" label="Dashboard" />
             <x-sidebar-link route="admin.facilities.index" icon="bi-building" label="Facilities" match="admin.facilities.*" />
-        </nav>
+            <x-sidebar-link route="admin.background-videos.index" icon="bi-camera-video" label="Background Video" match="admin.background-video.*" />
+            </nav>
 
         <hr class="my-6 border-gray-700 mx-4">
 

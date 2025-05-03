@@ -230,7 +230,7 @@
             <div class="w-full py-4 flex items-center justify-between">
                 <!-- Logo (left side) -->
                 <div class="flex-shrink-0">
-                    <a href="{{ route('home') }}" class="site-logo">copicop</a>
+                    <a href="{{ route('home') }}" class="site-logo">Karvin</a>
                 </div>
 
                 <!-- Desktop Navigation Links (centered) -->

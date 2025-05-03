@@ -4,7 +4,7 @@
 
 @section('content')
     <!-- Full-screen Parallax Background -->
-    <div class="fixed inset-0 bg-cover bg-center z-0" style="background-image: url('https://placehold.co/1920x1080');">
+    <div class="fixed inset-0 bg-cover bg-center z-0" style="background-image: url('{{ Vite::asset('resources/images/copicop.jpg') }}');">
         <!-- Semi-transparent overlay for better text readability -->
         <div class="absolute inset-0 bg-black opacity-40"></div>
     </div>
@@ -49,8 +49,8 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
                     @foreach($facilities as $index => $facility)
                         <div class="bg-white bg-opacity-90 shadow-lg rounded-lg overflow-hidden flex flex-col md:flex-row transition transform hover:scale-105"
-                             data-aos="{{ $index % 2 == 0 ? 'fade-right' : 'fade-left' }}" 
-                             data-aos-duration="800" 
+                             data-aos="{{ $index % 2 == 0 ? 'fade-right' : 'fade-left' }}"
+                             data-aos-duration="800"
                              data-aos-delay="{{ $index * 100 }}">
                             <div class="md:w-2/5">
                                 <img src="{{ asset('storage/' . $facility->image_path) }}" alt="{{ $facility->name }}" class="h-full w-full object-cover">

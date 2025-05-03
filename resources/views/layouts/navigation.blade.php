@@ -1,13 +1,13 @@
-<div class="sidebar fixed top-0 bottom-0 lg:left-0 p-4 w-[320px] bg-gray-900 text-white shadow-xl lg:block hidden transition-all duration-300">
-    <div class="mb-6">
+<div id="mobile-sidebar" class="fixed inset-y-0 left-0 z-50 w-[320px] bg-gray-900 text-white shadow-xl transform -translate-x-full transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:block">
+    <div class="mb-6 p-4">
         <div class="flex items-center justify-between">
             <h1 class="text-2xl font-semibold tracking-wide text-white">Admin Panel</h1>
-            <i class="bi bi-x cursor-pointer text-gray-400 hover:text-white lg:hidden" onclick="openSidebar()"></i>
+            <i class="bi bi-x cursor-pointer text-gray-400 hover:text-white lg:hidden" onclick="toggleSidebar()"></i>
         </div>
         <hr class="my-4 border-gray-700">
     </div>
 
-    <nav class="space-y-1">
+    <nav class="space-y-1 px-4">
         <x-sidebar-link route="admin.dashboard" icon="bi-house-door-fill" label="Dashboard" />
         <x-sidebar-link route="admin.categories.index" icon="bi-collection" label="Categories" match="admin.categories.*" />
         <x-sidebar-link route="admin.menus.index" icon="bi-menu-button" label="Menu Items" match="admin.menus.*" />
@@ -16,9 +16,9 @@
         <x-sidebar-link route="admin.careers.index" icon="bi-briefcase" label="Careers" match="admin.careers.*" />
     </nav>
 
-    <hr class="my-6 border-gray-700">
+    <hr class="my-6 border-gray-700 mx-4">
 
-    <a href="{{ route('home') }}" target="_blank" class="flex items-center p-3 rounded-md text-sm font-medium hover:bg-blue-600 transition">
+    <a href="{{ route('home') }}" target="_blank" class="flex items-center px-4 py-3 rounded-md text-sm font-medium hover:bg-blue-600 transition">
         <i class="bi bi-globe text-lg"></i>
         <span class="ml-3">View Site</span>
     </a>

@@ -4,7 +4,7 @@
 
 @section('content')
     <!-- Full-screen Parallax Background -->
-    <div class="fixed inset-0 bg-cover bg-center z-0" style="background-image: url('https://placehold.co/1920x1080');">
+    <div class="fixed inset-0 bg-cover bg-center z-0" style="background-image: url('{{ Vite::asset('resources/images/copicop.jpg') }}')">
         <!-- Semi-transparent overlay for better text readability -->
         <div class="absolute inset-0 bg-black opacity-40"></div>
     </div>
@@ -17,7 +17,7 @@
                     Contact Us
                 </h1>
                 <p class="text-xl text-white drop-shadow-lg mb-8 max-w-md">
-                    We'd love to hear from you. Whether you have a question about our services, 
+                    We'd love to hear from you. Whether you have a question about our services,
                     want to make a reservation, or just want to say hello, we're here to help.
                 </p>
             </div>
@@ -31,7 +31,7 @@
                 <div data-aos="fade-up" data-aos-duration="800">
                     <h2 class="text-3xl font-bold mb-6">Contact Information</h2>
                     <div class="w-20 h-1 bg-gray-800 mb-6"></div>
-                    
+
                     <div class="space-y-4 mb-8">
                         <div class="flex items-start">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600 mt-1 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -42,7 +42,7 @@
                                 <p class="text-gray-700">info@example.com</p>
                             </div>
                         </div>
-                        
+
                         <div class="flex items-start">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600 mt-1 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -52,7 +52,7 @@
                                 <p class="text-gray-700">+1 (123) 456-7890</p>
                             </div>
                         </div>
-                        
+
                         <div class="flex items-start">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600 mt-1 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -92,7 +92,7 @@
                             </li>
                         </ul>
                     </div>
-                    
+
                     <div class="bg-white bg-opacity-90 shadow-lg rounded-lg p-8" data-aos="fade-left" data-aos-duration="800">
                         <h3 class="text-xl font-bold mb-6">Follow Us</h3>
                         <div class="w-16 h-1 bg-gray-800 mb-6"></div>
@@ -134,7 +134,7 @@
                     </p>
                 </div>
                 <div class="rounded-lg overflow-hidden shadow-xl" data-aos="zoom-in" data-aos-duration="800">
-                    <img src="https://placehold.co/1200x400" alt="Map Location" class="w-full h-full object-cover">
+                    <img src="{{ Vite::asset(asset: 'resources/images/grup.jpg') }}" alt="Map Location" class="w-full h-full object-cover">
                 </div>
             </div>
         </div>

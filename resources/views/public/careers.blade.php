@@ -4,7 +4,7 @@
 
 @section('content')
     <!-- Full-screen Parallax Background -->
-    <div class="fixed inset-0 bg-cover bg-center z-0" style="background-image: url('https://placehold.co/1920x1080');">
+    <div class="fixed inset-0 bg-cover bg-center z-0" style="background-image: url('{{ Vite::asset('resources/images/copicop.jpg') }}');">
         <!-- Semi-transparent overlay for better text readability -->
         <div class="absolute inset-0 bg-black opacity-40"></div>
     </div>
@@ -48,28 +48,25 @@
                     <div class="space-y-8">
                         @foreach($careers as $index => $career)
                             <div class="bg-white bg-opacity-90 shadow-lg rounded-lg p-6 transition transform hover:scale-105"
-                                 data-aos="fade-up" 
-                                 data-aos-duration="800" 
+                                 data-aos="fade-up"
+                                 data-aos-duration="800"
                                  data-aos-delay="{{ $index * 100 }}">
                                 <h2 class="text-2xl font-bold mb-4">{{ $career->position }}</h2>
-                                
+
                                 <div class="mb-6">
                                     <h3 class="text-lg font-semibold mb-2">Job Description</h3>
                                     <div class="text-gray-700">
                                         {!! nl2br($career->description) !!}
                                     </div>
                                 </div>
-                                
+
                                 <div class="mb-6">
                                     <h3 class="text-lg font-semibold mb-2">Requirements</h3>
                                     <div class="text-gray-700">
                                         {!! nl2br($career->requirements) !!}
                                     </div>
                                 </div>
-                                
-                                <button class="bg-gray-800 text-white px-6 py-2 rounded hover:bg-gray-700 font-medium transition duration-300">
-                                    Apply Now
-                                </button>
+
                             </div>
                         @endforeach
                     </div>
@@ -104,7 +101,7 @@
                         </p>
                     </div>
                     <div class="rounded-lg overflow-hidden shadow-xl" data-aos="fade-left" data-aos-duration="1000">
-                        <img src="https://placehold.co/600x400" alt="Team Working" class="w-full h-full object-cover">
+                        <img src="{{ Vite::asset('resources/images/tim.jpg') }}" alt="Team Working" class="w-full h-full object-cover">
                     </div>
                 </div>
             </div>

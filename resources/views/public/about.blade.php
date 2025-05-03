@@ -4,16 +4,16 @@
 
 @section('content')
     <!-- Full-screen Parallax Background -->
-    <div class="fixed inset-0 bg-cover bg-center z-0" style="background-image: url('https://placehold.co/1920x1080');">
+    <div class="fixed inset-0 bg-cover bg-center z-0" style="background-image: url('{{ Vite::asset('resources/images/copicop.jpg') }}');">
         <!-- Semi-transparent overlay for better text readability -->
         <div class="absolute inset-0 bg-black opacity-40"></div>
     </div>
-    
+
     <!-- Main Content - With proper spacing for the fixed header -->
     <div class="relative z-10 pt-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <h1 class="text-4xl font-bold mb-8 text-center text-white">About Our Cafe</h1>
-            
+
             <!-- Our Story Section -->
             <div class="bg-white bg-opacity-80 backdrop-blur-md p-8 rounded-lg shadow-lg mb-16" data-aos="fade-up" data-aos-duration="1000">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
@@ -28,16 +28,16 @@
                         </p>
                     </div>
                     <div>
-                        <img src="https://placehold.co/600x400" alt="Our Cafe Story" class="rounded-lg shadow-lg w-full">
+                        <img src="{{ Vite::asset(asset: 'resources/images/copicop.jpg') }}" alt="Our Cafe Story" class="rounded-lg shadow-lg w-full">
                     </div>
                 </div>
             </div>
-            
+
             <!-- Our Mission Section -->
             <div class="bg-black bg-opacity-70 backdrop-blur-md p-8 rounded-lg shadow-lg mb-16 text-white" data-aos="fade-up" data-aos-duration="1000">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                     <div class="order-2 md:order-1">
-                        <img src="https://placehold.co/600x400" alt="Our Mission" class="rounded-lg shadow-lg w-full">
+                        <img src="{{ Vite::asset(asset: 'resources/images/owner.jpg') }}" alt="Our Mission" class="rounded-lg shadow-lg w-full">
                     </div>
                     <div class="order-1 md:order-2">
                         <h2 class="text-2xl font-bold mb-4">Our Mission</h2>
@@ -51,7 +51,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Our Values Section -->
             <div class="bg-white bg-opacity-80 backdrop-blur-md p-8 rounded-lg shadow-lg" data-aos="fade-up" data-aos-duration="1000">
                 <h2 class="text-2xl font-bold mb-6 text-center">Our Values</h2>
@@ -68,7 +68,7 @@
                             We never compromise on the quality of our products, from bean to cup and from kitchen to table.
                         </p>
                     </div>
-                    
+
                     <div class="text-center p-6 bg-white bg-opacity-90 rounded-lg shadow-md">
                         <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-md bg-gray-800">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -80,7 +80,7 @@
                             We strive to create spaces where people feel welcome and connections flourish.
                         </p>
                     </div>
-                    
+
                     <div class="text-center p-6 bg-white bg-opacity-90 rounded-lg shadow-md">
                         <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-md bg-gray-800">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -96,7 +96,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- AOS Library Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />

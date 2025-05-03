@@ -23,7 +23,7 @@
                     <img src="{{ Vite::asset(asset: 'resources/images/Karvin.png') }}" alt="Karvin Logo"
                         class="h-10 w-auto">
                     <span
-                        class="italic font-black text-white ml-2 absolute right-[-60px] whitespace-nowrap">Karvin</span>
+                        class="italic font-black text-white text-xl ml-2 absolute right-[-60px] whitespace-nowrap">Karvin</span>
                 </div>
 
                 <div id="desktopMenu" class="hidden md:flex flex-grow justify-center space-x-6">
@@ -83,7 +83,7 @@
 
     <footer class="w-full mt-auto">
         <div class="bg-[#1A1A19] backdrop-blur p-8">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 gap-8">
                     <div>
                         <h3 class="text-lg sm:text-xl font-bold mb-4 text-white">Contact Us</h3>
@@ -110,7 +110,7 @@
                 </div>
 
                 <div class="mt-6 border-t border-[#ffff] pt-6 text-center">
-                    <p class="text-white text-sm">&copy; {{ date('Y') }} Cafe. All rights reserved.</p>
+                    <p class="text-white text-sm">&copy; {{ date('Y') }} Karvin. All rights reserved.</p>
                 </div>
             </div>
         </div>

@@ -3,49 +3,48 @@
 @section('title', 'Contact Us')
 
 @section('content')
-    <!-- Full-screen Video Background -->
-    <div class="fixed inset-0 z-0 overflow-hidden">
+<!-- Hero Section with Video Background -->
+<div class="relative h-screen -mt-[70px] md:-mt-[80px]">
+    <!-- Video Background - Positioned with lower z-index so header appears above it -->
+    <div class="absolute inset-0 w-full h-full z-10 overflow-hidden">
         @php
-            $backgroundVideo = \App\Models\BackgroundVideo::getActive();
+        $backgroundVideo = \App\Models\BackgroundVideo::getActive();
         @endphp
-        
-        @if($backgroundVideo)
-            <video autoplay muted loop class="absolute min-w-full min-h-full object-cover">
-                <source src="{{ Storage::url($backgroundVideo->path) }}" type="{{ $backgroundVideo->mime_type }}">
-                Your browser does not support the video tag.
-            </video>
+
+        @if ($backgroundVideo)
+        <video autoplay muted loop playsinline class="w-full h-full object-cover">
+            <source src="{{ Storage::url($backgroundVideo->path) }}" type="{{ $backgroundVideo->mime_type }}">
+            Your browser does not support the video tag.
+        </video>
         @else
-            <!-- Fallback to image if no video is active -->
-            <div class="bg-cover bg-center absolute inset-0" style="background-image: url('{{ Vite::asset('resources/images/copicop.jpg') }}');"></div>
+        <!-- Fallback to image -->
+        <div class="absolute inset-0 bg-cover bg-center"
+            style="background-image: url('{{ Vite::asset('resources/images/copicop.jpg') }}');"></div>
         @endif
-        
-        <!-- Semi-transparent overlay for better text readability -->
-        <div class="absolute inset-0 bg-black opacity-40"></div>
     </div>
 
-    <!-- Hero Section with transparent overlay -->
-    <div class="relative h-screen flex items-center z-10 pt-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="max-w-lg" data-aos="fade-right" data-aos-duration="1000">
-                <h1 class="text-5xl font-bold text-white drop-shadow-lg mb-6">
-                    Contact Us
-                </h1>
-                <p class="text-xl text-white drop-shadow-lg mb-8 max-w-md">
-                    We'd love to hear from you. Whether you have a question about our services,
-                    want to make a reservation, or just want to say hello, we're here to help.
-                </p>
-            </div>
+    <!-- Hero Content (Centered) - With higher z-index than video but lower than header -->
+    <div class="absolute inset-0 z-20 flex items-center justify-left text-white text-left px-4 md:px-72 pt-16">
+        <div class="max-w-xl" data-aos="fade-up" data-aos-duration="1000">
+            <h1 class="text-5xl font-bold drop-shadow-lg leading-tight" style="font-family: 'Helvetica', sans-serif; font-weight: 700;">Contact Us</h1>
+            <p class="text-m drop-shadow-lg mt-4" style="font-family: 'Helvetica', sans-serif;">
+                We'd love to hear from you. Whether you have a question about our services,
+                want to make a reservation, or just want to say hello, we're here to help.
+            </p>
         </div>
     </div>
+</div>
 
-    <!-- Contact Information Section - Semi-transparent Layer -->
-    <div class="relative z-10">
-        <div class="bg-white bg-opacity-80 backdrop-blur-md py-20">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div data-aos="fade-up" data-aos-duration="800">
-                    <h2 class="text-3xl font-bold mb-6">Contact Information</h2>
+<!-- Scrollable Content -->
+<div class="relative z-30 bg-white">
+    <!-- Contact Information Section -->
+    <div class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div data-aos="fade-right" data-aos-duration="1000">
+                    <h2 class="text-3xl font-bold text-black mb-6">Contact Information</h2>
                     <div class="w-20 h-1 bg-gray-800 mb-6"></div>
-
+                    
                     <div class="space-y-4 mb-8">
                         <div class="flex items-start">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600 mt-1 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -79,16 +78,24 @@
                         </div>
                     </div>
                 </div>
+                <div class="rounded-lg overflow-hidden shadow-xl" data-aos="fade-left" data-aos-duration="1000">
+                    <img src="{{ Vite::asset('resources/images/copicop.jpg') }}" alt="Contact Us" class="w-full h-full object-cover">
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Hours and Social Media Section - Semi-transparent Layer -->
-    <div class="relative z-10">
-        <div class="bg-black bg-opacity-70 backdrop-blur-md py-20">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-                    <div class="bg-white bg-opacity-90 shadow-lg rounded-lg p-8" data-aos="fade-right" data-aos-duration="800">
+    <!-- Business Hours and Social Media Section -->
+    <div class="py-20 bg-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12" data-aos="fade-up" data-aos-duration="800">
+                <h2 class="text-3xl font-bold text-black">Connect With Us</h2>
+                <div class="w-20 h-1 bg-gray-800 mx-auto mt-4 mb-2"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div class="bg-white shadow-lg rounded-lg overflow-hidden" data-aos="fade-right" data-aos-duration="800">
+                    <div class="p-8">
                         <h3 class="text-xl font-bold mb-6">Business Hours</h3>
                         <div class="w-16 h-1 bg-gray-800 mb-6"></div>
                         <ul class="space-y-4 text-gray-700">
@@ -106,8 +113,10 @@
                             </li>
                         </ul>
                     </div>
+                </div>
 
-                    <div class="bg-white bg-opacity-90 shadow-lg rounded-lg p-8" data-aos="fade-left" data-aos-duration="800">
+                <div class="bg-white shadow-lg rounded-lg overflow-hidden" data-aos="fade-left" data-aos-duration="800">
+                    <div class="p-8">
                         <h3 class="text-xl font-bold mb-6">Follow Us</h3>
                         <div class="w-16 h-1 bg-gray-800 mb-6"></div>
                         <p class="text-gray-700 mb-4">
@@ -136,34 +145,33 @@
         </div>
     </div>
 
-    <!-- Map Location Section - Semi-transparent Layer -->
-    <div class="relative z-10">
-        <div class="bg-white bg-opacity-80 backdrop-blur-md py-20">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-8" data-aos="fade-up" data-aos-duration="800">
-                    <h2 class="text-3xl font-bold">Find Us</h2>
-                    <div class="w-20 h-1 bg-gray-800 mx-auto mt-4 mb-2"></div>
-                    <p class="text-gray-600 max-w-3xl mx-auto">
-                        Visit us at one of our convenient locations. We're easy to find!
-                    </p>
-                </div>
-                <div class="rounded-lg overflow-hidden shadow-xl" data-aos="zoom-in" data-aos-duration="800">
-                    <img src="{{ Vite::asset(asset: 'resources/images/grup.jpg') }}" alt="Map Location" class="w-full h-full object-cover">
-                </div>
+    <!-- Map Location Section -->
+    <div class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12" data-aos="fade-up" data-aos-duration="800">
+                <h2 class="text-3xl font-bold text-black">Find Us</h2>
+                <div class="w-20 h-1 bg-gray-800 mx-auto mt-4 mb-2"></div>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    Visit us at one of our convenient locations. We're easy to find!
+                </p>
+            </div>
+            <div class="rounded-lg overflow-hidden shadow-xl" data-aos="zoom-in" data-aos-duration="800">
+                <img src="{{ Vite::asset('resources/images/grup.jpg') }}" alt="Map Location" class="w-full h-full object-cover">
             </div>
         </div>
     </div>
+</div>
 
-    <!-- AOS Library Scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            AOS.init({
-                once: true,
-                offset: 120,
-                duration: 800
-            });
+<!-- AOS Library Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        AOS.init({
+            once: true,
+            offset: 120,
+            duration: 800
         });
-    </script>
+    });
+</script>
 @endsection

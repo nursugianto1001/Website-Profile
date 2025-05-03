@@ -12,26 +12,12 @@ use App\Http\Controllers\PublicController;
 
 Route::get('/', [PublicController::class, 'home'])->name('home');
 Route::get('/about', [PublicController::class, 'about'])->name('about');
-Route::get('/menu', [PublicController::class, 'menu'])->name('menu');
-Route::get('/outlets', [PublicController::class, 'outlets'])->name('outlets');
-Route::get('/facilities', [PublicController::class, 'facilities'])->name('facilities');
-Route::get('/careers', [PublicController::class, 'careers'])->name('careers');
 Route::get('/contact', [PublicController::class, 'contact'])->name('contact');
 
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
     })->name('dashboard');
-    
-    Route::resource('categories', CategoryController::class);
-    
-    Route::resource('menus', MenuController::class);
-    
-    Route::resource('outlets', OutletController::class);
-    
-    Route::resource('facilities', FacilityController::class);
-
-    Route::resource('careers', CareerController::class);
 });
 
 Route::middleware('auth')->group(function () {

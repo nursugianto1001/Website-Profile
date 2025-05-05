@@ -25,8 +25,8 @@ class DatabaseSeeder extends Seeder
 
         $fields = [
             [
-                'name' => 'Lapangan Futsal A',
-                'description' => 'Lapangan futsal berukuran standar dengan rumput sintetis berkualitas tinggi',
+                'name' => 'Lapangan Badmin 1',
+                'description' => 'Lapangan Badmin berukuran standar dengan karet berkualitas tinggi',
                 'price_per_hour' => 150000,
                 'image_url' => '/storage/fields/futsal-a.jpg',
                 'is_active' => true,
@@ -34,8 +34,8 @@ class DatabaseSeeder extends Seeder
                 'closing_hour' => 22,
             ],
             [
-                'name' => 'Lapangan Futsal B',
-                'description' => 'Lapangan futsal indoor dengan lantai vinyl dan sistem pendingin udara',
+                'name' => 'Lapangan Badminton 2',
+                'description' => 'Lapangan Badmin berukuran standar dengan karet berkualitas tinggi',
                 'price_per_hour' => 200000,
                 'image_url' => '/storage/fields/futsal-b.jpg',
                 'is_active' => true,
@@ -43,8 +43,8 @@ class DatabaseSeeder extends Seeder
                 'closing_hour' => 23,
             ],
             [
-                'name' => 'Lapangan Futsal C',
-                'description' => 'Lapangan futsal outdoor dengan rumput sintetis dan lampu sorot',
+                'name' => 'Lapangan Badminton 3',
+                'description' => 'Lapangan Badmin berukuran standar dengan karet berkualitas tinggi',
                 'price_per_hour' => 120000,
                 'image_url' => '/storage/fields/futsal-c.jpg',
                 'is_active' => true,
@@ -52,8 +52,8 @@ class DatabaseSeeder extends Seeder
                 'closing_hour' => 21,
             ],
             [
-                'name' => 'Lapangan Basket A',
-                'description' => 'Lapangan basket indoor dengan lantai kayu dan tribun penonton',
+                'name' => 'Lapangan Badminton 4',
+                'description' => 'Lapangan Badmin berukuran standar dengan karet berkualitas tinggi',
                 'price_per_hour' => 250000,
                 'image_url' => '/storage/fields/basket-a.jpg',
                 'is_active' => true,
@@ -61,7 +61,7 @@ class DatabaseSeeder extends Seeder
                 'closing_hour' => 22,
             ],
             [
-                'name' => 'Lapangan Badminton',
+                'name' => 'Lapangan Badminton 5',
                 'description' => 'Lapangan badminton dengan lantai vinyl profesional dan pencahayaan standar turnamen',
                 'price_per_hour' => 100000,
                 'image_url' => '/storage/fields/badminton.jpg',
@@ -70,8 +70,8 @@ class DatabaseSeeder extends Seeder
                 'closing_hour' => 21,
             ],
             [
-                'name' => 'Lapangan Tennis',
-                'description' => 'Lapangan tennis outdoor dengan permukaan hard court dan lampu sorot',
+                'name' => 'Lapangan Badminton 6',
+                'description' => 'Lapangan Badmin berukuran standar dengan karet berkualitas tinggi',
                 'price_per_hour' => 180000,
                 'image_url' => '/storage/fields/tennis.jpg',
                 'is_active' => false,

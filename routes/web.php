@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\FacilityController;
+use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\Admin\BackgroundVideoController;
 
@@ -17,11 +18,15 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     })->name('dashboard');
 
     Route::resource('facilities', FacilityController::class);
+    
+    // Gallery routes
+    Route::resource('gallery', GalleryController::class);
+    Route::post('gallery/{gallery}/toggle-featured', [GalleryController::class, 'toggleFeatured'])
+        ->name('gallery.toggle-featured');
 
     Route::resource('background-videos', BackgroundVideoController::class);
     Route::post('background-videos/{backgroundVideo}/set-active', [BackgroundVideoController::class, 'setActive'])
         ->name('background-videos.set-active');
-
 });
 
 Route::middleware('auth')->group(function () {

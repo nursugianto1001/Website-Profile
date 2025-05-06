@@ -21,7 +21,9 @@ Route::get('/fields', [BookingPageController::class, 'fields'])->name('booking.f
 Route::get('/fields/{field}', [BookingPageController::class, 'fieldDetail'])->name('booking.field-detail');
 Route::get('/fields/{field}/book', [BookingPageController::class, 'bookingForm'])->name('booking.form');
 Route::post('/booking/process', [BookingPageController::class, 'processBooking'])->name('booking.process');
+Route::post('/booking/process-multiple', [BookingPageController::class, 'processMultipleBooking'])->name('booking.process-multiple');
 Route::get('/booking/{booking}/success', [BookingPageController::class, 'bookingSuccess'])->name('booking.success');
+Route::get('/booking/{booking}/payment', [BookingPageController::class, 'payment'])->name('booking.payment');
 Route::get('/payment/finish', [BookingPageController::class, 'finishPayment'])->name('payment.finish');
 Route::get('/payment/unfinish', [BookingPageController::class, 'unfinishPayment'])->name('payment.unfinish');
 Route::get('/payment/error', [BookingPageController::class, 'errorPayment'])->name('payment.error');

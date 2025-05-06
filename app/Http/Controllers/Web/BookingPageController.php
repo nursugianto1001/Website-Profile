@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class BookingPageController extends Controller
 {
@@ -54,12 +55,11 @@ class BookingPageController extends Controller
     }
 
     /**
-     * Display booking form for a field
+     * Display booking form with multi-field selection capability
      *
-     * @param Field $field
      * @return \Illuminate\View\View
      */
-    public function bookingForm(Field $field)
+    public function bookingForm()
     {
         $today = Carbon::today();
         $weeklyDates = [];
@@ -75,14 +75,85 @@ class BookingPageController extends Controller
             ];
         }
 
-        // Get slots for today
-        $slots = $this->bookingService->getAvailableSlots($field->id, $today->format('Y-m-d'));
+        // Get slots based on opening and closing hours
+        $openingHour = 8; // Default 8 AM
+        $closingHour = 22; // Default 10 PM
 
-        return view('pages.booking-form', compact('field', 'weeklyDates', 'slots'));
+        $slots = [];
+        for ($hour = $openingHour; $hour < $closingHour; $hour++) {
+            $slotTime = sprintf('%02d:00:00', $hour);
+            $slots[] = [
+                'time' => $slotTime,
+                'formatted_time' => Carbon::parse($slotTime)->format('g:i A')
+            ];
+        }
+
+        // Get availability for all fields
+        $fieldAvailability = [];
+        $fields = Field::where('is_active', true)->take(6)->get();
+
+        foreach ($fields as $field) {
+            $fieldId = $field->id;
+            $fieldAvailability[$fieldId] = [];
+
+            $bookedSlots = DB::table('booking_slots')
+                ->join('bookings', 'booking_slots.booking_id', '=', 'bookings.id')
+                ->where('bookings.field_id', $fieldId)
+                ->where('bookings.booking_date', $today->format('Y-m-d'))
+                ->whereNotIn('bookings.payment_status', ['expired', 'cancel'])
+                ->pluck('booking_slots.slot_time')
+                ->toArray();
+
+            foreach ($slots as $slot) {
+                $fieldAvailability[$fieldId][$slot['time']] = !in_array($slot['time'], $bookedSlots);
+            }
+        }
+
+        return view('pages.booking-form', compact('weeklyDates', 'slots', 'fieldAvailability'));
     }
 
     /**
-     * Process booking submission
+     * Get available slots for a specific date and all fields
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAvailableSlots(Request $request)
+    {
+        $date = $request->input('date', Carbon::today()->format('Y-m-d'));
+        $fields = Field::where('is_active', true)->take(6)->get();
+
+        $fieldAvailability = [];
+
+        foreach ($fields as $field) {
+            $fieldId = $field->id;
+            $fieldAvailability[$fieldId] = [];
+
+            $bookedSlots = DB::table('booking_slots')
+                ->join('bookings', 'booking_slots.booking_id', '=', 'bookings.id')
+                ->where('bookings.field_id', $fieldId)
+                ->where('bookings.booking_date', $date)
+                ->whereNotIn('bookings.payment_status', ['expired', 'cancel'])
+                ->pluck('booking_slots.slot_time')
+                ->toArray();
+
+            $openingHour = $field->opening_hour ?? 8;
+            $closingHour = $field->closing_hour ?? 22;
+
+            for ($hour = $openingHour; $hour < $closingHour; $hour++) {
+                $slotTime = sprintf('%02d:00:00', $hour);
+                $fieldAvailability[$fieldId][$slotTime] = !in_array($slotTime, $bookedSlots);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'fieldAvailability' => $fieldAvailability
+        ]);
+    }
+
+    /**
+     * Process booking submission for multiple fields
      *
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
@@ -90,11 +161,11 @@ class BookingPageController extends Controller
     public function processBooking(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'field_id' => 'required|exists:fields,id',
             'customer_name' => 'required|string|max:255',
             'customer_email' => 'required|email|max:255',
             'customer_phone' => 'required|string|max:20',
             'booking_date' => 'required|date|date_format:Y-m-d',
+            'selected_fields' => 'required|array|min:1',
             'selected_slots' => 'required|array|min:1',
             'payment_method' => 'required|in:online,cash',
         ]);
@@ -103,55 +174,99 @@ class BookingPageController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        // Process selected slots
+        $bookingDate = $request->booking_date;
+        $selectedFields = $request->selected_fields;
         $selectedSlots = $request->selected_slots;
-        sort($selectedSlots);
 
-        if (empty($selectedSlots)) {
-            return redirect()->back()->with('error', 'Please select at least one time slot.')->withInput();
-        }
+        $bookings = [];
+        $totalPrice = 0;
 
-        // Calculate start and end times
-        $startTime = $selectedSlots[0];
-        $endTime = Carbon::parse($selectedSlots[count($selectedSlots) - 1])->addHour()->format('H:i:s');
+        DB::beginTransaction();
+        try {
+            // Create a booking for each field
+            foreach ($selectedFields as $fieldId) {
+                if (!isset($selectedSlots[$fieldId]) || empty($selectedSlots[$fieldId])) {
+                    continue;
+                }
 
-        // Check availability
-        $isAvailable = $this->bookingService->areSlotsAvailable(
-            $request->field_id,
-            $request->booking_date,
-            $startTime,
-            $endTime
-        );
+                // Sort time slots
+                $timeSlots = $selectedSlots[$fieldId];
+                sort($timeSlots);
 
-        if (!$isAvailable) {
-            return redirect()->back()->with('error', 'Selected slots are no longer available. Please choose different time slots.')->withInput();
-        }
+                if (empty($timeSlots)) {
+                    continue;
+                }
 
-        // Create booking
-        $bookingData = $request->all();
-        $bookingData['start_time'] = $startTime;
-        $bookingData['end_time'] = $endTime;
+                // Calculate start and end times
+                $startTime = $timeSlots[0];
+                $endTime = Carbon::parse($timeSlots[count($timeSlots) - 1])->addHour()->format('H:i:s');
 
-        $booking = $this->bookingService->createBooking($bookingData);
+                // Check availability
+                $isAvailable = $this->bookingService->areSlotsAvailable(
+                    $fieldId,
+                    $bookingDate,
+                    $startTime,
+                    $endTime
+                );
 
-        if (!$booking) {
-            return redirect()->back()->with('error', 'Failed to create booking. Please try again.')->withInput();
-        }
+                if (!$isAvailable) {
+                    DB::rollBack();
+                    return redirect()->back()->with('error', "Field {$fieldId} is no longer available for the selected time slots. Please choose different time slots.")->withInput();
+                }
 
-        // Handle different payment methods
-        if ($request->payment_method === 'online' && $booking->snap_token) {
-            // Store booking ID in session for after payment
-            Session::put('booking_id', $booking->id);
+                // Create booking
+                $bookingData = [
+                    'field_id' => $fieldId,
+                    'customer_name' => $request->customer_name,
+                    'customer_email' => $request->customer_email,
+                    'customer_phone' => $request->customer_phone,
+                    'booking_date' => $bookingDate,
+                    'start_time' => $startTime,
+                    'end_time' => $endTime,
+                    'payment_method' => $request->payment_method
+                ];
 
-            // Redirect to payment page
-            return view('pages.payment', [
-                'booking' => $booking,
-                'snapToken' => $booking->snap_token,
-                'clientKey' => config('midtrans.client_key')
-            ]);
-        } else {
-            // For cash payment, redirect to success page
-            return redirect()->route('booking.success', $booking);
+                $booking = $this->bookingService->createBooking($bookingData);
+
+                if (!$booking) {
+                    DB::rollBack();
+                    return redirect()->back()->with('error', "Failed to create booking for Field {$fieldId}. Please try again.")->withInput();
+                }
+
+                $bookings[] = $booking;
+                $totalPrice += $booking->total_price;
+            }
+
+            DB::commit();
+
+            // Handle payment for all bookings collectively
+            if ($request->payment_method === 'online') {
+                // For online payment, we'll need to create a combined payment
+                // In a real app, you'd want to create a transaction that references all bookings
+                $mainBooking = $bookings[0]; // Use the first booking for payment
+
+                // Store all booking IDs in session
+                Session::put('booking_ids', array_map(function ($booking) {
+                    return $booking->id;
+                }, $bookings));
+
+                // Redirect to payment page
+                return view('pages.payment', [
+                    'booking' => $mainBooking,
+                    'totalBookings' => count($bookings),
+                    'totalPrice' => $totalPrice,
+                    'snapToken' => $mainBooking->snap_token,
+                    'clientKey' => config('midtrans.client_key')
+                ]);
+            } else {
+                // For cash payment, redirect to success page with the first booking
+                return redirect()->route('booking.success', $bookings[0])
+                    ->with('multipleBookings', true)
+                    ->with('totalBookings', count($bookings));
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -164,7 +279,11 @@ class BookingPageController extends Controller
     public function bookingSuccess(Booking $booking)
     {
         $booking->load(['field', 'slots']);
-        return view('pages.booking-success', compact('booking'));
+
+        $multipleBookings = Session::get('multipleBookings', false);
+        $totalBookings = Session::get('totalBookings', 1);
+
+        return view('pages.booking-success', compact('booking', 'multipleBookings', 'totalBookings'));
     }
 
     /**
@@ -175,18 +294,20 @@ class BookingPageController extends Controller
      */
     public function finishPayment(Request $request)
     {
-        $bookingId = Session::get('booking_id');
+        $bookingIds = Session::get('booking_ids', []);
 
-        if (!$bookingId) {
+        if (empty($bookingIds)) {
             return redirect()->route('home')->with('error', 'Booking not found.');
         }
 
-        $booking = Booking::findOrFail($bookingId);
+        $booking = Booking::findOrFail($bookingIds[0]);
 
         // Clear session
-        Session::forget('booking_id');
+        Session::forget('booking_ids');
 
-        return redirect()->route('booking.success', $booking);
+        return redirect()->route('booking.success', $booking)
+            ->with('multipleBookings', count($bookingIds) > 1)
+            ->with('totalBookings', count($bookingIds));
     }
 
     /**
@@ -197,18 +318,20 @@ class BookingPageController extends Controller
      */
     public function unfinishPayment(Request $request)
     {
-        $bookingId = Session::get('booking_id');
+        $bookingIds = Session::get('booking_ids', []);
 
-        if (!$bookingId) {
+        if (empty($bookingIds)) {
             return redirect()->route('home')->with('error', 'Booking not found.');
         }
 
-        $booking = Booking::findOrFail($bookingId);
+        $booking = Booking::findOrFail($bookingIds[0]);
 
         // Clear session
-        Session::forget('booking_id');
+        Session::forget('booking_ids');
 
         return redirect()->route('booking.success', $booking)
+            ->with('multipleBookings', count($bookingIds) > 1)
+            ->with('totalBookings', count($bookingIds))
             ->with('warning', 'Your payment is still in process. You will receive a confirmation once the payment is completed.');
     }
 
@@ -220,22 +343,25 @@ class BookingPageController extends Controller
      */
     public function errorPayment(Request $request)
     {
-        $bookingId = Session::get('booking_id');
+        $bookingIds = Session::get('booking_ids', []);
 
-        if (!$bookingId) {
+        if (empty($bookingIds)) {
             return redirect()->route('home')->with('error', 'Booking not found.');
         }
 
-        $booking = Booking::findOrFail($bookingId);
-
-        // Update booking status to failed
-        $booking->status = 'failed';
-        $booking->save();
+        // Update all bookings to failed status
+        foreach ($bookingIds as $id) {
+            $booking = Booking::find($id);
+            if ($booking) {
+                $booking->status = 'failed';
+                $booking->save();
+            }
+        }
 
         // Clear session
-        Session::forget('booking_id');
+        Session::forget('booking_ids');
 
-        return redirect()->route('booking.form', $booking->field)
+        return redirect()->route('booking.form')
             ->with('error', 'Payment failed. Please try booking again.');
     }
 }

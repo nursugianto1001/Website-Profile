@@ -13,6 +13,7 @@ class BookingSlot extends Model
         'booking_id',
         'field_id',
         'booking_date',
+        'slot_time', // Tambahkan field ini
         'start_time',
         'end_time',
         'status',

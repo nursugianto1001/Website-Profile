@@ -119,13 +119,26 @@ class BookingService
                 DB::beginTransaction();
             }
 
+            // Standardize date formats for correct calculation
+            $bookingDate = Carbon::parse($data['booking_date'])->format('Y-m-d');
             $startTime = Carbon::parse($data['start_time']);
             $endTime = Carbon::parse($data['end_time']);
-            $hours = $endTime->diffInHours($startTime);
+
+            // Ensure both times are on the same date for correct duration calculation
+            if ($startTime->format('Y-m-d') !== $endTime->format('Y-m-d')) {
+                $endTime->setDate(
+                    $startTime->year,
+                    $startTime->month,
+                    $startTime->day
+                );
+            }
+
+            // Calculate hours (ensure positive value)
+            $hours = abs($endTime->diffInHours($startTime));
 
             // Get field details
             $field = Field::findOrFail($data['field_id']);
-            $totalPrice = $field->price_per_hour * $hours;
+            $totalPrice = abs($field->price_per_hour * $hours);
 
             // Create booking
             $booking = Booking::create([
@@ -133,11 +146,11 @@ class BookingService
                 'customer_name' => $data['customer_name'],
                 'customer_email' => $data['customer_email'],
                 'customer_phone' => $data['customer_phone'],
-                'booking_date' => $data['booking_date'],
-                'start_time' => $data['start_time'],
-                'end_time' => $data['end_time'],
-                'duration_hours' => $hours, // Tambahkan field ini
-                'total_price' => $totalPrice,
+                'booking_date' => $bookingDate,
+                'start_time' => $startTime,
+                'end_time' => $endTime,
+                'duration_hours' => $hours, // Ensure positive value
+                'total_price' => $totalPrice, // Ensure positive value
                 'payment_method' => $data['payment_method'],
                 'payment_status' => 'pending',
                 'status' => 'booked',
@@ -149,17 +162,58 @@ class BookingService
                 BookingSlot::create([
                     'booking_id' => $booking->id,
                     'field_id' => $data['field_id'],
-                    'booking_date' => $data['booking_date'],
-                    'slot_time' => $currentSlot->format('H:i:s'), // Pastikan field ini ada
-                    'start_time' => $currentSlot->format('Y-m-d H:i:s'), // Tambahkan ini
-                    'end_time' => $currentSlot->copy()->addHour()->format('Y-m-d H:i:s'), // Tambahkan ini
+                    'booking_date' => $bookingDate,
+                    'slot_time' => $currentSlot->format('H:i:s'),
+                    'start_time' => $currentSlot->format('Y-m-d H:i:s'),
+                    'end_time' => $currentSlot->copy()->addHour()->format('Y-m-d H:i:s'),
                     'status' => 'booked'
                 ]);
                 $currentSlot->addHour();
             }
 
             // Handle payment method
-            // ... kode lainnya tetap sama ...
+            if ($data['payment_method'] === 'online') {
+                // Generate Midtrans payment with proper formatting
+                $snapToken = $this->midtransService->createTransaction([
+                    'booking_id' => $booking->id,
+                    'customer_name' => $booking->customer_name,
+                    'customer_email' => $booking->customer_email,
+                    'customer_phone' => $booking->customer_phone,
+                    'total_price' => (int)$totalPrice, // Ensure integer value
+                    'items' => [
+                        [
+                            'id' => $field->id,
+                            'name' => $field->name ?: "Field #$field->id",
+                            'price' => (int)$field->price_per_hour, // Ensure integer value
+                            'quantity' => (int)$hours // Ensure positive integer
+                        ]
+                    ]
+                ]);
+
+                if ($snapToken) {
+                    $booking->update(['snap_token' => $snapToken]);
+
+                    // Create transaction record
+                    Transaction::create([
+                        'booking_id' => $booking->id,
+                        'order_id' => 'ORD-' . $booking->id . '-' . time(),
+                        'transaction_status' => 'pending',
+                        'gross_amount' => (int)$totalPrice, // Ensure integer value
+                        'transaction_time' => now(),
+                    ]);
+                }
+            } else if ($data['payment_method'] === 'cash') {
+                // Create cash transaction
+                Transaction::create([
+                    'booking_id' => $booking->id,
+                    'order_id' => 'CASH-' . $booking->id . '-' . time(),
+                    'payment_type' => 'cash',
+                    'transaction_status' => 'pending',
+                    'gross_amount' => (int)$totalPrice, // Ensure integer value
+                    'transaction_time' => now(),
+                    'is_manual' => true,
+                ]);
+            }
 
             // Commit transaction if we created one
             if (!$currentTransaction) {

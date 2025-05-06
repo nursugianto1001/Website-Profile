@@ -78,8 +78,8 @@ class BookingPageController extends Controller
         // Get slots based on opening and closing hours
         $openingHour = 8; // Default 8 AM
         $closingHour = 22; // Default 10 PM
-
         $slots = [];
+
         for ($hour = $openingHour; $hour < $closingHour; $hour++) {
             $slotTime = sprintf('%02d:00:00', $hour);
             $slots[] = [
@@ -109,8 +109,11 @@ class BookingPageController extends Controller
             }
         }
 
-        return view('pages.booking-form', compact('weeklyDates', 'slots', 'fieldAvailability'));
+        // Tambahkan 'fields' ke dalam compact
+        return view('pages.booking-form', compact('weeklyDates', 'slots', 'fieldAvailability', 'fields'));
     }
+
+
 
     /**
      * Get available slots for a specific date and all fields

@@ -7,12 +7,15 @@ use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\API\Admin\AdminBookingController;
 use App\Http\Controllers\API\Admin\AdminFieldController;
 use App\Http\Controllers\API\Admin\AdminTransactionController;
+use App\Http\Controllers\Web\BookingPageController;
 
 // Public API
 Route::get('/fields', [FieldController::class, 'index']);
 Route::get('/fields/{field}', [FieldController::class, 'show']);
 Route::get('/fields/{field}/available-slots', [FieldController::class, 'getAvailableSlots']);
 Route::get('/fields/{field}/weekly-slots', [FieldController::class, 'getWeeklySlots']);
+// Tambahkan route API untuk mendapatkan available slots tanpa parameter field
+Route::get('/fields/available-slots', [BookingPageController::class, 'getAvailableSlots']);
 
 Route::post('/bookings/check-availability', [BookingController::class, 'checkAvailability']);
 Route::post('/bookings', [BookingController::class, 'store']);

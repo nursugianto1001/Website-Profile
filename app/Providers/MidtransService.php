@@ -37,7 +37,7 @@ class MidtransService
      * Create Midtrans Snap transaction
      *
      * @param array $params
-     * @return string|null Snap token
+     * @return array|null Snap token dan order_id
      */
     public function createTransaction($params)
     {
@@ -50,7 +50,7 @@ class MidtransService
 
             $transaction_details = [
                 'order_id' => 'ORD-' . $params['booking_id'] . '-' . time(),
-                'gross_amount' => abs((int)$params['total_price']), // Ensure positive integer
+                'gross_amount' => abs((int)$params['total_price']),
             ];
 
             // Process item details to ensure valid values
@@ -59,8 +59,8 @@ class MidtransService
                 $item_details[] = [
                     'id' => $item['id'],
                     'name' => $item['name'],
-                    'price' => abs((int)$item['price']), // Ensure positive integer
-                    'quantity' => abs((int)$item['quantity']) // Ensure positive integer
+                    'price' => abs((int)$item['price']),
+                    'quantity' => abs((int)$item['quantity'])
                 ];
             }
 

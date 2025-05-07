@@ -22,13 +22,23 @@ Route::get('/fields/book', [BookingPageController::class, 'bookingForm'])->name(
 Route::get('/fields/{field}', [BookingPageController::class, 'fieldDetail'])->name('booking.field-detail');
 Route::post('/booking/process', [BookingPageController::class, 'processBooking'])->name('booking.process');
 Route::post('/booking/process-multiple', [BookingPageController::class, 'processMultipleBooking'])->name('booking.process-multiple');
-Route::get('/booking/{booking}/success', [BookingPageController::class, 'bookingSuccess'])->name('booking.success');
-Route::get('/booking/{booking}/payment', [BookingPageController::class, 'payment'])->name('booking.payment');
+
+// Rute yang diamankan dengan signed URL
+Route::get('/booking/{booking}/success', [BookingPageController::class, 'bookingSuccess'])
+    ->name('booking.success')
+    ->middleware('signed');
+
+Route::get('/booking/{booking}/payment', [BookingPageController::class, 'payment'])
+    ->name('booking.payment')
+    ->middleware('signed');
+
+// Rute payment yang memerlukan validasi session
 Route::get('/payment/finish', [BookingPageController::class, 'finishPayment'])->name('payment.finish');
 Route::get('/payment/unfinish', [BookingPageController::class, 'unfinishPayment'])->name('payment.unfinish');
 Route::get('/payment/error', [BookingPageController::class, 'errorPayment'])->name('payment.error');
-Route::post('/payment/notification', [BookingPageController::class, 'handlePaymentNotification']);
 
+// Webhook Midtrans - tidak perlu signed karena diakses oleh Midtrans
+Route::post('/payment/notification', [BookingPageController::class, 'handlePaymentNotification']);
 
 // Booking (hanya penampil)
 Route::get('/bookings/{fieldId}', [BookingController::class, 'index'])->name('bookings.index');

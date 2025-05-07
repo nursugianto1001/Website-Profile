@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\URL;
 
 class BookingPageController extends Controller
 {
@@ -112,8 +113,6 @@ class BookingPageController extends Controller
 
         return view('pages.booking-form', compact('weeklyDates', 'slots', 'fieldAvailability', 'fields'));
     }
-
-
 
     /**
      * Get available slots for a specific date and all fields
@@ -245,7 +244,6 @@ class BookingPageController extends Controller
             // Handle payment for all bookings collectively
             if ($request->payment_method === 'online') {
                 // For online payment, we'll need to create a combined payment
-                // In a real app, you'd want to create a transaction that references all bookings
                 $mainBooking = $bookings[0]; // Use the first booking for payment
 
                 // Store all booking IDs in session
@@ -253,17 +251,15 @@ class BookingPageController extends Controller
                     return $booking->id;
                 }, $bookings));
 
-                // Redirect to payment page
-                return view('pages.payment', [
-                    'booking' => $mainBooking,
-                    'totalBookings' => count($bookings),
-                    'totalPrice' => $totalPrice,
-                    'snapToken' => $mainBooking->snap_token,
-                    'clientKey' => config('midtrans.client_key')
-                ]);
+                // Generate signed URL for payment page
+                $paymentUrl = URL::signedRoute('booking.payment', ['booking' => $mainBooking->id]);
+
+                return redirect()->to($paymentUrl);
             } else {
-                // For cash payment, redirect to success page with the first booking
-                return redirect()->route('booking.success', $bookings[0])
+                // Generate signed URL for success page
+                $successUrl = URL::signedRoute('booking.success', ['booking' => $bookings[0]->id]);
+
+                return redirect()->to($successUrl)
                     ->with('multipleBookings', true)
                     ->with('totalBookings', count($bookings));
             }
@@ -274,13 +270,39 @@ class BookingPageController extends Controller
     }
 
     /**
-     * Display booking success page
+     * Display payment page
      *
+     * @param Request $request
      * @param Booking $booking
      * @return \Illuminate\View\View
      */
-    public function bookingSuccess(Booking $booking)
+    public function payment(Request $request, Booking $booking)
     {
+        // Signature validation is handled by the 'signed' middleware
+
+        $totalBookings = Session::get('totalBookings', 1);
+        $totalPrice = $booking->total_price;
+
+        return view('pages.payment', [
+            'booking' => $booking,
+            'totalBookings' => $totalBookings,
+            'totalPrice' => $totalPrice,
+            'snapToken' => $booking->snap_token,
+            'clientKey' => config('midtrans.client_key')
+        ]);
+    }
+
+    /**
+     * Display booking success page
+     *
+     * @param Request $request
+     * @param Booking $booking
+     * @return \Illuminate\View\View
+     */
+    public function bookingSuccess(Request $request, Booking $booking)
+    {
+        // Signature validation is handled by the 'signed' middleware
+
         $booking->load(['field', 'slots']);
 
         $multipleBookings = Session::get('multipleBookings', false);
@@ -326,12 +348,13 @@ class BookingPageController extends Controller
         // Clear session
         Session::forget('booking_ids');
 
-        return redirect()->route('booking.success', $booking)
+        // Generate signed URL for success page
+        $successUrl = URL::signedRoute('booking.success', ['booking' => $booking->id]);
+
+        return redirect()->to($successUrl)
             ->with('multipleBookings', count($bookingIds) > 1)
             ->with('totalBookings', count($bookingIds));
     }
-
-
 
     /**
      * Handle payment unfinish callback from Midtrans
@@ -352,7 +375,10 @@ class BookingPageController extends Controller
         // Clear session
         Session::forget('booking_ids');
 
-        return redirect()->route('booking.success', $booking)
+        // Generate signed URL for success page
+        $successUrl = URL::signedRoute('booking.success', ['booking' => $booking->id]);
+
+        return redirect()->to($successUrl)
             ->with('multipleBookings', count($bookingIds) > 1)
             ->with('totalBookings', count($bookingIds))
             ->with('warning', 'Your payment is still in process. You will receive a confirmation once the payment is completed.');

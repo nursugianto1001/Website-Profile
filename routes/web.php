@@ -7,7 +7,6 @@ use App\Http\Controllers\Admin\FacilityController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\BackgroundVideoController;
 use App\Http\Controllers\Web\BookingPageController;
-use App\Http\Controllers\API\BookingController;
 
 // Public Routes
 Route::get('/', [PublicController::class, 'home'])->name('home');
@@ -40,9 +39,6 @@ Route::get('/payment/error', [BookingPageController::class, 'errorPayment'])->na
 // Webhook Midtrans - tidak perlu signed karena diakses oleh Midtrans
 Route::post('/payment/notification', [BookingPageController::class, 'handlePaymentNotification']);
 
-// Booking (hanya penampil)
-Route::get('/bookings/{fieldId}', [BookingController::class, 'index'])->name('bookings.index');
-
 // Auth Routes
 require __DIR__ . '/auth.php';
 
@@ -61,10 +57,6 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::resource('gallery', GalleryController::class);
     Route::post('gallery/{gallery}/toggle-featured', [GalleryController::class, 'toggleFeatured'])
         ->name('gallery.toggle-featured');
-
-    Route::resource('background-videos', BackgroundVideoController::class);
-    Route::post('background-videos/{backgroundVideo}/set-active', [BackgroundVideoController::class, 'setActive'])
-        ->name('background-videos.set-active');
 });
 
 // Profile Routes

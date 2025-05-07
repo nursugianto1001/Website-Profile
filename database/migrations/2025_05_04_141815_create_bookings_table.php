@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('field_id')->constrained()->onDelete('cascade');
+            $table->string('booking_code')->nullable();
             $table->string('customer_name');
             $table->string('customer_email');
             $table->string('customer_phone');

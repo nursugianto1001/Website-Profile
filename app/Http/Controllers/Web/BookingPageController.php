@@ -298,6 +298,7 @@ class BookingPageController extends Controller
     public function finishPayment(Request $request)
     {
         $bookingIds = Session::get('booking_ids', []);
+        $orderId = $request->input('order_id'); // Get order_id from Midtrans callback
 
         if (empty($bookingIds)) {
             return redirect()->route('home')->with('error', 'Booking not found.');
@@ -305,11 +306,21 @@ class BookingPageController extends Controller
 
         $booking = Booking::with(['field', 'slots'])->findOrFail($bookingIds[0]);
 
-        // Update status pembayaran jika belum diupdate oleh notifikasi
+        if (empty($booking->booking_code) && !empty($orderId)) {
+            $booking->booking_code = $orderId;
+            Log::info('Setting booking code: ' . $orderId);
+        }
+
+        // Update payment status
         if ($booking->payment_status == 'pending') {
-            $booking->payment_status = 'settlement'; // Gunakan 'settlement' bukan 'paid'
-            $booking->status = 'confirmed'; // Pastikan kolom status sudah ada di database
-            $booking->save();
+            $booking->payment_status = 'settlement';
+            $booking->status = 'confirmed';
+            $saved = $booking->save();
+            Log::info('Booking saved: ' . ($saved ? 'Yes' : 'No'));
+
+            if (!$saved) {
+                Log::error('Failed to save booking: ' . $booking->id);
+            }
         }
 
         // Clear session
@@ -319,6 +330,7 @@ class BookingPageController extends Controller
             ->with('multipleBookings', count($bookingIds) > 1)
             ->with('totalBookings', count($bookingIds));
     }
+
 
 
     /**
@@ -387,13 +399,22 @@ class BookingPageController extends Controller
         $payload = $request->all();
         $orderId = $payload['order_id'] ?? null;
         $transactionStatus = $payload['transaction_status'] ?? null;
-        $fraudStatus = $payload['fraud_status'] ?? null;
 
-        // Log notifikasi
+        // Log notification
         Log::info('Midtrans Notification: ', $payload);
 
-        // Cari booking berdasarkan order_id
+        // Find booking by order_id
         $booking = Booking::where('booking_code', $orderId)->first();
+
+        if (!$booking) {
+            // If booking not found by booking_code, try to find by ID
+            $bookingId = explode('-', $orderId)[0] ?? null;
+            $booking = Booking::find($bookingId);
+
+            if ($booking && empty($booking->booking_code)) {
+                $booking->booking_code = $orderId;
+            }
+        }
 
         if (!$booking) {
             return response()->json(['message' => 'Booking not found'], 404);

@@ -87,7 +87,10 @@ class MidtransService
             $snapToken = \Midtrans\Snap::getSnapToken($transaction_data);
             Log::info('Midtrans Response: ' . $snapToken);
 
-            return $snapToken;
+            return [
+                'token' => $snapToken,
+                'order_id' => $transaction_details['order_id']
+            ];
         } catch (\Exception $e) {
             Log::error('Midtrans Error: ' . $e->getMessage() . ' - ' . $e->getTraceAsString());
             return null;

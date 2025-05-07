@@ -154,6 +154,7 @@ class BookingService
                 'payment_method' => $data['payment_method'],
                 'payment_status' => 'pending',
                 'status' => 'booked',
+                'booking_code' => null, // Initialize booking_code field
             ]);
 
             // Create booking slots (1 slot per hour)
@@ -172,41 +173,54 @@ class BookingService
             }
 
             // Handle payment method
+            // Handle payment method
             if ($data['payment_method'] === 'online') {
+                // Generate order ID
+                $orderId = 'ORD-' . $booking->id . '-' . time();
+
                 // Generate Midtrans payment with proper formatting
-                $snapToken = $this->midtransService->createTransaction([
+                $midtransResponse = $this->midtransService->createTransaction([
                     'booking_id' => $booking->id,
                     'customer_name' => $booking->customer_name,
                     'customer_email' => $booking->customer_email,
                     'customer_phone' => $booking->customer_phone,
-                    'total_price' => (int)$totalPrice, // Ensure integer value
+                    'total_price' => (int)$totalPrice,
                     'items' => [
                         [
                             'id' => $field->id,
                             'name' => $field->name ?: "Field #$field->id",
-                            'price' => (int)$field->price_per_hour, // Ensure integer value
-                            'quantity' => (int)$hours // Ensure positive integer
+                            'price' => (int)$field->price_per_hour,
+                            'quantity' => (int)$hours
                         ]
                     ]
                 ]);
 
-                if ($snapToken) {
-                    $booking->update(['snap_token' => $snapToken]);
+                if ($midtransResponse) {
+                    // Update booking with token and order ID
+                    $booking->update([
+                        'snap_token' => $midtransResponse['token'],
+                        'booking_code' => $midtransResponse['order_id']
+                    ]);
 
                     // Create transaction record
                     Transaction::create([
                         'booking_id' => $booking->id,
-                        'order_id' => 'ORD-' . $booking->id . '-' . time(),
+                        'order_id' => $midtransResponse['order_id'],
                         'transaction_status' => 'pending',
-                        'gross_amount' => (int)$totalPrice, // Ensure integer value
+                        'gross_amount' => (int)$totalPrice,
                         'transaction_time' => now(),
                     ]);
                 }
             } else if ($data['payment_method'] === 'cash') {
                 // Create cash transaction
+                $cashOrderId = 'CASH-' . $booking->id . '-' . time();
+
+                // Set booking code for cash payments too
+                $booking->update(['booking_code' => $cashOrderId]);
+
                 Transaction::create([
                     'booking_id' => $booking->id,
-                    'order_id' => 'CASH-' . $booking->id . '-' . time(),
+                    'order_id' => $cashOrderId,
                     'payment_type' => 'cash',
                     'transaction_status' => 'pending',
                     'gross_amount' => (int)$totalPrice, // Ensure integer value
@@ -219,6 +233,9 @@ class BookingService
             if (!$currentTransaction) {
                 DB::commit();
             }
+
+            // Refresh booking to get the updated data
+            $booking->refresh();
 
             return $booking;
         } catch (\Exception $e) {

@@ -113,7 +113,6 @@
                 </div>
 
                 <div class="mt-8 space-y-4">
-                    <p class="text-gray-700">A confirmation email has been sent to your email address.</p>
 
                     @if ($booking->payment_status == 'pending')
                     <div class="bg-blue-50 p-4 border border-blue-100 rounded-lg">

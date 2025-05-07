@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('field_id')->constrained()->onDelete('cascade');
+            $table->string('booking_code')->nullable();
             $table->string('customer_name');
             $table->string('customer_email');
             $table->string('customer_phone');
@@ -25,6 +26,7 @@ return new class extends Migration
             $table->enum('payment_method', ['online', 'cash'])->default('online');
             $table->enum('payment_status', ['pending', 'settlement', 'expired', 'cancel', 'refund'])->default('pending');
             $table->string('snap_token')->nullable();
+            $table->string('status')->nullable();
             $table->timestamps();
         });
     }

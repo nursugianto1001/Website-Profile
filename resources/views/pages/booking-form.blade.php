@@ -1,465 +1,626 @@
-@extends('layouts.booking-app')
+<!DOCTYPE html>
+<html lang="en">
 
-@section('content')
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-6 text-center">Book Your Fields</h1>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Your Field</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
 
-    <form id="bookingForm" action="{{ route('booking.process') }}" method="POST">
-        @csrf
-        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-            <!-- Date Selection -->
-            <div class="mb-6">
-                <label class="block text-gray-700 font-semibold mb-2">Select Date</label>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-6">Book Your Field</h1>
 
-                <div class="flex space-x-2 overflow-x-auto pb-2">
-                    @foreach($weeklyDates as $index => $dateInfo)
-                    <button type="button"
-                        class="date-selector p-2 border rounded-md min-w-[100px] text-center {{ $index === 0 ? 'bg-blue-500 text-white' : 'bg-gray-100' }}"
-                        data-date="{{ $dateInfo['date'] }}">
-                        <div class="font-medium">{{ $dateInfo['day'] }}</div>
-                        <div class="text-sm">{{ $dateInfo['formatted_date'] }}</div>
-                    </button>
-                    @endforeach
-                </div>
-                <input type="hidden" name="booking_date" id="booking_date" value="{{ $weeklyDates[0]['date'] }}">
-            </div>
+        <div id="error-container" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 hidden">
+            <span id="error-message"></span>
+        </div>
 
-            <!-- Field Selection Table -->
-            <div class="mb-6 overflow-x-auto">
-                <label class="block text-gray-700 font-semibold mb-2">Select Field(s) and Time Slot(s)</label>
-                <p class="text-sm text-gray-600 mb-4">You can select multiple fields for the same time slot(s).</p>
-
-                <table class="w-full border-collapse">
-                    <thead>
-                        <tr>
-                            <th class="border p-2 bg-gray-100">Time</th>
-                            @for($i = 1; $i <= 6; $i++)
-                                <th class="border p-2 bg-gray-100">Field {{ $i }}</th>
-                                @endfor
-                        </tr>
-                    </thead>
-                    <tbody id="slot-matrix">
-                        @foreach($slots as $slot)
-                        <tr class="slot-row">
-                            <td class="border p-2 font-medium">{{ $slot['formatted_time'] }}</td>
-                            @for($i = 1; $i <= 6; $i++)
-                                <td class="border p-2 text-center">
-                                <button type="button" class="field-selector w-full cursor-pointer p-2 rounded-md 
-                                        {{ isset($fieldAvailability[$i][$slot['time']]) && !$fieldAvailability[$i][$slot['time']] ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800 hover:bg-green-200' }}"
-                                    data-field-id="{{ $i }}"
-                                    data-time="{{ $slot['time'] }}"
-                                    data-formatted-time="{{ $slot['formatted_time'] }}"
-                                    data-available="{{ isset($fieldAvailability[$i][$slot['time']]) && !$fieldAvailability[$i][$slot['time']] ? 'false' : 'true' }}">
-                                    @if(isset($fieldAvailability[$i][$slot['time']]) && !$fieldAvailability[$i][$slot['time']])
-                                    <span>Booked</span>
-                                    @else
-                                    <span>Available</span>
-                                    @endif
-                                </button>
-                                </td>
-                                @endfor
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-                <div id="selected-slots-container" class="mt-4 hidden">
-                    <div class="font-semibold mb-2">Selected Fields and Time Slots:</div>
-                    <ul id="selected-slots-list" class="list-disc ml-5 text-sm"></ul>
-                </div>
-                <div id="no-selection" class="mt-4 text-red-600">Please select at least one field and time slot.</div>
-
-                <!-- Hidden inputs to store selected fields and slots -->
-                <div id="selected-fields-container"></div>
-            </div>
+        <form id="bookingForm" action="/booking/process" method="POST" class="space-y-6">
+            <!-- CSRF Token -->
+            @csrf
 
             <!-- Customer Information -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                    <label for="customer_name" class="block text-gray-700 font-semibold mb-2">Name</label>
-                    <input type="text" name="customer_name" id="customer_name" class="w-full px-4 py-2 border rounded-md" required value="{{ old('customer_name') }}">
-                    @error('customer_name')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label for="customer_email" class="block text-gray-700 font-semibold mb-2">Email</label>
-                    <input type="email" name="customer_email" id="customer_email" class="w-full px-4 py-2 border rounded-md" required value="{{ old('customer_email') }}">
-                    @error('customer_email')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label for="customer_phone" class="block text-gray-700 font-semibold mb-2">Phone</label>
-                    <input type="tel" name="customer_phone" id="customer_phone" class="w-full px-4 py-2 border rounded-md" required value="{{ old('customer_phone') }}">
-                    @error('customer_phone')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2">Payment Method</label>
-                    <div class="flex space-x-4">
-                        <label class="inline-flex items-center">
-                            <input type="radio" name="payment_method" value="online" class="form-radio" checked>
-                            <span class="ml-2">Online Payment</span>
-                        </label>
-                        <label class="inline-flex items-center">
-                            <input type="radio" name="payment_method" value="cash" class="form-radio">
-                            <span class="ml-2">Cash</span>
-                        </label>
+            <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-semibold mb-4">Customer Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="customer_name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                        <input type="text" name="customer_name" id="customer_name"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            required>
+                        <span class="text-red-500 text-sm customer_name-error"></span>
                     </div>
-                    @error('payment_method')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
+
+                    <div>
+                        <label for="customer_email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" name="customer_email" id="customer_email"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            required>
+                        <span class="text-red-500 text-sm customer_email-error"></span>
+                    </div>
+
+                    <div>
+                        <label for="customer_phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                        <input type="text" name="customer_phone" id="customer_phone"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            required>
+                        <span class="text-red-500 text-sm customer_phone-error"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Date Selection -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-semibold mb-4">Select Date</h2>
+                <div class="flex flex-wrap gap-2" id="date-selector-container">
+                    <!-- Date buttons will be populated by JavaScript -->
+                </div>
+                <input type="hidden" name="booking_date" id="booking_date" required>
+            </div>
+
+            <!-- Field and Time Selection -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-semibold mb-4">Select Fields & Time Slots</h2>
+                <p class="mb-4 text-sm text-gray-600">Click on the available time slots to book. Green slots are available.</p>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse booking-table">
+                        <thead>
+                            <tr>
+                                <th class="border px-4 py-2 bg-gray-100">Time / Field</th>
+                                <!-- Field headers will be populated by JavaScript -->
+                            </tr>
+                        </thead>
+                        <tbody id="booking-table-body">
+                            <!-- Time slots will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="selected-slots-container" class="mt-4 hidden">
+                    <h3 class="font-medium mb-2">Selected Slots:</h3>
+                    <div id="selected-slots-summary" class="p-3 bg-gray-50 rounded text-sm"></div>
+                </div>
+            </div>
+
+            <!-- Payment Method -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-semibold mb-4">Payment Method</h2>
+                <div class="space-y-2">
+                    <label class="flex items-center">
+                        <input type="radio" name="payment_method" value="online" checked class="mr-2">
+                        <span>Online Payment (Midtrans)</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="radio" name="payment_method" value="cash" class="mr-2">
+                        <span>Cash Payment</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Booking Summary and Total -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-semibold mb-4">Booking Summary</h2>
+
+                <div id="booking-summary" class="mb-4">
+                    <p class="text-gray-500 italic">Please select field(s) and time slot(s) to see the summary</p>
+                </div>
+
+                <div class="flex justify-between items-center border-t pt-4 mt-4">
+                    <span class="text-xl font-bold">Total Amount:</span>
+                    <span id="total-price" class="text-xl font-bold text-blue-600">Rp 0</span>
+                    <input type="hidden" name="total_amount" id="total_amount" value="0">
                 </div>
             </div>
 
             <!-- Submit Button -->
-            <div class="text-center">
-                <button type="submit" id="submitBtn" class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed">Book Now</button>
+            <div class="mt-6">
+                <button type="submit" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-md shadow-md transition-colors">
+                    Proceed to Payment
+                </button>
             </div>
+        </form>
+    </div>
 
-            <!-- Debug section (can be removed in production) -->
-            <div id="debug-info" class="mt-4 p-4 bg-gray-100 rounded-md text-xs text-gray-700 hidden">
-                <div class="font-semibold mb-2">Debug Information:</div>
-                <div id="debug-selections"></div>
-            </div>
-        </div>
-    </form>
-</div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sample data (in a real application, this would come from your backend)
+            const fields = [{
+                    id: 1,
+                    name: "Field A",
+                    price_per_hour: 100000
+                },
+                {
+                    id: 2,
+                    name: "Field B",
+                    price_per_hour: 150000
+                },
+                {
+                    id: 3,
+                    name: "Field C",
+                    price_per_hour: 120000
+                }
+            ];
 
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const dateSelectors = document.querySelectorAll('.date-selector');
-        const bookingDateInput = document.getElementById('booking_date');
-        const selectedSlotsContainer = document.getElementById('selected-slots-container');
-        const selectedSlotsList = document.getElementById('selected-slots-list');
-        const selectedFieldsContainer = document.getElementById('selected-fields-container');
-        const noSelectionWarning = document.getElementById('no-selection');
-        const submitBtn = document.getElementById('submitBtn');
-        const slotMatrix = document.getElementById('slot-matrix');
+            const slots = [{
+                    time: "08:00:00",
+                    formatted_time: "08:00 AM"
+                },
+                {
+                    time: "09:00:00",
+                    formatted_time: "09:00 AM"
+                },
+                {
+                    time: "10:00:00",
+                    formatted_time: "10:00 AM"
+                },
+                {
+                    time: "11:00:00",
+                    formatted_time: "11:00 AM"
+                },
+                {
+                    time: "12:00:00",
+                    formatted_time: "12:00 PM"
+                },
+                {
+                    time: "13:00:00",
+                    formatted_time: "01:00 PM"
+                },
+                {
+                    time: "14:00:00",
+                    formatted_time: "02:00 PM"
+                },
+                {
+                    time: "15:00:00",
+                    formatted_time: "03:00 PM"
+                },
+                {
+                    time: "16:00:00",
+                    formatted_time: "04:00 PM"
+                },
+                {
+                    time: "17:00:00",
+                    formatted_time: "05:00 PM"
+                },
+                {
+                    time: "18:00:00",
+                    formatted_time: "06:00 PM"
+                },
+                {
+                    time: "19:00:00",
+                    formatted_time: "07:00 PM"
+                }
+            ];
 
-        let selectedBookings = {};
-
-        // Set initial booking date
-        bookingDateInput.value = dateSelectors[0].dataset.date;
-
-        // Initialize form validation
-        submitBtn.disabled = true;
-
-        // Debug log to verify script loading
-        console.log("Booking form script loaded");
-
-        // Date Selection
-        dateSelectors.forEach(btn => {
-            btn.addEventListener('click', function() {
-                // Update visual selection
-                dateSelectors.forEach(b => {
-                    b.classList.remove('bg-blue-500', 'text-white');
-                    b.classList.add('bg-gray-100');
+            // Sample field availability (would come from backend)
+            let fieldAvailability = {};
+            fields.forEach(field => {
+                fieldAvailability[field.id] = {};
+                slots.forEach(slot => {
+                    // Randomly set some slots as available (for demo purposes)
+                    fieldAvailability[field.id][slot.time] = Math.random() > 0.3;
                 });
-                btn.classList.remove('bg-gray-100');
-                btn.classList.add('bg-blue-500', 'text-white');
-
-                // Update hidden input with selected date
-                const selectedDate = btn.dataset.date;
-                bookingDateInput.value = selectedDate;
-
-                // Reload available slots for the selected date via AJAX
-                fetch(`/api/fields/available-slots?date=${selectedDate}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        // Update the slot matrix with new availability data
-                        updateSlotMatrix(data.fieldAvailability);
-
-                        // Clear current selections when changing date
-                        clearSelections();
-                    })
-                    .catch(error => {
-                        console.error('Error fetching availability data:', error);
-                    });
             });
-        });
 
-        // Initialize field selectors with a slight delay to ensure DOM is fully loaded
-        setTimeout(function() {
-            initializeFieldSelectors();
-        }, 100);
+            // Variables to track selected slots and pricing
+            const selectedSlots = {};
+            const fieldPrices = {}; // Will store the price per hour for each field
+            let currentDate = '';
+            let totalAmount = 0;
 
-        function initializeFieldSelectors() {
-            console.log("Initializing field selectors");
-            const fieldSelectors = document.querySelectorAll('.field-selector');
-            console.log("Found " + fieldSelectors.length + " field selectors");
+            // Initialize field prices
+            fields.forEach(field => {
+                fieldPrices[field.id] = field.price_per_hour;
+            });
 
-            fieldSelectors.forEach(selector => {
-                if (selector.dataset.available === 'true') {
-                    // Remove any existing event listeners
-                    const newSelector = selector.cloneNode(true);
-                    selector.parentNode.replaceChild(newSelector, selector);
+            // Generate dates for a week starting from today
+            function generateWeeklyDates() {
+                const weeklyDates = [];
+                const today = new Date();
 
-                    // Add new click event listener
-                    newSelector.addEventListener('click', function(event) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        console.log("Field clicked:", newSelector.dataset.fieldId, "Time:", newSelector.dataset.formattedTime);
-                        toggleFieldSelection(newSelector);
+                for (let i = 0; i < 7; i++) {
+                    const date = new Date(today);
+                    date.setDate(today.getDate() + i);
+
+                    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                    const day = dayNames[date.getDay()];
+
+                    const dateString = date.toISOString().split('T')[0];
+                    const formattedDate = date.toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric'
+                    });
+
+                    weeklyDates.push({
+                        date: dateString,
+                        day: day,
+                        formatted_date: formattedDate
                     });
                 }
+
+                return weeklyDates;
+            }
+
+            // Generate weekly dates and populate date selector
+            const weeklyDates = generateWeeklyDates();
+            const dateContainer = document.getElementById('date-selector-container');
+
+            weeklyDates.forEach((dateObj, index) => {
+                const dateButton = document.createElement('button');
+                dateButton.type = 'button';
+                dateButton.className = `date-selector px-4 py-2 border rounded-md transition-colors ${index === 0 ? 'bg-blue-500 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`;
+                dateButton.setAttribute('data-date', dateObj.date);
+
+                dateButton.innerHTML = `
+                <span class="block font-medium">${dateObj.day}</span>
+                <span class="block text-sm">${dateObj.formatted_date}</span>
+            `;
+
+                dateContainer.appendChild(dateButton);
             });
-        }
 
-        function toggleFieldSelection(selector) {
-            const fieldId = selector.dataset.fieldId;
-            const timeSlot = selector.dataset.time;
-            const formattedTime = selector.dataset.formattedTime || timeSlot;
-            const isSelected = selector.classList.contains('selected');
+            // Set initial date
+            currentDate = weeklyDates[0].date;
+            document.getElementById('booking_date').value = currentDate;
 
-            console.log("Toggling selection for Field:", fieldId, "Time:", timeSlot);
-            console.log("Current state:", isSelected ? "Selected" : "Not Selected");
+            // Populate field headers
+            const tableHeader = document.querySelector('.booking-table thead tr');
+            fields.forEach(field => {
+                const th = document.createElement('th');
+                th.className = 'border px-4 py-2 bg-gray-100';
+                th.innerHTML = `
+                ${field.name}
+                <div class="text-sm text-gray-600">Rp ${field.price_per_hour.toLocaleString('id-ID')}/hour</div>
+                <input type="checkbox" class="ml-2 field-checkbox"
+                    id="field_${field.id}"
+                    data-field-id="${field.id}"
+                    data-field-name="${field.name}"
+                    data-field-price="${field.price_per_hour}"
+                    name="selected_fields[]"
+                    value="${field.id}">
+            `;
+                tableHeader.appendChild(th);
+            });
 
-            if (isSelected) {
-                // Remove selection
-                selector.classList.remove('selected', 'bg-blue-500', 'text-white');
-                selector.classList.add('bg-green-100', 'text-green-800');
-                selector.querySelector('span').textContent = 'Available';
+            // Populate time slots
+            const tableBody = document.getElementById('booking-table-body');
+            slots.forEach(slot => {
+                const tr = document.createElement('tr');
 
-                // Remove from tracking
-                if (selectedBookings[fieldId]) {
-                    const index = selectedBookings[fieldId].indexOf(timeSlot);
-                    if (index > -1) {
-                        selectedBookings[fieldId].splice(index, 1);
-                        console.log("Removed time slot from tracking");
+                // Time column
+                const tdTime = document.createElement('td');
+                tdTime.className = 'border px-4 py-2 font-medium';
+                tdTime.textContent = slot.formatted_time;
+                tr.appendChild(tdTime);
+
+                // Field columns
+                fields.forEach(field => {
+                    const isAvailable = fieldAvailability[field.id][slot.time];
+                    const tdSlot = document.createElement('td');
+                    tdSlot.className = `border px-1 py-1 text-center time-slot
+                                    ${isAvailable ? 'bg-green-100 hover:bg-green-200 cursor-pointer' : 'bg-red-100'}`;
+                    tdSlot.setAttribute('data-field-id', field.id);
+                    tdSlot.setAttribute('data-time-slot', slot.time);
+                    tdSlot.setAttribute('data-available', isAvailable ? 'true' : 'false');
+
+                    tdSlot.innerHTML = `
+                    <div class="h-8 w-full flex items-center justify-center">
+                        <span class="slot-status">${isAvailable ? 'Available' : 'Booked'}</span>
+                    </div>
+                `;
+
+                    tr.appendChild(tdSlot);
+                });
+
+                tableBody.appendChild(tr);
+            });
+
+            // Date selector functionality
+            document.querySelectorAll('.date-selector').forEach(button => {
+                button.addEventListener('click', function() {
+                    // Update visual selection
+                    document.querySelectorAll('.date-selector').forEach(btn => {
+                        btn.classList.remove('bg-blue-500', 'text-white', 'border-blue-600');
+                        btn.classList.add('bg-white', 'text-gray-700', 'border-gray-300', 'hover:bg-gray-50');
+                    });
+
+                    this.classList.remove('bg-white', 'text-gray-700', 'border-gray-300', 'hover:bg-gray-50');
+                    this.classList.add('bg-blue-500', 'text-white', 'border-blue-600');
+
+                    // Set selected date and fetch availability
+                    const selectedDate = this.getAttribute('data-date');
+                    document.getElementById('booking_date').value = selectedDate;
+                    currentDate = selectedDate;
+
+                    // Clear all selections on date change
+                    clearAllSelections();
+
+                    // In a real application, you would fetch availability for the selected date
+                    // For demo purposes, we'll randomize the availability
+                    randomizeAvailability();
+                });
+            });
+
+            // Field checkbox functionality
+            document.querySelectorAll('.field-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const fieldId = this.getAttribute('data-field-id');
+
+                    if (!this.checked) {
+                        // Deselect all slots for this field
+                        if (selectedSlots[fieldId]) {
+                            // Subtract from total amount
+                            totalAmount -= selectedSlots[fieldId].length * fieldPrices[fieldId];
+
+                            delete selectedSlots[fieldId];
+
+                            // Deselect visually
+                            document.querySelectorAll(`.time-slot[data-field-id="${fieldId}"].selected`).forEach(slot => {
+                                slot.classList.remove('selected', 'bg-blue-500', 'text-white');
+                                if (slot.getAttribute('data-available') === 'true') {
+                                    slot.classList.add('bg-green-100', 'hover:bg-green-200');
+                                } else {
+                                    slot.classList.add('bg-red-100');
+                                }
+                                slot.querySelector('.slot-status').textContent = 'Available';
+                            });
+                        }
                     }
 
-                    if (selectedBookings[fieldId].length === 0) {
-                        delete selectedBookings[fieldId];
-                        console.log("Removed field from tracking as no slots remain");
+                    updateSelectedSlotsDisplay();
+                    updateBookingSummary();
+                    updateTotalPrice();
+                });
+            });
+
+            // Time slot selection functionality
+            document.querySelectorAll('.time-slot').forEach(slot => {
+                slot.addEventListener('click', function() {
+                    if (this.getAttribute('data-available') !== 'true') {
+                        return; // Skip if not available
                     }
-                }
-            } else {
-                // Add selection
-                selector.classList.remove('bg-green-100', 'text-green-800');
-                selector.classList.add('selected', 'bg-blue-500', 'text-white');
-                selector.querySelector('span').textContent = 'Selected';
 
-                // Add to tracking
-                if (!selectedBookings[fieldId]) {
-                    selectedBookings[fieldId] = [];
-                    console.log("Created new array for field", fieldId);
-                }
+                    const fieldId = this.getAttribute('data-field-id');
+                    const timeSlot = this.getAttribute('data-time-slot');
+                    const fieldPrice = fieldPrices[fieldId];
 
-                // Only add if not already in the array
-                if (!selectedBookings[fieldId].includes(timeSlot)) {
-                    selectedBookings[fieldId].push(timeSlot);
-                    console.log("Added time slot to tracking");
-                }
-            }
+                    // Ensure field checkbox is checked
+                    const fieldCheckbox = document.getElementById(`field_${fieldId}`);
+                    fieldCheckbox.checked = true;
 
-            // Update UI and form data
-            updateSelectedSlotsList();
-            updateHiddenInputs();
-            validateSelection();
+                    // Toggle selection
+                    if (!selectedSlots[fieldId]) {
+                        selectedSlots[fieldId] = [];
+                    }
 
-            // For debugging: Show current selections
-            const debugInfo = document.getElementById('debug-info');
-            const debugSelections = document.getElementById('debug-selections');
-            if (debugInfo && debugSelections) {
-                debugInfo.classList.remove('hidden');
-                debugSelections.innerHTML = `Selected bookings: ${JSON.stringify(selectedBookings)}`;
-            }
-        }
+                    const slotIndex = selectedSlots[fieldId].indexOf(timeSlot);
+                    if (slotIndex === -1) {
+                        // Select this slot
+                        selectedSlots[fieldId].push(timeSlot);
+                        this.classList.remove('bg-green-100', 'hover:bg-green-200');
+                        this.classList.add('selected', 'bg-blue-500', 'text-white');
+                        this.querySelector('.slot-status').textContent = 'Selected';
 
-        // Form Validation
-        function validateSelection() {
-            const hasSelection = Object.keys(selectedBookings).length > 0;
-
-            if (hasSelection) {
-                noSelectionWarning.classList.add('hidden');
-                submitBtn.disabled = false;
-            } else {
-                noSelectionWarning.classList.remove('hidden');
-                submitBtn.disabled = true;
-            }
-        }
-
-        // Update slot matrix with new availability data
-        function updateSlotMatrix(fieldAvailability) {
-            console.log("Updating slot matrix with new availability data");
-            const rows = document.querySelectorAll('.slot-row');
-
-            if (!fieldAvailability) {
-                console.warn("No field availability data provided");
-                fieldAvailability = {};
-            }
-
-            rows.forEach(row => {
-                const timeCell = row.querySelector('td');
-                const timeSlot = timeCell.textContent.trim();
-                const cells = row.querySelectorAll('.field-selector');
-
-                cells.forEach((selector, index) => {
-                    const fieldId = selector.dataset.fieldId;
-                    const time = selector.dataset.time;
-                    const formattedTime = selector.dataset.formattedTime || timeSlot;
-
-                    // Check if the field is available at this time slot
-                    const isBooked = fieldAvailability[fieldId] &&
-                        !fieldAvailability[fieldId][time];
-
-                    if (isBooked) {
-                        // Booked
-                        selector.classList.remove('bg-green-100', 'text-green-800', 'hover:bg-green-200', 'selected', 'bg-blue-500', 'text-white');
-                        selector.classList.add('bg-red-100', 'text-red-800');
-                        selector.disabled = true;
-                        selector.dataset.available = 'false';
-                        selector.querySelector('span').textContent = 'Booked';
-
-                        // Create a new button to replace the old one (to remove event listeners)
-                        const newSelector = selector.cloneNode(true);
-                        selector.parentNode.replaceChild(newSelector, selector);
+                        // Add to total amount
+                        totalAmount += fieldPrice;
                     } else {
-                        // Available
-                        selector.classList.remove('bg-red-100', 'text-red-800', 'selected', 'bg-blue-500', 'text-white');
-                        selector.classList.add('bg-green-100', 'text-green-800', 'hover:bg-green-200');
-                        selector.disabled = false;
-                        selector.dataset.available = 'true';
-                        selector.querySelector('span').textContent = 'Available';
+                        // Deselect this slot
+                        selectedSlots[fieldId].splice(slotIndex, 1);
+                        this.classList.remove('selected', 'bg-blue-500', 'text-white');
+                        this.classList.add('bg-green-100', 'hover:bg-green-200');
+                        this.querySelector('.slot-status').textContent = 'Available';
 
-                        // Create a new button to ensure clean event listeners
-                        const newSelector = selector.cloneNode(true);
-                        selector.parentNode.replaceChild(newSelector, selector);
+                        // Subtract from total amount
+                        totalAmount -= fieldPrice;
 
-                        // Add click event with explicit parameters
-                        newSelector.addEventListener('click', function(event) {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            console.log("Available field clicked:", fieldId, "Time:", formattedTime);
-                            toggleFieldSelection(newSelector);
-                        });
+                        // If no slots selected for this field, uncheck the field
+                        if (selectedSlots[fieldId].length === 0) {
+                            delete selectedSlots[fieldId];
+                            fieldCheckbox.checked = false;
+                        }
                     }
+
+                    updateSelectedSlotsDisplay();
+                    updateBookingSummary();
+                    updateTotalPrice();
+                    updateFormInputs();
                 });
             });
 
-            // Reinitialize selectors after update
-            console.log("Field matrix updated, slots should now be clickable");
-        }
+            // Function to update slot availability display
+            function updateAvailabilityDisplay() {
+                document.querySelectorAll('.time-slot').forEach(slot => {
+                    const fieldId = slot.getAttribute('data-field-id');
+                    const timeSlot = slot.getAttribute('data-time-slot');
 
-        // Update the selected slots list
-        function updateSelectedSlotsList() {
-            selectedSlotsList.innerHTML = '';
-
-            const fieldIds = Object.keys(selectedBookings).sort((a, b) => parseInt(a) - parseInt(b));
-
-            if (fieldIds.length > 0) {
-                selectedSlotsContainer.classList.remove('hidden');
-
-                fieldIds.forEach(fieldId => {
-                    const times = selectedBookings[fieldId].sort();
-                    const li = document.createElement('li');
-                    li.textContent = `Field ${fieldId}: ${formatTimeSlots(times)}`;
-                    selectedSlotsList.appendChild(li);
+                    if (fieldAvailability[fieldId] && fieldAvailability[fieldId][timeSlot]) {
+                        // Slot is available
+                        slot.setAttribute('data-available', 'true');
+                        slot.classList.remove('bg-red-100', 'selected', 'bg-blue-500', 'text-white');
+                        slot.classList.add('bg-green-100', 'hover:bg-green-200', 'cursor-pointer');
+                        slot.querySelector('.slot-status').textContent = 'Available';
+                    } else {
+                        // Slot is not available
+                        slot.setAttribute('data-available', 'false');
+                        slot.classList.remove('bg-green-100', 'hover:bg-green-200', 'cursor-pointer', 'selected', 'bg-blue-500', 'text-white');
+                        slot.classList.add('bg-red-100');
+                        slot.querySelector('.slot-status').textContent = 'Booked';
+                    }
                 });
-            } else {
-                selectedSlotsContainer.classList.add('hidden');
             }
-        }
 
-        // Update hidden inputs for form submission
-        function updateHiddenInputs() {
-            // Clear existing hidden inputs
-            selectedFieldsContainer.innerHTML = '';
-
-            const fieldIds = Object.keys(selectedBookings);
-
-            fieldIds.forEach(fieldId => {
-                // Create hidden input for field ID
-                const fieldInput = document.createElement('input');
-                fieldInput.type = 'hidden';
-                fieldInput.name = 'selected_fields[]';
-                fieldInput.value = fieldId;
-                selectedFieldsContainer.appendChild(fieldInput);
-
-                // Create hidden inputs for time slots
-                selectedBookings[fieldId].forEach(slot => {
-                    const slotInput = document.createElement('input');
-                    slotInput.type = 'hidden';
-                    slotInput.name = `selected_slots[${fieldId}][]`;
-                    slotInput.value = slot;
-                    selectedFieldsContainer.appendChild(slotInput);
-                });
-            });
-        }
-
-        // Format time slots for display
-        function formatTimeSlots(slots) {
-            if (slots.length === 0) return '';
-
-            // Convert time slots to formatted time
-            const formattedSlots = slots.map(slot => {
-                // Handle cases where the time might be already formatted
-                if (slot.includes(':')) {
-                    const timeParts = slot.split(':');
-                    if (timeParts.length >= 2) {
-                        const hour = parseInt(timeParts[0]);
-                        const minute = timeParts[1].substring(0, 2);
-                        return `${hour}:${minute}`;
-                    }
-                    return slot;
-                }
-
-                try {
-                    const time = new Date(`2000-01-01T${slot}`);
-                    return time.toLocaleTimeString([], {
-                        hour: 'numeric',
-                        minute: '2-digit'
+            // Function to randomize availability (for demo only)
+            function randomizeAvailability() {
+                fields.forEach(field => {
+                    fieldAvailability[field.id] = {};
+                    slots.forEach(slot => {
+                        fieldAvailability[field.id][slot.time] = Math.random() > 0.3;
                     });
-                } catch (e) {
-                    return slot; // Fallback to original value if parsing fails
-                }
-            });
-
-            return formattedSlots.join(', ');
-        }
-
-        // Clear all selections
-        function clearSelections() {
-            const selectedElements = document.querySelectorAll('.field-selector.selected');
-            selectedElements.forEach(el => {
-                el.classList.remove('selected', 'bg-blue-500', 'text-white');
-                el.classList.add('bg-green-100', 'text-green-800');
-                el.querySelector('span').textContent = 'Available';
-            });
-
-            selectedBookings = {};
-            updateSelectedSlotsList();
-            updateHiddenInputs();
-            validateSelection();
-        }
-
-        // Form submission
-        const bookingForm = document.getElementById('bookingForm');
-        bookingForm.addEventListener('submit', function(e) {
-            // Check if any fields are selected
-            if (Object.keys(selectedBookings).length === 0) {
-                e.preventDefault();
-                alert('Please select at least one field and time slot.');
-                return false;
+                });
+                updateAvailabilityDisplay();
             }
 
-            // Log what we're submitting
-            console.log("Submitting booking form with the following selections:", selectedBookings);
-            console.log("Form data:", new FormData(bookingForm));
+            // Function to update the display of selected slots
+            function updateSelectedSlotsDisplay() {
+                const container = document.getElementById('selected-slots-container');
+                const summary = document.getElementById('selected-slots-summary');
 
-            // Form is valid, it will submit naturally
-            return true;
+                // Check if any slots are selected
+                const hasSelections = Object.keys(selectedSlots).length > 0;
+                if (hasSelections) {
+                    let summaryHTML = '';
+
+                    for (const fieldId in selectedSlots) {
+                        const fieldName = document.querySelector(`th input[data-field-id="${fieldId}"]`).getAttribute('data-field-name');
+                        const slots = selectedSlots[fieldId].sort();
+
+                        // Format times nicely
+                        const formattedTimes = slots.map(slot => {
+                            const time = new Date(`2000-01-01T${slot}`);
+                            return time.toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+                        }).join(', ');
+
+                        summaryHTML += `<div class="mb-2"><strong>${fieldName}:</strong> ${formattedTimes}</div>`;
+                    }
+
+                    summary.innerHTML = summaryHTML;
+                    container.classList.remove('hidden');
+                } else {
+                    container.classList.add('hidden');
+                }
+            }
+
+            // Function to update form inputs for submission
+            function updateFormInputs() {
+                // Remove any existing dynamic inputs
+                document.querySelectorAll('input[name^="selected_slots["]').forEach(input => input.remove());
+
+                // Create inputs for selected slots
+                for (const fieldId in selectedSlots) {
+                    selectedSlots[fieldId].forEach(slot => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = `selected_slots[${fieldId}][]`;
+                        input.value = slot;
+                        document.getElementById('bookingForm').appendChild(input);
+                    });
+                }
+            }
+
+            // Function to update booking summary with detailed breakdown
+            function updateBookingSummary() {
+                const summaryContainer = document.getElementById('booking-summary');
+
+                if (Object.keys(selectedSlots).length === 0) {
+                    summaryContainer.innerHTML = '<p class="text-gray-500 italic">Please select field(s) and time slot(s) to see the summary</p>';
+                    return;
+                }
+
+                let summaryHTML = '<div class="space-y-3">';
+
+                for (const fieldId in selectedSlots) {
+                    const fieldCheckbox = document.getElementById(`field_${fieldId}`);
+                    const fieldName = fieldCheckbox.getAttribute('data-field-name');
+                    const fieldPrice = parseFloat(fieldCheckbox.getAttribute('data-field-price'));
+                    const slots = selectedSlots[fieldId].sort();
+                    const subtotal = slots.length * fieldPrice;
+
+                    // Format times
+                    const formattedTimes = slots.map(slot => {
+                        const time = new Date(`2000-01-01T${slot}`);
+                        return time.toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    }).join(', ');
+
+                    summaryHTML += `
+                <div class="p-3 bg-gray-50 rounded border">
+                    <div class="font-medium">${fieldName}</div>
+                    <div class="text-sm text-gray-600">Time: ${formattedTimes}</div>
+                    <div class="text-sm text-gray-600">Hours: ${slots.length}</div>
+                    <div class="flex justify-between mt-1">
+                        <span>Price per hour:</span>
+                        <span>Rp ${fieldPrice.toLocaleString('id-ID')}</span>
+                    </div>
+                    <div class="flex justify-between font-medium">
+                        <span>Subtotal:</span>
+                        <span>Rp ${subtotal.toLocaleString('id-ID')}</span>
+                    </div>
+                </div>
+            `;
+                }
+
+                summaryHTML += '</div>';
+                summaryContainer.innerHTML = summaryHTML;
+            }
+
+            // Function to update total price display
+            function updateTotalPrice() {
+                document.getElementById('total-price').textContent = `Rp ${totalAmount.toLocaleString('id-ID')}`;
+                document.getElementById('total_amount').value = totalAmount;
+            }
+
+            // Function to clear all selections
+            function clearAllSelections() {
+                for (const fieldId in selectedSlots) {
+                    delete selectedSlots[fieldId];
+                }
+
+                // Reset total amount
+                totalAmount = 0;
+
+                // Uncheck all field checkboxes
+                document.querySelectorAll('.field-checkbox').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+
+                // Reset slot display
+                document.querySelectorAll('.time-slot.selected').forEach(slot => {
+                    slot.classList.remove('selected', 'bg-blue-500', 'text-white');
+                    if (slot.getAttribute('data-available') === 'true') {
+                        slot.classList.add('bg-green-100', 'hover:bg-green-200');
+                        slot.querySelector('.slot-status').textContent = 'Available';
+                    }
+                });
+
+                // Update displays
+                updateSelectedSlotsDisplay();
+                updateBookingSummary();
+                updateTotalPrice();
+                updateFormInputs();
+            }
+
+            // Form submission validation
+            document.getElementById('bookingForm').addEventListener('submit', function(e) {
+                const hasSelections = Object.keys(selectedSlots).length > 0;
+
+                if (!hasSelections) {
+                    e.preventDefault(); // Prevent form submission only if validation fails
+                    alert('Please select at least one time slot for a field.');
+                    return false;
+                }
+
+                if (totalAmount <= 0) {
+                    e.preventDefault(); // Prevent form submission only if validation fails
+                    alert('Total amount cannot be zero. Please select valid time slots.');
+                    return false;
+                }
+
+                // If validation passes, form will be submitted normally
+                // No need to call preventDefault() or return false
+            });
+
+            // Initialize form inputs and displays
+            updateFormInputs();
+            updateBookingSummary();
+            updateTotalPrice();
         });
+    </script>
+</body>
 
-        // Initialize validation
-        validateSelection();
-    });
-</script>
-@endpush
-@endsection
+</html>

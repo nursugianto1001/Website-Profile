@@ -22,6 +22,8 @@ class Booking extends Model
         'payment_method',
         'payment_status',
         'snap_token',
+        'booking_code',
+        'status',
     ];
 
     protected $casts = [
@@ -65,18 +67,26 @@ class Booking extends Model
     }
 
     /**
-     * Scope a query to only include settled bookings
+     * Scope a query to only include paid bookings
      */
-    public function scopeSettlement($query)
+    public function scopePaid($query)
     {
-        return $query->where('payment_status', 'settlement');
+        return $query->where('payment_status', 'paid');
     }
 
     /**
-     * Scope a query to only include active bookings (pending or settlement)
+     * Scope a query to only include confirmed bookings
+     */
+    public function scopeConfirmed($query)
+    {
+        return $query->where('status', 'confirmed');
+    }
+
+    /**
+     * Scope a query to only include active bookings (pending or paid)
      */
     public function scopeActive($query)
     {
-        return $query->whereIn('payment_status', ['pending', 'settlement']);
+        return $query->whereIn('payment_status', ['pending', 'paid']);
     }
 }

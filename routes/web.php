@@ -18,8 +18,8 @@ Route::get('/contact', [PublicController::class, 'contact'])->name('contact');
 // BookingPageController Routes
 Route::get('/browse', [BookingPageController::class, 'index'])->name('booking.home');
 Route::get('/fields', [BookingPageController::class, 'fields'])->name('booking.fields');
+Route::get('/fields/book', [BookingPageController::class, 'bookingForm'])->name('booking.form');
 Route::get('/fields/{field}', [BookingPageController::class, 'fieldDetail'])->name('booking.field-detail');
-Route::get('/fields/{field}/book', [BookingPageController::class, 'bookingForm'])->name('booking.form');
 Route::post('/booking/process', [BookingPageController::class, 'processBooking'])->name('booking.process');
 Route::post('/booking/process-multiple', [BookingPageController::class, 'processMultipleBooking'])->name('booking.process-multiple');
 Route::get('/booking/{booking}/success', [BookingPageController::class, 'bookingSuccess'])->name('booking.success');
@@ -27,6 +27,8 @@ Route::get('/booking/{booking}/payment', [BookingPageController::class, 'payment
 Route::get('/payment/finish', [BookingPageController::class, 'finishPayment'])->name('payment.finish');
 Route::get('/payment/unfinish', [BookingPageController::class, 'unfinishPayment'])->name('payment.unfinish');
 Route::get('/payment/error', [BookingPageController::class, 'errorPayment'])->name('payment.error');
+Route::post('/payment/notification', [BookingPageController::class, 'handlePaymentNotification']);
+
 
 // Booking (hanya penampil)
 Route::get('/bookings/{fieldId}', [BookingController::class, 'index'])->name('bookings.index');

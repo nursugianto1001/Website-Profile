@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class BookingPageController extends Controller
 {
@@ -109,7 +110,6 @@ class BookingPageController extends Controller
             }
         }
 
-        // Tambahkan 'fields' ke dalam compact
         return view('pages.booking-form', compact('weeklyDates', 'slots', 'fieldAvailability', 'fields'));
     }
 
@@ -298,12 +298,30 @@ class BookingPageController extends Controller
     public function finishPayment(Request $request)
     {
         $bookingIds = Session::get('booking_ids', []);
+        $orderId = $request->input('order_id'); // Get order_id from Midtrans callback
 
         if (empty($bookingIds)) {
             return redirect()->route('home')->with('error', 'Booking not found.');
         }
 
-        $booking = Booking::findOrFail($bookingIds[0]);
+        $booking = Booking::with(['field', 'slots'])->findOrFail($bookingIds[0]);
+
+        if (empty($booking->booking_code) && !empty($orderId)) {
+            $booking->booking_code = $orderId;
+            Log::info('Setting booking code: ' . $orderId);
+        }
+
+        // Update payment status
+        if ($booking->payment_status == 'pending') {
+            $booking->payment_status = 'settlement';
+            $booking->status = 'confirmed';
+            $saved = $booking->save();
+            Log::info('Booking saved: ' . ($saved ? 'Yes' : 'No'));
+
+            if (!$saved) {
+                Log::error('Failed to save booking: ' . $booking->id);
+            }
+        }
 
         // Clear session
         Session::forget('booking_ids');
@@ -312,6 +330,8 @@ class BookingPageController extends Controller
             ->with('multipleBookings', count($bookingIds) > 1)
             ->with('totalBookings', count($bookingIds));
     }
+
+
 
     /**
      * Handle payment unfinish callback from Midtrans
@@ -366,5 +386,56 @@ class BookingPageController extends Controller
 
         return redirect()->route('booking.form')
             ->with('error', 'Payment failed. Please try booking again.');
+    }
+
+    /**
+     * Handle payment notification from Midtrans
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function handlePaymentNotification(Request $request)
+    {
+        $payload = $request->all();
+        $orderId = $payload['order_id'] ?? null;
+        $transactionStatus = $payload['transaction_status'] ?? null;
+
+        // Log notification
+        Log::info('Midtrans Notification: ', $payload);
+
+        // Find booking by order_id
+        $booking = Booking::where('booking_code', $orderId)->first();
+
+        if (!$booking) {
+            // If booking not found by booking_code, try to find by ID
+            $bookingId = explode('-', $orderId)[0] ?? null;
+            $booking = Booking::find($bookingId);
+
+            if ($booking && empty($booking->booking_code)) {
+                $booking->booking_code = $orderId;
+            }
+        }
+
+        if (!$booking) {
+            return response()->json(['message' => 'Booking not found'], 404);
+        }
+
+        // Update status pembayaran berdasarkan status transaksi
+        if ($transactionStatus == 'capture' || $transactionStatus == 'settlement') {
+            // Pembayaran berhasil
+            $booking->payment_status = 'settlement';
+            $booking->status = 'confirmed';
+        } elseif ($transactionStatus == 'pending') {
+            // Pembayaran pending
+            $booking->payment_status = 'pending';
+        } elseif ($transactionStatus == 'deny' || $transactionStatus == 'expire' || $transactionStatus == 'cancel') {
+            // Pembayaran gagal
+            $booking->payment_status = 'failed';
+            $booking->status = 'cancelled';
+        }
+
+        $booking->save();
+
+        return response()->json(['message' => 'Notification processed successfully']);
     }
 }

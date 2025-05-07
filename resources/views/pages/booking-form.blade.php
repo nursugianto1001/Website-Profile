@@ -145,16 +145,25 @@
             function generateWeeklyDates() {
                 const weeklyDates = [];
                 const today = new Date();
+
                 for (let i = 0; i < 7; i++) {
                     const date = new Date(today);
                     date.setDate(today.getDate() + i);
+
                     const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
                     const day = dayNames[date.getDay()];
-                    const dateString = date.toISOString().split('T')[0];
+
+                    // Format date to YYYY-MM-DD without timezone issues
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const dayOfMonth = String(date.getDate()).padStart(2, '0');
+                    const dateString = `${year}-${month}-${dayOfMonth}`;
+
                     const formattedDate = date.toLocaleDateString('en-US', {
                         month: 'short',
                         day: 'numeric'
                     });
+
                     weeklyDates.push({
                         date: dateString,
                         day: day,

@@ -13,7 +13,7 @@
 
     <form action="{{ route('admin.gallery.store') }}" method="POST" enctype="multipart/form-data" class="max-w-3xl">
         @csrf
-        
+
         <!-- Type field (hidden but can be changed) -->
         <div class="mb-6">
             <label for="type" class="block text-sm font-medium text-gray-700 mb-2">Type</label>

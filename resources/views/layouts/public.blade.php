@@ -97,7 +97,7 @@
                                 class="text-gray-300 hover:text-[#A66E38] w-10 h-10 flex items-center justify-center">
                                 <i class="fab fa-twitter text-xl"></i>
                             </a>
-                            <a href="https://www.instagram.com/karvin_badminton/"
+                            <a href="#"
                                 class="text-gray-300 hover:text-[#A66E38] w-10 h-10 flex items-center justify-center">
                                 <i class="fab fa-instagram text-xl"></i>
                             </a>

@@ -39,7 +39,7 @@
                 </div>
 
                 <div class="hidden md:block flex-shrink-0">
-                    <a href="#"
+                    <a href="{{ route('booking.fields') }}"
                         class="bg-[#A66E38] text-white px-5 py-2 rounded-md text-sm font-bold border-2 border-[#A66E38] transition duration-300 hover:bg-transparent hover:text-[#ffff] hover:border-white text-center">
                         Pesan Sekarang
                     </a>

@@ -67,7 +67,7 @@
                 </ul>
 
                 <div class="mt-6">
-                    <a href="{{ route('booking.form', $field) }}" class="block w-full bg-primary text-white text-center py-3 px-4 rounded-lg font-semibold hover:bg-primary-dark transition">Book Now</a>
+                    <a href="{{ route('booking.form', $field) }}" class="block w-full bg-primary text-blue-900 text-center py-3 px-4 rounded-lg font-semibold hover:bg-primary-dark transition">Book Now</a>
                 </div>
             </div>
         </div>

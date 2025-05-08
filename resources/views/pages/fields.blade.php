@@ -34,7 +34,7 @@
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-primary font-bold">{{ number_format($field->price_per_hour) }} / hour</span>
-                        <a href="{{ route('booking.field-detail', $field) }}" class="bg-primary text-white py-2 px-4 rounded hover:bg-primary-dark transition">View Details</a>
+                        <a href="{{ route('booking.field-detail', $field) }}" class="bg-primary text-blue-900 py-2 px-4 rounded hover:bg-primary-dark transition">View Details</a>
                     </div>
                 </div>
             </div>

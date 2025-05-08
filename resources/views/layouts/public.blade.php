@@ -101,6 +101,10 @@
                                 class="text-gray-300 hover:text-[#A66E38] w-10 h-10 flex items-center justify-center">
                                 <i class="fab fa-instagram text-xl"></i>
                             </a>
+                            <a href="https://maps.app.goo.gl/XryjjSfbFV3FjJJAA" target="_blank"
+                                class="text-gray-300 hover:text-[#A66E38] w-10 h-10 flex items-center justify-center">
+                                <i class="fas fa-map-marker-alt text-xl"></i>
+                            </a>
                         </div>
                     </div>
                 </div>

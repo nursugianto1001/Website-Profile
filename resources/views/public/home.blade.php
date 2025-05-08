@@ -19,7 +19,7 @@
             @else
                 <!-- Fallback to image -->
                 <div class="absolute inset-0 bg-cover bg-center"
-                    style="background-image: url('{{ Vite::asset('resources/images/copicop.jpg') }}');"></div>
+                    style="background-image: url('{{ Vite::asset('resources/images/open.jpg') }}');"></div>
             @endif
         </div>
 

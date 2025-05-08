@@ -25,8 +25,6 @@ class BookingPageController extends Controller
 
     /**
      * Display homepage with featured fields
-     *
-     * @return \Illuminate\View\View
      */
     public function index()
     {
@@ -36,8 +34,6 @@ class BookingPageController extends Controller
 
     /**
      * Display all fields
-     *
-     * @return \Illuminate\View\View
      */
     public function fields()
     {
@@ -47,9 +43,6 @@ class BookingPageController extends Controller
 
     /**
      * Display field details
-     *
-     * @param Field $field
-     * @return \Illuminate\View\View
      */
     public function fieldDetail(Field $field)
     {
@@ -57,16 +50,14 @@ class BookingPageController extends Controller
     }
 
     /**
-     * Display booking form with multi-field selection capability
-     *
-     * @return \Illuminate\View\View
+     * Display booking form with field and slot selection
      */
     public function bookingForm()
     {
         $today = Carbon::today();
         $weeklyDates = [];
 
-        // Generate dates for the next 7 days
+        // Generate 7 hari ke depan
         for ($i = 0; $i < 7; $i++) {
             $date = $today->copy()->addDays($i);
             $weeklyDates[] = [
@@ -77,53 +68,40 @@ class BookingPageController extends Controller
             ];
         }
 
-        // Get slots based on opening and closing hours
-        $openingHour = 8; // Default 8 AM
-        $closingHour = 22; // Default 10 PM
-        $slots = [];
+        // Ambil field aktif
+        $fields = Field::where('is_active', true)->get();
 
-        for ($hour = $openingHour; $hour < $closingHour; $hour++) {
+        // Jika tidak ada field, tampilkan error di view
+        if ($fields->isEmpty()) {
+            abort(500, 'Tidak ada data lapangan aktif di database!');
+        }
+
+        // Ambil jam operasional minimum dan maksimum dari SEMUA field aktif
+        $minOpeningHour = $fields->min('opening_hour') ?? 8;
+        $maxClosingHour = $fields->max('closing_hour') ?? 22;
+
+        // Generate slot waktu (misal 08:00-22:00)
+        $slots = [];
+        for ($hour = $minOpeningHour; $hour < $maxClosingHour; $hour++) {
             $slotTime = sprintf('%02d:00:00', $hour);
             $slots[] = [
                 'time' => $slotTime,
-                'formatted_time' => Carbon::parse($slotTime)->format('g:i A')
+                'formatted_time' => Carbon::parse($slotTime)->format('H:i')
             ];
         }
 
-        // Get availability for all fields
-        $fieldAvailability = [];
-        $fields = Field::where('is_active', true)->take(6)->get();
-
-        foreach ($fields as $field) {
-            $fieldId = $field->id;
-            $fieldAvailability[$fieldId] = [];
-
-            $bookedSlots = DB::table('booking_slots')
-                ->join('bookings', 'booking_slots.booking_id', '=', 'bookings.id')
-                ->where('bookings.field_id', $fieldId)
-                ->where('bookings.booking_date', $today->format('Y-m-d'))
-                ->whereNotIn('bookings.payment_status', ['expired', 'cancel'])
-                ->pluck('booking_slots.slot_time')
-                ->toArray();
-
-            foreach ($slots as $slot) {
-                $fieldAvailability[$fieldId][$slot['time']] = !in_array($slot['time'], $bookedSlots);
-            }
-        }
-
-        return view('pages.booking-form', compact('weeklyDates', 'slots', 'fieldAvailability', 'fields'));
+        // Kirim ke view
+        return view('pages.booking-form', compact('weeklyDates', 'slots', 'fields'));
     }
 
+
     /**
-     * Get available slots for a specific date and all fields
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * Get available slots for a specific date and all fields (AJAX)
      */
     public function getAvailableSlots(Request $request)
     {
         $date = $request->input('date', Carbon::today()->format('Y-m-d'));
-        $fields = Field::where('is_active', true)->take(6)->get();
+        $fields = Field::where('is_active', true)->get();
 
         $fieldAvailability = [];
 
@@ -131,6 +109,11 @@ class BookingPageController extends Controller
             $fieldId = $field->id;
             $fieldAvailability[$fieldId] = [];
 
+            // Ambil jam operasional dari kolom integer
+            $openingHour = $field->opening_hour ?? 8;
+            $closingHour = $field->closing_hour ?? 22;
+
+            // Query slot yang sudah dibooking
             $bookedSlots = DB::table('booking_slots')
                 ->join('bookings', 'booking_slots.booking_id', '=', 'bookings.id')
                 ->where('bookings.field_id', $fieldId)
@@ -139,9 +122,7 @@ class BookingPageController extends Controller
                 ->pluck('booking_slots.slot_time')
                 ->toArray();
 
-            $openingHour = $field->opening_hour ?? 8;
-            $closingHour = $field->closing_hour ?? 22;
-
+            // Generate slot waktu dan cek ketersediaan
             for ($hour = $openingHour; $hour < $closingHour; $hour++) {
                 $slotTime = sprintf('%02d:00:00', $hour);
                 $fieldAvailability[$fieldId][$slotTime] = !in_array($slotTime, $bookedSlots);
@@ -155,10 +136,7 @@ class BookingPageController extends Controller
     }
 
     /**
-     * Process booking submission for multiple fields
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
+     * Process booking submission
      */
     public function processBooking(Request $request)
     {
@@ -185,13 +163,12 @@ class BookingPageController extends Controller
 
         DB::beginTransaction();
         try {
-            // Create a booking for each field
             foreach ($selectedFields as $fieldId) {
                 if (!isset($selectedSlots[$fieldId]) || empty($selectedSlots[$fieldId])) {
                     continue;
                 }
 
-                // Sort time slots
+                // Sort slot waktu
                 $timeSlots = $selectedSlots[$fieldId];
                 sort($timeSlots);
 
@@ -199,11 +176,11 @@ class BookingPageController extends Controller
                     continue;
                 }
 
-                // Calculate start and end times
+                // Hitung waktu mulai dan selesai
                 $startTime = $timeSlots[0];
                 $endTime = Carbon::parse($timeSlots[count($timeSlots) - 1])->addHour()->format('H:i:s');
 
-                // Check availability
+                // Cek ketersediaan
                 $isAvailable = $this->bookingService->areSlotsAvailable(
                     $fieldId,
                     $bookingDate,
@@ -213,10 +190,10 @@ class BookingPageController extends Controller
 
                 if (!$isAvailable) {
                     DB::rollBack();
-                    return redirect()->back()->with('error', "Field {$fieldId} is no longer available for the selected time slots. Please choose different time slots.")->withInput();
+                    return redirect()->back()->with('error', "Lapangan {$fieldId} tidak tersedia untuk slot waktu yang dipilih. Silakan pilih slot waktu lain.")->withInput();
                 }
 
-                // Create booking
+                // Buat booking
                 $bookingData = [
                     'field_id' => $fieldId,
                     'customer_name' => $request->customer_name,
@@ -232,7 +209,7 @@ class BookingPageController extends Controller
 
                 if (!$booking) {
                     DB::rollBack();
-                    return redirect()->back()->with('error', "Failed to create booking for Field {$fieldId}. Please try again.")->withInput();
+                    return redirect()->back()->with('error', "Gagal membuat booking untuk lapangan {$fieldId}. Silakan coba lagi.")->withInput();
                 }
 
                 $bookings[] = $booking;
@@ -241,44 +218,36 @@ class BookingPageController extends Controller
 
             DB::commit();
 
-            // Handle payment for all bookings collectively
+            // Proses pembayaran
             if ($request->payment_method === 'online') {
-                // For online payment, we'll need to create a combined payment
-                $mainBooking = $bookings[0]; // Use the first booking for payment
-
-                // Store all booking IDs in session
+                $mainBooking = $bookings[0];
                 Session::put('booking_ids', array_map(function ($booking) {
                     return $booking->id;
                 }, $bookings));
 
-                // Generate signed URL for payment page
+                // Redirect ke halaman pembayaran dengan signed URL
                 $paymentUrl = URL::signedRoute('booking.payment', ['booking' => $mainBooking->id]);
-
                 return redirect()->to($paymentUrl);
             } else {
-                // Generate signed URL for success page
+                // Redirect ke halaman sukses dengan signed URL
                 $successUrl = URL::signedRoute('booking.success', ['booking' => $bookings[0]->id]);
-
                 return redirect()->to($successUrl)
                     ->with('multipleBookings', true)
                     ->with('totalBookings', count($bookings));
             }
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage())->withInput();
+            Log::error('Booking error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
         }
     }
 
     /**
      * Display payment page
-     *
-     * @param Request $request
-     * @param Booking $booking
-     * @return \Illuminate\View\View
      */
     public function payment(Request $request, Booking $booking)
     {
-        // Signature validation is handled by the 'signed' middleware
+        // Validasi signature oleh middleware 'signed'
 
         $totalBookings = Session::get('totalBookings', 1);
         $totalPrice = $booking->total_price;
@@ -294,17 +263,12 @@ class BookingPageController extends Controller
 
     /**
      * Display booking success page
-     *
-     * @param Request $request
-     * @param Booking $booking
-     * @return \Illuminate\View\View
      */
     public function bookingSuccess(Request $request, Booking $booking)
     {
-        // Signature validation is handled by the 'signed' middleware
+        // Validasi signature oleh middleware 'signed'
 
         $booking->load(['field', 'slots']);
-
         $multipleBookings = Session::get('multipleBookings', false);
         $totalBookings = Session::get('totalBookings', 1);
 
@@ -312,18 +276,15 @@ class BookingPageController extends Controller
     }
 
     /**
-     * Handle payment finish callback from Midtrans
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
+     * Handle payment finish callback dari Midtrans
      */
     public function finishPayment(Request $request)
     {
         $bookingIds = Session::get('booking_ids', []);
-        $orderId = $request->input('order_id'); // Get order_id from Midtrans callback
+        $orderId = $request->input('order_id');
 
         if (empty($bookingIds)) {
-            return redirect()->route('home')->with('error', 'Booking not found.');
+            return redirect()->route('home')->with('error', 'Booking tidak ditemukan.');
         }
 
         $booking = Booking::with(['field', 'slots'])->findOrFail($bookingIds[0]);
@@ -333,22 +294,15 @@ class BookingPageController extends Controller
             Log::info('Setting booking code: ' . $orderId);
         }
 
-        // Update payment status
         if ($booking->payment_status == 'pending') {
             $booking->payment_status = 'settlement';
             $booking->status = 'confirmed';
-            $saved = $booking->save();
-            Log::info('Booking saved: ' . ($saved ? 'Yes' : 'No'));
-
-            if (!$saved) {
-                Log::error('Failed to save booking: ' . $booking->id);
-            }
+            $booking->save();
         }
 
-        // Clear session
         Session::forget('booking_ids');
 
-        // Generate signed URL for success page
+        // Redirect ke halaman sukses dengan signed URL
         $successUrl = URL::signedRoute('booking.success', ['booking' => $booking->id]);
 
         return redirect()->to($successUrl)
@@ -357,48 +311,39 @@ class BookingPageController extends Controller
     }
 
     /**
-     * Handle payment unfinish callback from Midtrans
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
+     * Handle pembayaran belum selesai dari Midtrans
      */
     public function unfinishPayment(Request $request)
     {
         $bookingIds = Session::get('booking_ids', []);
 
         if (empty($bookingIds)) {
-            return redirect()->route('home')->with('error', 'Booking not found.');
+            return redirect()->route('home')->with('error', 'Booking tidak ditemukan.');
         }
 
         $booking = Booking::findOrFail($bookingIds[0]);
-
-        // Clear session
         Session::forget('booking_ids');
 
-        // Generate signed URL for success page
+        // Redirect ke halaman sukses dengan signed URL
         $successUrl = URL::signedRoute('booking.success', ['booking' => $booking->id]);
 
         return redirect()->to($successUrl)
             ->with('multipleBookings', count($bookingIds) > 1)
             ->with('totalBookings', count($bookingIds))
-            ->with('warning', 'Your payment is still in process. You will receive a confirmation once the payment is completed.');
+            ->with('warning', 'Pembayaran Anda masih dalam proses. Anda akan menerima konfirmasi setelah pembayaran selesai.');
     }
 
     /**
-     * Handle payment error callback from Midtrans
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
+     * Handle pembayaran error dari Midtrans
      */
     public function errorPayment(Request $request)
     {
         $bookingIds = Session::get('booking_ids', []);
 
         if (empty($bookingIds)) {
-            return redirect()->route('home')->with('error', 'Booking not found.');
+            return redirect()->route('home')->with('error', 'Booking tidak ditemukan.');
         }
 
-        // Update all bookings to failed status
         foreach ($bookingIds as $id) {
             $booking = Booking::find($id);
             if ($booking) {
@@ -407,18 +352,14 @@ class BookingPageController extends Controller
             }
         }
 
-        // Clear session
         Session::forget('booking_ids');
 
         return redirect()->route('booking.form')
-            ->with('error', 'Payment failed. Please try booking again.');
+            ->with('error', 'Pembayaran gagal. Silakan coba booking kembali.');
     }
 
     /**
-     * Handle payment notification from Midtrans
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\Response
+     * Handle notifikasi pembayaran dari Midtrans
      */
     public function handlePaymentNotification(Request $request)
     {
@@ -426,15 +367,12 @@ class BookingPageController extends Controller
         $orderId = $payload['order_id'] ?? null;
         $transactionStatus = $payload['transaction_status'] ?? null;
 
-        // Log notification
         Log::info('Midtrans Notification: ', $payload);
 
-        // Find booking by order_id
         $booking = Booking::where('booking_code', $orderId)->first();
 
         if (!$booking) {
-            // If booking not found by booking_code, try to find by ID
-            $bookingId = explode('-', $orderId)[0] ?? null;
+            $bookingId = explode('-', $orderId)[1] ?? null;
             $booking = Booking::find($bookingId);
 
             if ($booking && empty($booking->booking_code)) {
@@ -443,25 +381,22 @@ class BookingPageController extends Controller
         }
 
         if (!$booking) {
-            return response()->json(['message' => 'Booking not found'], 404);
+            return response()->json(['message' => 'Booking tidak ditemukan'], 404);
         }
 
-        // Update status pembayaran berdasarkan status transaksi
+        // Update status pembayaran
         if ($transactionStatus == 'capture' || $transactionStatus == 'settlement') {
-            // Pembayaran berhasil
             $booking->payment_status = 'settlement';
             $booking->status = 'confirmed';
         } elseif ($transactionStatus == 'pending') {
-            // Pembayaran pending
             $booking->payment_status = 'pending';
         } elseif ($transactionStatus == 'deny' || $transactionStatus == 'expire' || $transactionStatus == 'cancel') {
-            // Pembayaran gagal
             $booking->payment_status = 'failed';
             $booking->status = 'cancelled';
         }
 
         $booking->save();
 
-        return response()->json(['message' => 'Notification processed successfully']);
+        return response()->json(['message' => 'Notifikasi berhasil diproses']);
     }
 }

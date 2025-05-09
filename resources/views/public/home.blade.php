@@ -41,7 +41,7 @@
 
                 <!-- CTA Buttons - Only visible on mobile -->
                 <div class="flex sm:hidden mt-4">
-                    <a href="#booking"
+                    <a href="{{ route('booking.form') }}"
                         class="inline-block px-6 py-3 text-white font-medium rounded text-center transition duration-300"
                         style="background-color: #A66E38;" onmouseover="this.style.backgroundColor='#1A1A19';"
                         onmouseout="this.style.backgroundColor='#A66E38';">

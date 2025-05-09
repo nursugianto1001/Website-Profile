@@ -7,6 +7,10 @@ use App\Http\Controllers\Admin\FacilityController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\BackgroundVideoController;
 use App\Http\Controllers\Web\BookingPageController;
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminFieldController;
+use App\Http\Controllers\Admin\AdminBookingController;
+use App\Http\Controllers\Admin\AdminTransactionController;
 
 // Public Routes
 Route::get('/', [PublicController::class, 'home'])->name('home');
@@ -44,6 +48,7 @@ require __DIR__ . '/auth.php';
 
 // Admin Routes
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
+    // Original Admin Routes
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
     })->name('dashboard');
@@ -57,6 +62,12 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::resource('gallery', GalleryController::class);
     Route::post('gallery/{gallery}/toggle-featured', [GalleryController::class, 'toggleFeatured'])
         ->name('gallery.toggle-featured');
+    
+    // New Booking System Admin Routes
+    Route::resource('fields', AdminFieldController::class);
+    Route::resource('bookings', AdminBookingController::class)->only(['index', 'show']);
+    Route::put('bookings/{booking}/cancel', [AdminBookingController::class, 'cancel'])->name('bookings.cancel');
+    Route::resource('transactions', AdminTransactionController::class)->only(['index', 'show']);
 });
 
 // Profile Routes

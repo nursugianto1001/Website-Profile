@@ -6,7 +6,7 @@
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-semibold">Upload New Background Video</h1>
         <a href="{{ route('admin.background-videos.index') }}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
-            Back to List
+            <i class="bi bi-arrow-left mr-2"></i>Back to List
         </a>
     </div>
 

@@ -6,7 +6,7 @@
         <h2 class="text-3xl font-semibold text-gray-800">
             {{ request('type') == 'documentation' ? 'Add Documentation Photo' : 'Add Poster' }}
         </h2>
-        <a href="{{ route('admin.gallery.index') }}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
+        <a href="{{ route('admin.gallery.index') }}" class="inline-flex px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition">
             <i class="bi bi-arrow-left mr-2"></i> Back to Gallery
         </a>
     </div>

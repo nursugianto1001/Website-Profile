@@ -168,15 +168,11 @@ class BookingPageController extends Controller
                     continue;
                 }
 
-                // Sort slot waktu
                 $timeSlots = $selectedSlots[$fieldId];
                 sort($timeSlots);
 
-                if (empty($timeSlots)) {
-                    continue;
-                }
+                if (empty($timeSlots)) continue;
 
-                // Hitung waktu mulai dan selesai
                 $startTime = $timeSlots[0];
                 $endTime = Carbon::parse($timeSlots[count($timeSlots) - 1])->addHour()->format('H:i:s');
 
@@ -193,7 +189,7 @@ class BookingPageController extends Controller
                     return redirect()->back()->with('error', "Lapangan {$fieldId} tidak tersedia untuk slot waktu yang dipilih. Silakan pilih slot waktu lain.")->withInput();
                 }
 
-                // Buat booking
+                // Buat booking (perhitungan harga di backend)
                 $bookingData = [
                     'field_id' => $fieldId,
                     'customer_name' => $request->customer_name,
@@ -204,7 +200,6 @@ class BookingPageController extends Controller
                     'end_time' => $endTime,
                     'payment_method' => $request->payment_method
                 ];
-
                 $booking = $this->bookingService->createBooking($bookingData);
 
                 if (!$booking) {
@@ -218,21 +213,38 @@ class BookingPageController extends Controller
 
             DB::commit();
 
-            // Proses pembayaran
+            // Pembayaran Online: buat satu transaksi Midtrans untuk semua booking
             if ($request->payment_method === 'online') {
-                $mainBooking = $bookings[0];
-                Session::put('booking_ids', array_map(function ($booking) {
-                    return $booking->id;
-                }, $bookings));
-
-                // Redirect ke halaman pembayaran dengan signed URL
-                $paymentUrl = URL::signedRoute('booking.payment', ['booking' => $mainBooking->id]);
+                $orderId = 'ORD-MULTI-' . implode('-', array_map(fn($b) => $b->id, $bookings)) . '-' . time();
+                $midtransResponse = app('App\Providers\MidtransService')->createTransaction([
+                    'booking_id' => implode(',', array_map(fn($b) => $b->id, $bookings)),
+                    'customer_name' => $request->customer_name,
+                    'customer_email' => $request->customer_email,
+                    'customer_phone' => $request->customer_phone,
+                    'total_price' => (int)$totalPrice,
+                    'items' => [
+                        [
+                            'id' => 'MULTI',
+                            'name' => 'Multi Booking',
+                            'price' => (int)$totalPrice,
+                            'quantity' => 1
+                        ]
+                    ]
+                ]);
+                foreach ($bookings as $booking) {
+                    $booking->update([
+                        'snap_token' => $midtransResponse['token'],
+                        'booking_code' => $midtransResponse['order_id']
+                    ]);
+                }
+                Session::put('booking_ids', array_map(fn($b) => $b->id, $bookings));
+                $paymentUrl = URL::signedRoute('booking.payment', ['booking' => $bookings[0]->id]);
                 return redirect()->to($paymentUrl);
             } else {
-                // Redirect ke halaman sukses dengan signed URL
+                // Pembayaran cash: redirect ke halaman sukses
                 $successUrl = URL::signedRoute('booking.success', ['booking' => $bookings[0]->id]);
                 return redirect()->to($successUrl)
-                    ->with('multipleBookings', true)
+                    ->with('multipleBookings', count($bookings) > 1)
                     ->with('totalBookings', count($bookings));
             }
         } catch (\Exception $e) {
@@ -242,38 +254,50 @@ class BookingPageController extends Controller
         }
     }
 
+
     /**
      * Display payment page
      */
     public function payment(Request $request, Booking $booking)
     {
-        // Validasi signature oleh middleware 'signed'
+        // Ambil semua booking terkait dari session atau parameter
+        $bookingIds = Session::get('booking_ids', [$booking->id]);
+        $bookings = Booking::with('field')->whereIn('id', $bookingIds)->get();
 
-        $totalBookings = Session::get('totalBookings', 1);
-        $totalPrice = $booking->total_price;
+        $totalBookings = $bookings->count();
+        $totalPrice = $bookings->sum('total_price');
+        $snapToken = $booking->snap_token; // Ambil dari booking utama
 
-        return view('pages.payment', [
-            'booking' => $booking,
-            'totalBookings' => $totalBookings,
-            'totalPrice' => $totalPrice,
-            'snapToken' => $booking->snap_token,
-            'clientKey' => config('midtrans.client_key')
-        ]);
+        return view('pages.payment', compact('bookings', 'totalBookings', 'totalPrice', 'snapToken'));
     }
+
 
     /**
      * Display booking success page
      */
-    public function bookingSuccess(Request $request, Booking $booking)
+    public function bookingSuccess(Request $request, $booking = null)
     {
-        // Validasi signature oleh middleware 'signed'
+        $bookingIds = session('booking_ids', []);
 
-        $booking->load(['field', 'slots']);
-        $multipleBookings = Session::get('multipleBookings', false);
-        $totalBookings = Session::get('totalBookings', 1);
+        // Jika session kosong, ambil dari parameter URL (bisa multi-ID)
+        if (empty($bookingIds) && $booking) {
+            $bookingIds = explode(',', $booking);
+        } elseif (empty($bookingIds) && $request->has('booking')) {
+            $bookingIds = explode(',', $request->booking);
+        }
 
-        return view('pages.booking-success', compact('booking', 'multipleBookings', 'totalBookings'));
+        $bookings = Booking::with('field')->whereIn('id', $bookingIds)->get();
+
+        if ($bookings->isEmpty()) {
+            return redirect('/')->with('error', 'Data booking tidak ditemukan.');
+        }
+
+        $totalBookings = $bookings->count();
+        $totalPrice = $bookings->sum('total_price');
+
+        return view('pages.booking-success', compact('bookings', 'totalBookings', 'totalPrice'));
     }
+
 
     /**
      * Handle payment finish callback dari Midtrans
@@ -287,28 +311,31 @@ class BookingPageController extends Controller
             return redirect()->route('home')->with('error', 'Booking tidak ditemukan.');
         }
 
-        $booking = Booking::with(['field', 'slots'])->findOrFail($bookingIds[0]);
-
-        if (empty($booking->booking_code) && !empty($orderId)) {
-            $booking->booking_code = $orderId;
-            Log::info('Setting booking code: ' . $orderId);
-        }
-
-        if ($booking->payment_status == 'pending') {
-            $booking->payment_status = 'settlement';
-            $booking->status = 'confirmed';
-            $booking->save();
+        // Update semua booking yang terkait
+        foreach ($bookingIds as $id) {
+            $booking = Booking::with(['field', 'slots'])->find($id);
+            if ($booking) {
+                if (empty($booking->booking_code) && !empty($orderId)) {
+                    $booking->booking_code = $orderId;
+                }
+                if ($booking->payment_status == 'pending') {
+                    $booking->payment_status = 'settlement';
+                    $booking->status = 'confirmed';
+                }
+                $booking->save();
+            }
         }
 
         Session::forget('booking_ids');
 
-        // Redirect ke halaman sukses dengan signed URL
-        $successUrl = URL::signedRoute('booking.success', ['booking' => $booking->id]);
+        // Kirim semua ID booking ke URL success (dipisah koma)
+        $successUrl = URL::signedRoute('booking.success', ['booking' => implode(',', $bookingIds)]);
 
         return redirect()->to($successUrl)
             ->with('multipleBookings', count($bookingIds) > 1)
             ->with('totalBookings', count($bookingIds));
     }
+
 
     /**
      * Handle pembayaran belum selesai dari Midtrans
@@ -321,17 +348,19 @@ class BookingPageController extends Controller
             return redirect()->route('home')->with('error', 'Booking tidak ditemukan.');
         }
 
-        $booking = Booking::findOrFail($bookingIds[0]);
+        // (Opsional) update status booking jika perlu
+
         Session::forget('booking_ids');
 
-        // Redirect ke halaman sukses dengan signed URL
-        $successUrl = URL::signedRoute('booking.success', ['booking' => $booking->id]);
+        // Kirim semua ID booking ke URL success (dipisah koma)
+        $successUrl = URL::signedRoute('booking.success', ['booking' => implode(',', $bookingIds)]);
 
         return redirect()->to($successUrl)
             ->with('multipleBookings', count($bookingIds) > 1)
             ->with('totalBookings', count($bookingIds))
             ->with('warning', 'Pembayaran Anda masih dalam proses. Anda akan menerima konfirmasi setelah pembayaran selesai.');
     }
+
 
     /**
      * Handle pembayaran error dari Midtrans

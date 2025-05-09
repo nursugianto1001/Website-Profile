@@ -14,7 +14,6 @@
     <div class="container mx-auto px-4 py-8">
         <div class="max-w-2xl mx-auto">
             <h1 class="text-3xl font-bold mb-6">Payment Details</h1>
-
             <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
                 <div class="bg-blue-600 text-white px-6 py-4">
                     <h2 class="text-xl font-semibold">Booking Summary</h2>
@@ -22,35 +21,41 @@
                 <div class="p-6 space-y-4">
                     <div class="flex justify-between border-b pb-3">
                         <span class="font-medium">Customer Name:</span>
-                        <span id="customer-name">{{ $booking->customer_name }}</span>
+                        <span>{{ $bookings->first()->customer_name }}</span>
                     </div>
                     <div class="flex justify-between border-b pb-3">
                         <span class="font-medium">Email:</span>
-                        <span id="customer-email">{{ $booking->customer_email }}</span>
+                        <span>{{ $bookings->first()->customer_email }}</span>
                     </div>
                     <div class="flex justify-between border-b pb-3">
                         <span class="font-medium">Phone:</span>
-                        <span id="customer-phone">{{ $booking->customer_phone }}</span>
+                        <span>{{ $bookings->first()->customer_phone }}</span>
                     </div>
                     <div class="flex justify-between border-b pb-3">
                         <span class="font-medium">Date:</span>
-                        <span id="booking-date">{{ \Carbon\Carbon::parse($booking->booking_date)->format('d M Y') }}</span>
+                        <span>{{ \Carbon\Carbon::parse($bookings->first()->booking_date)->format('d M Y') }}</span>
                     </div>
-                    <div class="flex justify-between border-b pb-3">
-                        <span class="font-medium">Number of Bookings:</span>
-                        <span id="total-bookings">{{ $totalBookings }}</span>
+                    <!-- Ringkasan multi-lapangan tanpa bullet/titik -->
+                    <div class="border-t pt-4 mb-2">
+                        <h3 class="font-semibold mb-2">Lapangan yang Dipesan:</h3>
+                        <div class="space-y-1">
+                            @foreach($bookings as $b)
+                            <div>
+                                <span class="font-bold">{{ $b->field->name }}</span>:
+                                {{ \Carbon\Carbon::parse($b->start_time)->format('H:i') }}-{{ \Carbon\Carbon::parse($b->end_time)->format('H:i') }}
+                            </div>
+                            @endforeach
+                        </div>
                     </div>
-                    <div class="flex justify-between text-lg font-bold">
+                    <div class="flex justify-between text-lg font-bold mt-4">
                         <span>Total Amount:</span>
                         <span id="total-amount">Rp {{ number_format($totalPrice, 0, ',', '.') }}</span>
                     </div>
                 </div>
             </div>
-
             <div class="text-center mt-6">
                 <a href="/" class="text-blue-600 hover:text-blue-800">← Back to Home</a>
             </div>
-
             <!-- Loading indicator -->
             <div id="loading-indicator" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                 <div class="bg-white p-5 rounded-lg shadow-lg text-center">
@@ -60,13 +65,10 @@
             </div>
         </div>
     </div>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const loadingIndicator = document.getElementById('loading-indicator');
             const snapToken = "{{ $snapToken }}";
-
-            // Automatically open Midtrans popup when page loads
             setTimeout(function() {
                 if (snapToken) {
                     snap.pay(snapToken, {
@@ -93,7 +95,7 @@
                     alert('Payment token not found. Please try again.');
                     window.location.href = '/booking/form';
                 }
-            }, 1000); // Delay 1 second to show loading indicator
+            }, 1000);
         });
     </script>
 </body>

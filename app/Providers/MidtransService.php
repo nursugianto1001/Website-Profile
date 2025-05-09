@@ -81,7 +81,11 @@ class MidtransService
                 'transaction_details' => $transaction_details,
                 'item_details' => $item_details,
                 'customer_details' => $customer_details,
+                'callbacks' => [
+                    'finish' => 'https://fe5d-118-99-64-209.ngrok-free.app/payment/finish'
+                ]
             ];
+
 
             Log::info('Midtrans Request: ' . json_encode($transaction_data));
             $snapToken = \Midtrans\Snap::getSnapToken($transaction_data);

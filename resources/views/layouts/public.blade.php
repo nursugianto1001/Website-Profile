@@ -22,9 +22,9 @@
             <div class="w-full py-4 flex items-center justify-between">
                 <div class="flex-shrink-0 flex items-center relative">
                     <img src="{{ Vite::asset(asset: 'resources/images/Karvin.png') }}" alt="Karvin Logo"
-                        class="h-10 w-auto">
+                        class="h-12 w-auto">
                     <span
-                        class="italic font-black text-white text-xl ml-2 absolute right-[-60px] whitespace-nowrap">Karvin</span>
+                        class="italic font-black text-white">Karvin Badminton</span>
                 </div>
 
                 <div id="desktopMenu" class="hidden md:flex flex-grow justify-center space-x-6">
@@ -89,15 +89,7 @@
                             <li>Alamat: Jalan Veteran, Jalan Karvin</li>
                         </ul>
                         <div class="mt-4 flex gap-4">
-                            <a href="#"
-                                class="text-gray-300 hover:text-[#A66E38] w-10 h-10 flex items-center justify-center">
-                                <i class="fab fa-facebook text-xl"></i>
-                            </a>
-                            <a href="#"
-                                class="text-gray-300 hover:text-[#A66E38] w-10 h-10 flex items-center justify-center">
-                                <i class="fab fa-twitter text-xl"></i>
-                            </a>
-                            <a href="#"
+                            <a href="https://www.instagram.com/karvin_badminton/"
                                 class="text-gray-300 hover:text-[#A66E38] w-10 h-10 flex items-center justify-center">
                                 <i class="fab fa-instagram text-xl"></i>
                             </a>

@@ -113,34 +113,23 @@ class BookingService
     public function createBooking($data)
     {
         try {
-            // Create a transaction if not already in one
             $currentTransaction = DB::transactionLevel() > 0;
             if (!$currentTransaction) {
                 DB::beginTransaction();
             }
 
-            // Standardize date formats for correct calculation
             $bookingDate = Carbon::parse($data['booking_date'])->format('Y-m-d');
             $startTime = Carbon::parse($data['start_time']);
             $endTime = Carbon::parse($data['end_time']);
 
-            // Ensure both times are on the same date for correct duration calculation
             if ($startTime->format('Y-m-d') !== $endTime->format('Y-m-d')) {
-                $endTime->setDate(
-                    $startTime->year,
-                    $startTime->month,
-                    $startTime->day
-                );
+                $endTime->setDate($startTime->year, $startTime->month, $startTime->day);
             }
 
-            // Calculate hours (ensure positive value)
             $hours = abs($endTime->diffInHours($startTime));
-
-            // Get field details
             $field = Field::findOrFail($data['field_id']);
             $totalPrice = abs($field->price_per_hour * $hours);
 
-            // Create booking
             $booking = Booking::create([
                 'field_id' => $data['field_id'],
                 'customer_name' => $data['customer_name'],
@@ -149,15 +138,15 @@ class BookingService
                 'booking_date' => $bookingDate,
                 'start_time' => $startTime,
                 'end_time' => $endTime,
-                'duration_hours' => $hours, // Ensure positive value
-                'total_price' => $totalPrice, // Ensure positive value
+                'duration_hours' => $hours,
+                'total_price' => $totalPrice,
                 'payment_method' => $data['payment_method'],
                 'payment_status' => 'pending',
                 'status' => 'booked',
-                'booking_code' => null, // Initialize booking_code field
+                'booking_code' => null,
             ]);
 
-            // Create booking slots (1 slot per hour)
+            // Buat slot booking
             $currentSlot = $startTime->copy();
             while ($currentSlot < $endTime) {
                 BookingSlot::create([
@@ -172,66 +161,10 @@ class BookingService
                 $currentSlot->addHour();
             }
 
-            // Handle payment method
-            // Handle payment method
-            if ($data['payment_method'] === 'online') {
-                // Generate order ID
-                $orderId = 'ORD-' . $booking->id . '-' . time();
-
-                // Generate Midtrans payment with proper formatting
-                $midtransResponse = $this->midtransService->createTransaction([
-                    'booking_id' => $booking->id,
-                    'customer_name' => $booking->customer_name,
-                    'customer_email' => $booking->customer_email,
-                    'customer_phone' => $booking->customer_phone,
-                    'total_price' => (int)$totalPrice,
-                    'items' => [
-                        [
-                            'id' => $field->id,
-                            'name' => $field->name ?: "Field #$field->id",
-                            'price' => (int)$field->price_per_hour,
-                            'quantity' => (int)$hours
-                        ]
-                    ]
-                ]);
-
-                if ($midtransResponse) {
-                    // Update booking with token and order ID
-                    $booking->update([
-                        'snap_token' => $midtransResponse['token'],
-                        'booking_code' => $midtransResponse['order_id']
-                    ]);
-
-                    // Create transaction record
-                    Transaction::create([
-                        'booking_id' => $booking->id,
-                        'order_id' => $midtransResponse['order_id'],
-                        'transaction_status' => 'pending',
-                        'gross_amount' => (int)$totalPrice,
-                        'transaction_time' => now(),
-                    ]);
-                }
-            } else if ($data['payment_method'] === 'cash') {
-                // Create cash transaction
-                $cashOrderId = 'CASH-' . $booking->id . '-' . time();
-
-                // Set booking code for cash payments too
-                $booking->update(['booking_code' => $cashOrderId]);
-
-                Transaction::create([
-                    'booking_id' => $booking->id,
-                    'order_id' => $cashOrderId,
-                    'payment_type' => 'cash',
-                    'transaction_status' => 'pending',
-                    'gross_amount' => (int)$totalPrice, // Ensure integer value
-                    'transaction_time' => now(),
-                    'is_manual' => true,
-                ]);
-            }
-
+            // Pembayaran cash: kirim invoice WhatsApp
             if ($data['payment_method'] === 'cash') {
                 try {
-                    $adminPhone = env('ADMIN_WHATSAPP_NUMBER', '6281254767505'); // Atur di .env
+                    $adminPhone = env('ADMIN_WHATSAPP_NUMBER', '6281254767505');
                     $fieldName = $field->name ?: "Lapangan #$field->id";
                     $formattedDate = Carbon::parse($bookingDate)->format('d M Y');
                     $timeRange = $startTime->format('H:i') . '-' . $endTime->format('H:i');
@@ -244,24 +177,19 @@ class BookingService
                         . "Total: Rp " . number_format($booking->total_price, 0, ',', '.') . "\n\n"
                         . "Segera konfirmasi slot!";
                     $waUrl = "https://api.whatsapp.com/send?phone={$adminPhone}&text=" . urlencode($message);
-
-                    // Simpan url WA ke kolom payment_instruction booking
                     $booking->update(['payment_instruction' => $waUrl]);
                 } catch (\Exception $e) {
                     Log::error('Gagal buat WhatsApp invoice: ' . $e->getMessage());
                 }
             }
-            // Commit transaction if we created one
+
             if (!$currentTransaction) {
                 DB::commit();
             }
 
-            // Refresh booking to get the updated data
             $booking->refresh();
-
             return $booking;
         } catch (\Exception $e) {
-            // Only rollback if we created the transaction
             if (!isset($currentTransaction) || !$currentTransaction) {
                 DB::rollBack();
             }
@@ -269,6 +197,7 @@ class BookingService
             return null;
         }
     }
+
 
     /**
      * Cancel a booking

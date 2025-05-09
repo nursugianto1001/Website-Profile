@@ -103,7 +103,6 @@
                 <div class="flex justify-between items-center border-t pt-4 mt-4">
                     <span class="text-xl font-bold">Total Amount:</span>
                     <span id="total-price" class="text-xl font-bold text-blue-600">Rp 0</span>
-                    <input type="hidden" name="total_amount" id="total_amount" value="0">
                 </div>
             </div>
 
@@ -536,7 +535,6 @@
                 document.getElementById(
                     "total-price"
                 ).textContent = `Rp ${totalAmount.toLocaleString("id-ID")}`;
-                document.getElementById("total_amount").value = totalAmount;
             }
 
             // Function to clear all selections
@@ -567,20 +565,11 @@
                     const hasSelections = Object.keys(selectedSlots).length > 0;
 
                     if (!hasSelections) {
-                        e.preventDefault(); // Prevent form submission only if validation fails
+                        e.preventDefault();
                         alert("Please select at least one time slot for a field.");
                         return false;
                     }
-
-                    if (totalAmount <= 0) {
-                        e.preventDefault(); // Prevent form submission only if validation fails
-                        alert(
-                            "Total amount cannot be zero. Please select valid time slots."
-                        );
-                        return false;
-                    }
-
-                    // If validation passes, form will be submitted normally
+                    // Hapus validasi totalAmount
                 });
 
             // Initialize form inputs and displays

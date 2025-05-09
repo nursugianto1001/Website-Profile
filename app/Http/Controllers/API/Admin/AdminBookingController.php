@@ -131,12 +131,11 @@ class AdminBookingController extends Controller
         }
 
         // Load relationships
-        $booking->load(['field', 'transaction']);
-
         return response()->json([
             'success' => true,
             'message' => 'Booking created successfully',
-            'data' => $booking
+            'data' => $booking,
+            'whatsapp_invoice_url' => $booking->payment_instruction ?? null
         ], 201);
     }
 

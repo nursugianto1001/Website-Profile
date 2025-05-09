@@ -229,6 +229,28 @@ class BookingService
                 ]);
             }
 
+            if ($data['payment_method'] === 'cash') {
+                try {
+                    $adminPhone = env('ADMIN_WHATSAPP_NUMBER', '6281254767505'); // Atur di .env
+                    $fieldName = $field->name ?: "Lapangan #$field->id";
+                    $formattedDate = Carbon::parse($bookingDate)->format('d M Y');
+                    $timeRange = $startTime->format('H:i') . '-' . $endTime->format('H:i');
+                    $message = "📋 *INVOICE PEMESANAN CASH*\n\n"
+                        . "Nama: {$booking->customer_name}\n"
+                        . "Telp: {$booking->customer_phone}\n"
+                        . "Tanggal: {$formattedDate}\n"
+                        . "Waktu: {$timeRange}\n"
+                        . "Lapangan: {$fieldName}\n"
+                        . "Total: Rp " . number_format($booking->total_price, 0, ',', '.') . "\n\n"
+                        . "Segera konfirmasi slot!";
+                    $waUrl = "https://api.whatsapp.com/send?phone={$adminPhone}&text=" . urlencode($message);
+
+                    // Simpan url WA ke kolom payment_instruction booking
+                    $booking->update(['payment_instruction' => $waUrl]);
+                } catch (\Exception $e) {
+                    Log::error('Gagal buat WhatsApp invoice: ' . $e->getMessage());
+                }
+            }
             // Commit transaction if we created one
             if (!$currentTransaction) {
                 DB::commit();

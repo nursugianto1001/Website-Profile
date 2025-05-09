@@ -24,6 +24,7 @@ class Booking extends Model
         'snap_token',
         'booking_code',
         'status',
+        'payment_instruction',
     ];
 
     protected $casts = [

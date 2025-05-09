@@ -10,7 +10,7 @@
             <form action="{{ route('admin.facilities.update', $facility) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
-                
+
                 <div class="mb-4">
                     <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
                     <input type="text" name="name" id="name" value="{{ old('name', $facility->name) }}" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required>

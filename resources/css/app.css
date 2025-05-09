@@ -1,3 +1,252 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Badminton Theme Colors */
+:root {
+    --primary-yellow: #FFEB00;
+    --badminton-blue: #0057A8;
+    --badminton-green: #00A651;
+    --badminton-court: #17223B;
+    --badminton-lines: #FFFFFF;
+    --badminton-net: #263238;
+}
+
+/* Background Elements */
+.badminton-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+    background-color: var(--badminton-court);
+}
+
+.court-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 90%;
+    border: 2px solid var(--badminton-lines);
+    opacity: 0.8;
+}
+
+.court-overlay::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--badminton-lines);
+}
+
+.court-overlay::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    background-color: var(--badminton-net);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+.shuttlecock {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50% 50% 5% 5%;
+    background: white;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transform: rotate(45deg);
+}
+
+.shuttlecock::before {
+    content: '';
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    width: 40%;
+    height: 40%;
+    border-radius: 50%;
+    background: var(--primary-yellow);
+}
+
+.shuttlecock::after {
+    content: '';
+    position: absolute;
+    top: 80%;
+    left: 25%;
+    width: 50%;
+    height: 40%;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.1));
+    border-radius: 0 0 50% 50%;
+}
+
+.shuttlecock-1 {
+    top: 15%;
+    right: 20%;
+    transform: rotate(45deg) scale(1.5);
+    animation: float 8s ease-in-out infinite;
+}
+
+.shuttlecock-2 {
+    bottom: 15%;
+    left: 15%;
+    transform: rotate(-120deg) scale(1.2);
+    animation: float 6s ease-in-out infinite 1s;
+}
+
+.shuttlecock-3 {
+    top: 60%;
+    right: 25%;
+    transform: rotate(75deg);
+    animation: float 7s ease-in-out infinite 2s;
+}
+
+.racket {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 10px solid var(--badminton-blue);
+    opacity: 0.8;
+}
+
+.racket::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 85%;
+    height: 85%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.1);
+}
+
+.racket::after {
+    content: '';
+    position: absolute;
+    top: 70%;
+    left: 50%;
+    width: 20px;
+    height: 100px;
+    transform: translateX(-50%);
+    background: var(--badminton-blue);
+    border-radius: 5px;
+}
+
+.racket-1 {
+    bottom: -5%;
+    left: 20%;
+    transform: rotate(-30deg) scale(0.7);
+    opacity: 0.6;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0) rotate(45deg);
+    }
+
+    50% {
+        transform: translateY(-20px) rotate(45deg);
+    }
+}
+
+/* Login Form Styling */
+.shadow-badminton {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(0, 87, 168, 0.1);
+}
+
+.badminton-icon {
+    width: 60px;
+    height: 60px;
+    background-color: var(--badminton-blue);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.shuttlecock-icon {
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50% 50% 15% 15%;
+    position: relative;
+}
+
+.shuttlecock-icon::before {
+    content: '';
+    position: absolute;
+    top: 25%;
+    left: 25%;
+    width: 50%;
+    height: 50%;
+    border-radius: 50%;
+    background-color: var(--primary-yellow);
+}
+
+.title-underline {
+    width: 70px;
+    height: 3px;
+    background-color: var(--primary-yellow);
+    margin: 0.5rem auto 1rem;
+}
+
+/* Form Elements */
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+    @apply block w-full rounded-md border-gray-300 focus:border-badminton-blue focus:ring focus:ring-badminton-blue/20 focus:ring-opacity-50 transition duration-150;
+}
+
+/* Button Styling */
+.btn,
+button[type="submit"],
+.primary-button {
+    @apply inline-flex items-center px-4 py-2 border border-transparent rounded-full text-sm font-medium transition ease-in-out duration-150;
+    background: var(--badminton-blue);
+    color: white;
+}
+
+.btn:hover,
+button[type="submit"]:hover,
+.primary-button:hover {
+    @apply transform -translate-y-0.5 shadow-md;
+    background: #0045a0;
+}
+
+.btn:focus,
+button[type="submit"]:focus,
+.primary-button:focus {
+    @apply outline-none ring-2 ring-offset-2 ring-badminton-blue;
+}
+
+/* Remember Me Checkbox */
+input[type="checkbox"] {
+    @apply rounded border-gray-300 text-badminton-green shadow-sm focus:border-badminton-green focus:ring focus:ring-badminton-green/20 focus:ring-opacity-50;
+}
+
+/* Text Colors */
+.text-badminton-blue {
+    color: var(--badminton-blue);
+}
+
+.text-badminton-green {
+    color: var(--badminton-green);
+}

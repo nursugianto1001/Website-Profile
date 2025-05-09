@@ -5,7 +5,8 @@
 <div class="container mx-auto px-4 py-6">
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-semibold">Background Videos</h1>
-        <a href="{{ route('admin.background-videos.create') }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+        <a href="{{ route('admin.background-videos.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg shadow hover:bg-blue-700 transition">
+            <i class="bi bi-plus-circle mr-2 text-white"></i>
             Upload New Video
         </a>
     </div>

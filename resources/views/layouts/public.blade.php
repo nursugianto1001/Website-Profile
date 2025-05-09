@@ -102,7 +102,7 @@
                 </div>
 
                 <div class="mt-6 border-t border-[#ffff] pt-6 text-center">
-                    <p class="text-white text-sm">&copy; {{ date('Y') }} Karvin. All rights reserved.</p>
+                    <p class="text-white text-sm">&copy; {{ date('Y') }} Karvin Badminton. All rights reserved.</p>
                 </div>
             </div>
         </div>

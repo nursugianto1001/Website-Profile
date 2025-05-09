@@ -71,9 +71,9 @@
                         Pelajari lebih lanjut tentang perjalanan kami
                     </a>
                 </div>
-                <div class="rounded-lg overflow-hidden shadow-xl" data-aos="fade-left" data-aos-duration="1000">
-                    <img src="{{ Vite::asset('resources/images/copicop.jpg') }}" alt="About Us"
-                        class="w-full h-full object-cover">
+                <div class="order-2 md:order-1" data-aos="fade-left" data-aos-duration="1000">
+                    <img src="{{ Vite::asset('resources/images/servis.jpg') }}" alt="About Us"
+                        class="w-[500px] h-[500px] rounded-lg max-w-md mx-auto">
                 </div>
             </div>
         </div>

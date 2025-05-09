@@ -211,6 +211,20 @@
                 tableHeader.appendChild(th);
             });
 
+            // Function to format time range
+            function formatTimeRange(startTime) {
+                // Parse the start time
+                const [hours, minutes] = startTime.split(':');
+                const startHour = parseInt(hours);
+                const startMin = minutes;
+
+                // Calculate end time (assuming 1-hour slots)
+                const endHour = (startHour + 1) % 24;
+
+                // Format as HH:MM-HH:MM
+                return `${hours}:${startMin}-${String(endHour).padStart(2, '0')}:${startMin}`;
+            }
+
             // Function to render time slots based on availability
             function renderTimeSlots() {
                 // Clear existing table body
@@ -221,10 +235,10 @@
                 slots.forEach(slot => {
                     const tr = document.createElement('tr');
 
-                    // Time column
+                    // Time column with range format (e.g., 08:00-09:00)
                     const tdTime = document.createElement('td');
                     tdTime.className = 'border px-4 py-2 font-medium';
-                    tdTime.textContent = slot.formatted_time;
+                    tdTime.textContent = formatTimeRange(slot.time);
                     tr.appendChild(tdTime);
 
                     // Field columns
@@ -436,15 +450,9 @@
                             .getAttribute("data-field-name");
                         const slots = selectedSlots[fieldId].sort();
 
-                        // Format times nicely
+                        // Format times with ranges
                         const formattedTimes = slots
-                            .map((slot) => {
-                                const time = new Date(`2000-01-01T${slot}`);
-                                return time.toLocaleTimeString([], {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                });
-                            })
+                            .map((slot) => formatTimeRange(slot))
                             .join(", ");
 
                         summaryHTML += `<div class="mb-2"><strong>${fieldName}:</strong> ${formattedTimes}</div>`;
@@ -497,15 +505,9 @@
                     const slots = selectedSlots[fieldId].sort();
                     const subtotal = slots.length * fieldPrice;
 
-                    // Format times
+                    // Format times with ranges
                     const formattedTimes = slots
-                        .map((slot) => {
-                            const time = new Date(`2000-01-01T${slot}`);
-                            return time.toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                            });
-                        })
+                        .map((slot) => formatTimeRange(slot))
                         .join(", ");
 
                     summaryHTML += `

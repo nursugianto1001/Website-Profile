@@ -9,6 +9,10 @@ use App\Providers\BookingService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Log;
+
 
 class AdminBookingController extends Controller
 {
@@ -246,5 +250,49 @@ class AdminBookingController extends Controller
             'success' => true,
             'message' => 'Booking deleted successfully'
         ]);
+    }
+
+    public function confirmCashBooking(Request $request)
+    {
+        $pendingBooking = Session::get('pending_cash_booking');
+
+        if (!$pendingBooking) {
+            abort(404, 'Booking tidak ditemukan');
+        }
+
+        DB::beginTransaction();
+        try {
+            foreach ($pendingBooking['selected_fields'] as $fieldId) {
+                // Validasi ulang ketersediaan slot
+                $slots = $pendingBooking['selected_slots'][$fieldId];
+                $startTime = Carbon::parse($slots[0]);
+                $endTime = Carbon::parse(end($slots))->addHour();
+
+                if (!$this->bookingService->areSlotsAvailable($fieldId, $pendingBooking['booking_date'], $startTime, $endTime)) {
+                    throw new \Exception("Slot untuk lapangan {$fieldId} sudah tidak tersedia");
+                }
+
+                // Create booking dengan status confirmed
+                $booking = $this->bookingService->createBooking([
+                    'field_id' => $fieldId,
+                    'customer_name' => $pendingBooking['customer_name'],
+                    'customer_phone' => $pendingBooking['customer_phone'],
+                    'booking_date' => $pendingBooking['booking_date'],
+                    'start_time' => $startTime,
+                    'end_time' => $endTime,
+                    'payment_method' => 'cash'
+                ], true);
+            }
+
+            Session::forget('pending_cash_booking');
+            DB::commit();
+
+            return redirect()->route('admin.bookings.index')
+                ->with('success', 'Booking berhasil dikonfirmasi. Slot sekarang tidak tersedia.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Gagal konfirmasi booking cash: ' . $e->getMessage());
+            return back()->with('error', 'Gagal mengonfirmasi booking: ' . $e->getMessage());
+        }
     }
 }

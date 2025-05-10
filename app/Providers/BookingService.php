@@ -108,10 +108,10 @@ class BookingService
     public function generateCashInvoiceWhatsapp(array $data): array
     {
         $adminPhone = env('ADMIN_WHATSAPP_NUMBER', '6281234567890');
-        $invoice = "📋 *INVOICE PEMESANAN CASH*\n\n"
-            . "👤 Nama: {$data['customer_name']}\n"
-            . "📞 Telp: {$data['customer_phone']}\n"
-            . "📅 Tanggal: " . Carbon::parse($data['booking_date'])->format('d M Y') . "\n\n";
+        $invoice = "INVOICE PEMESANAN CASH\n\n"
+            . "Nama: {$data['customer_name']}\n"
+            . "Telp: {$data['customer_phone']}\n"
+            . "Tanggal: " . Carbon::parse($data['booking_date'])->format('d M Y') . "\n\n";
 
         $totalPrice = 0;
 
@@ -129,14 +129,14 @@ class BookingService
             $subtotal = $field->price_per_hour * $duration;
             $totalPrice += $subtotal;
 
-            $invoice .= "▸ *{$field->name}*\n"
-                . "   ⌚ {$start} - {$end}\n"
-                . "   ⏳ {$duration} jam\n"
-                . "   💰 Rp " . number_format($subtotal, 0, ',', '.') . "\n\n";
+            $invoice .= "Lapangan: {$field->name}\n"
+                . "Waktu: {$start} - {$end}\n"
+                . "Durasi: {$duration} jam\n"
+                . "Harga: Rp " . number_format($subtotal, 0, ',', '.') . "\n\n";
         }
 
-        $invoice .= "----------\n"
-            . "💵 *TOTAL: Rp " . number_format($totalPrice, 0, ',', '.') . "*";
+        $invoice .= "------------------------\n"
+            . "TOTAL: Rp " . number_format($totalPrice, 0, ',', '.') . "\n\n";
 
         return [
             'wa_url' => "https://wa.me/{$adminPhone}?text=" . urlencode($invoice),
@@ -148,7 +148,7 @@ class BookingService
     /**
      * Proses pembuatan booking dengan validasi lengkap
      */
-    public function createBooking(array $data): ?Booking
+    public function createBooking(array $data, bool $isConfirmed = false): ?Booking
     {
         try {
             DB::beginTransaction();
@@ -166,13 +166,15 @@ class BookingService
             $duration = $endTime->diffInHours($startTime);
             $totalPrice = $field->price_per_hour * $duration;
 
-            // Generate booking code
-            $bookingCode = 'CASH-' . Carbon::now()->format('Ymd') . '-' . strtoupper(uniqid());
+            // Generate booking code hanya untuk yang sudah dikonfirmasi
+            $bookingCode = $isConfirmed
+                ? 'CASH-' . Carbon::now()->format('YmdHis') . '-' . strtoupper(uniqid())
+                : null;
 
-            $booking = Booking::create([
+            $bookingData = [
                 'field_id' => $field->id,
                 'customer_name' => $data['customer_name'],
-                'customer_email' => $data['customer_email'],
+                'customer_email' => $data['customer_email'] ?? null,
                 'customer_phone' => $data['customer_phone'],
                 'booking_date' => $bookingDate,
                 'start_time' => $startTime,
@@ -180,23 +182,27 @@ class BookingService
                 'duration_hours' => $duration,
                 'total_price' => $totalPrice,
                 'payment_method' => $data['payment_method'],
-                'payment_status' => 'pending',
-                'status' => 'booked',
-                'booking_code' => $bookingCode,
-            ]);
+                'payment_status' => $isConfirmed ? 'settlement' : 'pending',
+                'status' => $isConfirmed ? 'booked' : 'pending',
+                'booking_code' => $bookingCode
+            ];
 
-            // Create booking slots
-            $currentSlot = $startTime->copy();
-            while ($currentSlot < $endTime) {
-                BookingSlot::create([
-                    'booking_id' => $booking->id,
-                    'field_id' => $field->id,
-                    'booking_date' => $bookingDate,
-                    'slot_time' => $currentSlot->format('H:i:s'),
-                    'start_time' => $currentSlot->format('Y-m-d H:i:s'),
-                    'end_time' => $currentSlot->addHour()->format('Y-m-d H:i:s'),
-                    'status' => 'booked'
-                ]);
+            $booking = Booking::create($bookingData);
+
+            // Hanya buat slot jika booking dikonfirmasi
+            if ($isConfirmed) {
+                $currentSlot = $startTime->copy();
+                while ($currentSlot < $endTime) {
+                    BookingSlot::create([
+                        'booking_id' => $booking->id,
+                        'field_id' => $field->id,
+                        'booking_date' => $bookingDate,
+                        'slot_time' => $currentSlot->format('H:i:s'),
+                        'start_time' => $currentSlot->format('Y-m-d H:i:s'),
+                        'end_time' => $currentSlot->addHour()->format('Y-m-d H:i:s'),
+                        'status' => 'booked'
+                    ]);
+                }
             }
 
             DB::commit();

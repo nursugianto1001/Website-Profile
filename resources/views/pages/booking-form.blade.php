@@ -467,6 +467,15 @@
             updateBookingSummary();
             updateTotalPrice();
             fetchAvailability(currentDate);
+
+            // Jika tanggal yang dipilih adalah hari ini, refresh slot setiap menit
+            const today = new Date().toISOString().split('T')[0];
+            if (currentDate === today) {
+                setInterval(function() {
+                    fetchAvailability(currentDate);
+                }, 60000); // 60000 ms = 1 menit
+            }
+
         });
     </script>
 </body>

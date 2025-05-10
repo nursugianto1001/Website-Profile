@@ -171,14 +171,19 @@ class BookingPageController extends Controller
         $selectedSlots = $request->selected_slots;
         $paymentMethod = $request->payment_method;
 
-        // Di processBooking (cash)
+        // Handle Cash Payment
         if ($paymentMethod === 'cash') {
-            $today = now()->toDateString();
-            if ($bookingDate !== $today) {
-                return back()->with('error', 'Pembayaran cash hanya untuk jadwal hari ini.');
-            }
+            // Simpan data sementara di session
+            Session::put('pending_cash_booking', [
+                'customer_name' => $request->customer_name,
+                'customer_phone' => $request->customer_phone,
+                'booking_date' => $bookingDate,
+                'selected_fields' => $selectedFields,
+                'selected_slots' => $selectedSlots,
+                'payment_method' => 'cash'
+            ]);
 
-            // Panggil service untuk invoice gabungan
+            // Generate invoice WA untuk admin
             $invoiceResult = $this->bookingService->generateCashInvoiceWhatsApp([
                 'customer_name' => $request->customer_name,
                 'customer_phone' => $request->customer_phone,
@@ -186,28 +191,16 @@ class BookingPageController extends Controller
                 'selected_fields' => $selectedFields,
                 'selected_slots' => $selectedSlots,
             ]);
-            $waUrl = $invoiceResult['wa_url'];
-            $totalPrice = $invoiceResult['total_price'];
-
-            Session::put('pending_cash_booking', [
-                'customer_name' => $request->customer_name,
-                'customer_email' => $request->customer_email,
-                'customer_phone' => $request->customer_phone,
-                'booking_date' => $bookingDate,
-                'selected_fields' => $selectedFields,
-                'selected_slots' => $selectedSlots,
-                'payment_method' => $paymentMethod
-            ]);
 
             return view('pages.payment-cash', [
-                'waUrl' => $waUrl,
+                'waUrl' => $invoiceResult['wa_url'],
                 'customer_name' => $request->customer_name,
                 'customer_email' => $request->customer_email,
                 'customer_phone' => $request->customer_phone,
-                'booking_date' => $bookingDate,
-                'selected_fields' => $selectedFields,
-                'selected_slots' => $selectedSlots,
-                'totalPrice' => $totalPrice,
+                'booking_date' => $request->booking_date,
+                'selected_fields' => $request->selected_fields,
+                'selected_slots' => $request->selected_slots, // Tambahkan ini
+                'total_price' => $invoiceResult['total_price'] // Tambahkan ini
             ]);
         }
 

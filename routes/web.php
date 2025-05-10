@@ -62,12 +62,18 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::resource('gallery', GalleryController::class);
     Route::post('gallery/{gallery}/toggle-featured', [GalleryController::class, 'toggleFeatured'])
         ->name('gallery.toggle-featured');
-    
+
     // New Booking System Admin Routes
     Route::resource('fields', AdminFieldController::class);
     Route::resource('bookings', AdminBookingController::class)->only(['index', 'show']);
     Route::put('bookings/{booking}/cancel', [AdminBookingController::class, 'cancel'])->name('bookings.cancel');
     Route::resource('transactions', AdminTransactionController::class)->only(['index', 'show']);
+
+
+    // Route untuk konfirmasi admin via WA
+    Route::get('/admin/confirm-cash-booking', [AdminBookingController::class, 'confirmCashBooking'])
+        ->name('admin.confirm-cash-booking');
+
 });
 
 // Profile Routes
@@ -75,13 +81,4 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
-
-Route::get('/debug-time', function () {
-    return [
-        'date' => now('Asia/Jakarta')->format('Y-m-d'),
-        'time' => now('Asia/Jakarta')->format('H:i:s'),
-        'hour' => (int)now('Asia/Jakarta')->format('H')
-    ];
 });

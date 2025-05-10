@@ -5,203 +5,212 @@ namespace App\Providers;
 use App\Models\Booking;
 use App\Models\BookingSlot;
 use App\Models\Field;
-use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class BookingService
 {
-    protected $midtransService;
-
-    public function __construct(MidtransService $midtransService)
-    {
-        $this->midtransService = $midtransService;
-    }
-
     /**
-     * Check if slots are available for booking
-     *
-     * @param int $fieldId
-     * @param string $bookingDate
-     * @param string $startTime
-     * @param string $endTime
-     * @return bool
+     * Cek ketersediaan slot dengan validasi waktu real-time
      */
     public function areSlotsAvailable($fieldId, $bookingDate, $startTime, $endTime)
     {
-        // Convert times to Carbon instances for easier comparison
         $bookingDate = Carbon::parse($bookingDate)->format('Y-m-d');
         $startDateTime = Carbon::parse("$bookingDate $startTime");
         $endDateTime = Carbon::parse("$bookingDate $endTime");
+        $isToday = Carbon::parse($bookingDate)->isToday();
 
-        // Get all booked slots for the field on the given date
+        // Validasi waktu tidak valid
+        if ($startDateTime->gte($endDateTime)) {
+            return false;
+        }
+
         $bookedSlots = DB::table('booking_slots')
             ->join('bookings', 'booking_slots.booking_id', '=', 'bookings.id')
             ->where('bookings.field_id', $fieldId)
             ->where('bookings.booking_date', $bookingDate)
             ->whereNotIn('bookings.payment_status', ['expired', 'cancel'])
-            ->select('booking_slots.slot_time')
-            ->get();
+            ->pluck('booking_slots.slot_time')
+            ->toArray();
 
-        // Calculate booking slots (1 hour per slot)
-        $currentSlot = $startDateTime->copy();
         $requestedSlots = [];
+        $currentSlot = $startDateTime->copy();
 
+        // Generate slot per jam dengan validasi waktu
         while ($currentSlot < $endDateTime) {
-            $requestedSlots[] = $currentSlot->format('H:i:s');
-            $currentSlot->addHour();
-        }
+            $slotTime = $currentSlot->format('H:i:s');
 
-        // Check if any requested slot overlaps with existing booked slots
-        foreach ($requestedSlots as $slot) {
-            foreach ($bookedSlots as $bookedSlot) {
-                if ($slot === $bookedSlot->slot_time) {
-                    return false;
-                }
+            // Validasi slot hari ini yang sudah lewat
+            if ($isToday && $currentSlot->lt(now())) {
+                return false;
             }
+
+            // Validasi konflik dengan booking lain
+            if (in_array($slotTime, $bookedSlots)) {
+                return false;
+            }
+
+            $currentSlot->addHour();
         }
 
         return true;
     }
 
     /**
-     * Get all available slots for a field on a specific date
-     *
-     * @param int $fieldId
-     * @param string $date
-     * @return array
+     * Mendapatkan slot tersedia dengan validasi real-time
      */
-    public function getAvailableSlots($fieldId, $date)
+    public function getAvailableSlotsData($date)
     {
-        $field = Field::findOrFail($fieldId);
-        $date = Carbon::parse($date)->format('Y-m-d');
+        $date = Carbon::parse($date, 'Asia/Jakarta')->format('Y-m-d');
+        $fields = Field::where('is_active', true)->get();
+        $result = [];
+        $isToday = Carbon::parse($date, 'Asia/Jakarta')->isToday();
+        $currentTime = now('Asia/Jakarta');
 
-        // Get opening and closing hours
-        $openingHour = $field->opening_hour ?? 8; // Default 8 AM
-        $closingHour = $field->closing_hour ?? 22; // Default 10 PM
+        foreach ($fields as $field) {
+            $fieldId = $field->id;
+            $openingHour = $field->opening_hour ?? 8;
+            $closingHour = $field->closing_hour ?? 22;
 
-        // Get all booked slots for the field on the given date
-        $bookedSlots = DB::table('booking_slots')
-            ->join('bookings', 'booking_slots.booking_id', '=', 'bookings.id')
-            ->where('bookings.field_id', $fieldId)
-            ->where('bookings.booking_date', $date)
-            ->whereNotIn('bookings.payment_status', ['expired', 'cancel'])
-            ->pluck('booking_slots.slot_time')
-            ->toArray();
+            $bookedSlots = DB::table('booking_slots')
+                ->join('bookings', 'booking_slots.booking_id', '=', 'bookings.id')
+                ->where('bookings.field_id', $fieldId)
+                ->where('bookings.booking_date', $date)
+                ->whereNotIn('bookings.payment_status', ['expired', 'cancel'])
+                ->pluck('booking_slots.slot_time')
+                ->toArray();
 
-        // Generate all possible slots
-        $allSlots = [];
-        for ($hour = $openingHour; $hour < $closingHour; $hour++) {
-            $slotTime = sprintf('%02d:00:00', $hour);
-            $allSlots[] = [
-                'time' => $slotTime,
-                'formatted_time' => Carbon::parse($slotTime)->format('g:i A'),
-                'is_available' => !in_array($slotTime, $bookedSlots)
-            ];
+            $slots = [];
+            for ($hour = $openingHour; $hour < $closingHour; $hour++) {
+                $slotTime = sprintf('%02d:00:00', $hour);
+                $slotStart = Carbon::createFromFormat('Y-m-d H:i:s', "$date $slotTime", 'Asia/Jakarta');
+                $slotEnd = $slotStart->copy()->addHour();
+
+                $isPast = $isToday && $slotEnd->lte($currentTime);
+                $isBooked = in_array($slotTime, $bookedSlots, true);
+
+                $slots[$slotTime] = [
+                    'formatted_time' => $slotStart->format('H:i') . '-' . $slotEnd->format('H:i'),
+                    'is_available' => !$isBooked && !$isPast
+                ];
+            }
+
+            $result[$fieldId] = $slots;
         }
 
-        return $allSlots;
+        return $result;
     }
 
     /**
-     * Create a new booking
-     *
-     * @param array $data
-     * @return Booking|null
+     * Generate invoice WhatsApp untuk multi-lapangan
      */
-    public function createBooking($data)
+    public function generateCashInvoiceWhatsapp(array $data): array
+    {
+        $adminPhone = env('ADMIN_WHATSAPP_NUMBER', '6281234567890');
+        $invoice = "📋 *INVOICE PEMESANAN CASH*\n\n"
+            . "👤 Nama: {$data['customer_name']}\n"
+            . "📞 Telp: {$data['customer_phone']}\n"
+            . "📅 Tanggal: " . Carbon::parse($data['booking_date'])->format('d M Y') . "\n\n";
+
+        $totalPrice = 0;
+
+        foreach ($data['selected_fields'] as $fieldId) {
+            $field = Field::find($fieldId);
+            if (!$field) continue;
+
+            $slots = $data['selected_slots'][$fieldId] ?? [];
+            if (empty($slots)) continue;
+
+            sort($slots);
+            $start = Carbon::parse($slots[0])->format('H:i');
+            $end = Carbon::parse(end($slots))->addHour()->format('H:i');
+            $duration = count($slots);
+            $subtotal = $field->price_per_hour * $duration;
+            $totalPrice += $subtotal;
+
+            $invoice .= "▸ *{$field->name}*\n"
+                . "   ⌚ {$start} - {$end}\n"
+                . "   ⏳ {$duration} jam\n"
+                . "   💰 Rp " . number_format($subtotal, 0, ',', '.') . "\n\n";
+        }
+
+        $invoice .= "----------\n"
+            . "💵 *TOTAL: Rp " . number_format($totalPrice, 0, ',', '.') . "*";
+
+        return [
+            'wa_url' => "https://wa.me/{$adminPhone}?text=" . urlencode($invoice),
+            'total_price' => $totalPrice,
+            'invoice_text' => $invoice
+        ];
+    }
+
+    /**
+     * Proses pembuatan booking dengan validasi lengkap
+     */
+    public function createBooking(array $data): ?Booking
     {
         try {
-            $currentTransaction = DB::transactionLevel() > 0;
-            if (!$currentTransaction) {
-                DB::beginTransaction();
-            }
+            DB::beginTransaction();
 
             $bookingDate = Carbon::parse($data['booking_date'])->format('Y-m-d');
             $startTime = Carbon::parse($data['start_time']);
             $endTime = Carbon::parse($data['end_time']);
+            $field = Field::findOrFail($data['field_id']);
 
-            if ($startTime->format('Y-m-d') !== $endTime->format('Y-m-d')) {
-                $endTime->setDate($startTime->year, $startTime->month, $startTime->day);
+            // Validasi waktu
+            if ($startTime->gte($endTime)) {
+                throw new \Exception("Waktu akhir harus setelah waktu awal");
             }
 
-            $hours = abs($endTime->diffInHours($startTime));
-            $field = Field::findOrFail($data['field_id']);
-            $totalPrice = abs($field->price_per_hour * $hours);
+            $duration = $endTime->diffInHours($startTime);
+            $totalPrice = $field->price_per_hour * $duration;
+
+            // Generate booking code
+            $bookingCode = 'CASH-' . Carbon::now()->format('Ymd') . '-' . strtoupper(uniqid());
 
             $booking = Booking::create([
-                'field_id' => $data['field_id'],
+                'field_id' => $field->id,
                 'customer_name' => $data['customer_name'],
                 'customer_email' => $data['customer_email'],
                 'customer_phone' => $data['customer_phone'],
                 'booking_date' => $bookingDate,
                 'start_time' => $startTime,
                 'end_time' => $endTime,
-                'duration_hours' => $hours,
+                'duration_hours' => $duration,
                 'total_price' => $totalPrice,
                 'payment_method' => $data['payment_method'],
                 'payment_status' => 'pending',
                 'status' => 'booked',
-                'booking_code' => null,
+                'booking_code' => $bookingCode,
             ]);
 
-            // Buat slot booking
+            // Create booking slots
             $currentSlot = $startTime->copy();
             while ($currentSlot < $endTime) {
                 BookingSlot::create([
                     'booking_id' => $booking->id,
-                    'field_id' => $data['field_id'],
+                    'field_id' => $field->id,
                     'booking_date' => $bookingDate,
                     'slot_time' => $currentSlot->format('H:i:s'),
                     'start_time' => $currentSlot->format('Y-m-d H:i:s'),
-                    'end_time' => $currentSlot->copy()->addHour()->format('Y-m-d H:i:s'),
+                    'end_time' => $currentSlot->addHour()->format('Y-m-d H:i:s'),
                     'status' => 'booked'
                 ]);
-                $currentSlot->addHour();
             }
 
-            // Pembayaran cash: kirim invoice WhatsApp
-            if ($data['payment_method'] === 'cash') {
-                try {
-                    $adminPhone = env('ADMIN_WHATSAPP_NUMBER', '6281254767505');
-                    $fieldName = $field->name ?: "Lapangan #$field->id";
-                    $formattedDate = Carbon::parse($bookingDate)->format('d M Y');
-                    $timeRange = $startTime->format('H:i') . '-' . $endTime->format('H:i');
-                    $message = "📋 *INVOICE PEMESANAN CASH*\n\n"
-                        . "Nama: {$booking->customer_name}\n"
-                        . "Telp: {$booking->customer_phone}\n"
-                        . "Tanggal: {$formattedDate}\n"
-                        . "Waktu: {$timeRange}\n"
-                        . "Lapangan: {$fieldName}\n"
-                        . "Total: Rp " . number_format($booking->total_price, 0, ',', '.') . "\n\n"
-                        . "Segera konfirmasi slot!";
-                    $waUrl = "https://api.whatsapp.com/send?phone={$adminPhone}&text=" . urlencode($message);
-                    $booking->update(['payment_instruction' => $waUrl]);
-                } catch (\Exception $e) {
-                    Log::error('Gagal buat WhatsApp invoice: ' . $e->getMessage());
-                }
-            }
-
-            if (!$currentTransaction) {
-                DB::commit();
-            }
-
-            $booking->refresh();
+            DB::commit();
             return $booking;
         } catch (\Exception $e) {
-            if (!isset($currentTransaction) || !$currentTransaction) {
-                DB::rollBack();
-            }
-            Log::error('Failed to create booking: ' . $e->getMessage());
+            DB::rollBack();
+            Log::error('Booking failed: ' . $e->getMessage());
             return null;
         }
     }
 
-
     /**
-     * Cancel a booking
-     *
+     * Membatalkan booking dengan menghapus data dari database
+     * 
      * @param Booking $booking
      * @return bool
      */
@@ -210,58 +219,22 @@ class BookingService
         try {
             DB::beginTransaction();
 
-            // Update booking status
-            $booking->update([
-                'payment_status' => 'cancel',
-                'status' => 'cancelled'
-            ]);
+            // Hapus slot booking terlebih dahulu
+            BookingSlot::where('booking_id', $booking->id)->delete();
 
-            // Update slots
-            $booking->slots()->update(['status' => 'cancelled']);
-
-            // Update transaction if exists
+            // Hapus transaksi terkait jika ada
             if ($booking->transaction) {
-                $booking->transaction->update(['transaction_status' => 'cancel']);
+                $booking->transaction->delete();
             }
 
-            DB::commit();
-            return true;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Failed to cancel booking: ' . $e->getMessage());
-            return false;
-        }
-    }
-
-    /**
-     * Update booking payment status
-     *
-     * @param Booking $booking
-     * @param string $status
-     * @return bool
-     */
-    public function updatePaymentStatus(Booking $booking, $status)
-    {
-        try {
-            DB::beginTransaction();
-
-            // Update booking status
-            $bookingStatus = $status === 'settlement' ? 'paid' : $status;
-            $booking->update([
-                'payment_status' => $bookingStatus,
-                'status' => $status === 'settlement' ? 'confirmed' : 'pending'
-            ]);
-
-            // Update transaction if exists
-            if ($booking->transaction) {
-                $booking->transaction->update(['transaction_status' => $status]);
-            }
+            // Hapus booking dari database
+            $result = $booking->delete();
 
             DB::commit();
-            return true;
+            return $result;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Failed to update payment status: ' . $e->getMessage());
+            Log::error('Gagal membatalkan booking: ' . $e->getMessage());
             return false;
         }
     }

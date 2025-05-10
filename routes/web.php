@@ -69,9 +69,11 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::put('bookings/{booking}/cancel', [AdminBookingController::class, 'cancel'])->name('bookings.cancel');
     Route::resource('transactions', AdminTransactionController::class)->only(['index', 'show']);
 
+
     // Route untuk konfirmasi admin via WA
     Route::get('/admin/confirm-cash-booking', [AdminBookingController::class, 'confirmCashBooking'])
         ->name('admin.confirm-cash-booking');
+
 });
 
 // Profile Routes

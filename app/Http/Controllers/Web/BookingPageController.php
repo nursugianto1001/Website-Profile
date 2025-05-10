@@ -91,15 +91,25 @@ class BookingPageController extends Controller
      */
     public function getAvailableSlots(Request $request)
     {
-        $date = $request->input('date', Carbon::today()->format('Y-m-d'));
-        $fields = Field::where('is_active', true)->get();
+        $date = $request->input('date', now('Asia/Jakarta')->format('Y-m-d'));
+        $fields = \App\Models\Field::where('is_active', true)->get();
         $fieldAvailability = [];
+
+        // Pastikan waktu server benar
+        $currentTime = now('Asia/Jakarta');
+        $isToday = $date === $currentTime->format('Y-m-d');
+        $currentHour = (int) $currentTime->format('H');
+
+        // Debug info
+        Log::info("Current date: {$date}, Server time: {$currentTime->format('Y-m-d H:i:s')}, isToday: " . ($isToday ? 'true' : 'false'));
+        // Di dalam method getAvailableSlots() - BookingPageController.php
+        Log::info("IsToday: " . ($isToday ? 'YES' : 'NO') . " | Current Hour: $currentHour | Date: $date");
 
         foreach ($fields as $field) {
             $fieldId = $field->id;
-            $fieldAvailability[$fieldId] = [];
             $openingHour = $field->opening_hour ?? 8;
             $closingHour = $field->closing_hour ?? 22;
+
             $bookedSlots = DB::table('booking_slots')
                 ->join('bookings', 'booking_slots.booking_id', '=', 'bookings.id')
                 ->where('bookings.field_id', $fieldId)
@@ -107,17 +117,35 @@ class BookingPageController extends Controller
                 ->whereNotIn('bookings.payment_status', ['expired', 'cancel'])
                 ->pluck('booking_slots.slot_time')
                 ->toArray();
+
             for ($hour = $openingHour; $hour < $closingHour; $hour++) {
+                Log::info("Processing hour: $hour");
                 $slotTime = sprintf('%02d:00:00', $hour);
-                $fieldAvailability[$fieldId][$slotTime] = !in_array($slotTime, $bookedSlots);
+                $isBooked = in_array($slotTime, $bookedSlots, true);
+
+                // PAKSAKAN slot yang jam-nya < jam sekarang untuk jadi false
+                $isPast = $isToday && ($hour <= $currentHour);
+
+                // Debug slot 14 dan 15
+                if ($isToday && ($hour == 14 || $hour == 15)) {
+                    Log::info("Slot {$hour}:00: currentHour={$currentHour}, isPast=" . ($isPast ? 'true' : 'false'));
+                }
+
+                $fieldAvailability[$fieldId][$slotTime] = !$isBooked && !$isPast;
             }
         }
 
         return response()->json([
             'success' => true,
-            'fieldAvailability' => $fieldAvailability
-        ]);
+            'date' => $date,
+            'fieldAvailability' => $fieldAvailability,
+            'current_time' => $currentTime->format('Y-m-d H:i:s')
+        ])->header('Cache-Control', 'no-store, no-cache, must-revalidate')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
     }
+
+
 
     /**
      * Process booking submission

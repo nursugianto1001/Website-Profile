@@ -209,29 +209,37 @@
                     tdTime.className = 'border px-4 py-2 font-medium';
                     tdTime.textContent = formatTimeRange(slot.time);
                     tr.appendChild(tdTime);
+
                     fields.forEach(field => {
-                        const isAvailable = fieldAvailability && fieldAvailability[field.id] && fieldAvailability[field.id][slot.time] === true;
+                        const isAvailable = fieldAvailability && fieldAvailability[field.id] &&
+                            fieldAvailability[field.id][slot.time] === true;
                         const isSelected = selectedSlots[field.id]?.includes(slot.time);
                         const td = document.createElement('td');
+
                         let tdClass = 'border px-1 py-1 text-center time-slot';
+                        let statusText = 'Available';
+
                         if (isSelected) {
                             tdClass += ' bg-blue-500 text-white';
+                            statusText = 'Selected';
                         } else if (isAvailable) {
                             tdClass += ' bg-green-100 hover:bg-green-200 cursor-pointer';
                         } else {
-                            tdClass += ' bg-red-100';
+                            tdClass += ' bg-red-100 cursor-not-allowed';
+                            statusText = 'Unavailable';
                         }
+
                         td.className = tdClass;
                         td.setAttribute('data-field-id', field.id);
                         td.setAttribute('data-time-slot', slot.time);
                         td.setAttribute('data-available', isAvailable ? 'true' : 'false');
+
                         td.innerHTML = `
-                        <div class="h-8 w-full flex items-center justify-center">
-                            <span class="slot-status">
-                                ${isSelected ? 'Selected' : (isAvailable ? 'Available' : 'Booked')}
-                            </span>
-                        </div>
-                    `;
+                <div class="h-8 w-full flex items-center justify-center">
+                    <span class="slot-status">${statusText}</span>
+                </div>
+            `;
+
                         tr.appendChild(td);
                     });
                     tableBody.appendChild(tr);

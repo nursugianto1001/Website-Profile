@@ -3,7 +3,7 @@
 @section('content')
 <div class="bg-gradient-to-br from-white to-gray-50 p-6 md:p-8 rounded-xl shadow-lg ml-24 mb-8">
     <div class="flex items-center justify-between mb-8">
-        <h2 class="text-3xl font-bold text-gray-800">Dashboard Admin</h2>
+        <h2 class="text-3xl font-bold text-indigo-800">Dashboard Admin</h2>
         <div class="hidden md:flex items-center space-x-2 bg-white py-2 px-4 rounded-lg shadow-sm">
             <i class="bi bi-calendar-event text-blue-600"></i>
             <span class="text-gray-700">{{ now()->format('l, d F Y') }}</span>
@@ -15,7 +15,7 @@
         <div class="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all p-6 border-l-4 border-blue-500">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-500 mb-1">Total Fasilitas</p>
+                    <p class="text-sm font-medium text-indigo-500 mb-1">Total Fasilitas</p>
                     <h3 class="text-3xl font-extrabold text-gray-800">{{ \App\Models\Facility::count() }}</h3>
                 </div>
                 <div class="bg-blue-100 p-4 rounded-xl">
@@ -67,7 +67,7 @@
     {{-- Booking System Stats --}}
     <div class="mb-12">
         <div class="flex items-center justify-between mb-6">
-            <h3 class="text-xl font-bold text-gray-800">Sistem Analitik Pemesanan</h3>
+            <h3 class="text-xl font-bold text-indigo-800">Sistem Analitik Pemesanan</h3>
             <a href="{{ route('admin.bookings.index') }}" class="text-blue-600 text-sm font-medium hover:underline flex items-center">
                 Lihat Selengkapnya <i class="bi bi-arrow-right ml-1"></i>
             </a>
@@ -183,7 +183,7 @@
     {{-- Featured Content Preview --}}
     <div class="mb-12">
         <div class="flex items-center justify-between mb-6">
-            <h3 class="text-xl font-bold text-gray-800">Konten Unggulan</h3>
+            <h3 class="text-xl font-bold text-indigo-800">Konten Unggulan</h3>
             <a href="{{ route('admin.gallery.index') }}?featured=1" class="text-blue-600 text-sm font-medium hover:underline flex items-center">
                 Lihat Semua Konten <i class="bi bi-arrow-right ml-1"></i>
             </a>
@@ -217,7 +217,7 @@
     {{-- Recent Bookings --}}
     <div class="mb-12">
         <div class="flex items-center justify-between mb-6">
-            <h3 class="text-xl font-bold text-gray-800">Daftar Pemesanan Terbaru</h3>
+            <h3 class="text-xl font-bold text-indigo-800">Daftar Pemesanan Terbaru</h3>
             <a href="{{ route('admin.bookings.index') }}" class="text-blue-600 text-sm font-medium hover:underline flex items-center">
                 Lihat Semua Pemesanan <i class="bi bi-arrow-right ml-1"></i>
             </a>
@@ -294,7 +294,7 @@
 
     {{-- Quick Actions --}}
     <div class="bg-white rounded-xl shadow-md p-6">
-        <h3 class="text-xl font-bold text-gray-800 mb-6">Tindakan Cepat</h3>
+        <h3 class="text-xl font-bold text-indigo-800 mb-6">Tindakan Cepat</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <a href="{{ route('admin.facilities.create') }}" class="group flex flex-col items-center p-6 bg-blue-50 border border-blue-100 rounded-xl hover:bg-blue-100 hover:border-blue-200 transition-all">
                 <div class="bg-white p-4 rounded-full shadow-sm mb-4 group-hover:shadow-md transition-all">

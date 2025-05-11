@@ -65,7 +65,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
 
     // New Booking System Admin Routes
     Route::resource('fields', AdminFieldController::class);
-    Route::resource('bookings', AdminBookingController::class)->only(['index', 'show']);
+    Route::resource('bookings', AdminBookingController::class);
     Route::put('bookings/{booking}/cancel', [AdminBookingController::class, 'cancel'])->name('bookings.cancel');
     Route::resource('transactions', AdminTransactionController::class)->only(['index', 'show']);
 

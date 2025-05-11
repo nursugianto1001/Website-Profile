@@ -52,15 +52,15 @@
 
                 <!-- Navigation -->
                 <nav class="space-y-2 px-4">
-                    <x-sidebar-link route="admin.dashboard" icon="bi-house-door-fill" label="Dashboard" 
+                    <x-sidebar-link route="admin.dashboard" icon="bi-house-door-fill" label="Dashboard"
                                     class="group transition hover:translate-x-1 duration-200"/>
-                    
+
                     <!-- Content Management Dropdown -->
                     <div x-data="{ open: {{ request()->routeIs('admin.facilities.*') || request()->routeIs('admin.background-videos.*') || request()->routeIs('admin.gallery.*') ? 'true' : 'false' }} }">
                         <button @click="open = !open"
                                 class="flex items-center w-full px-3 py-3 text-sm font-medium text-left rounded-md transition-all duration-200 hover:bg-gray-700/50 focus:outline-none group {{ request()->routeIs(['admin.facilities.*', 'admin.background-videos.*', 'admin.gallery.*']) ? 'bg-blue-600/20 text-blue-300 border-l-4 border-blue-500 pl-2' : 'text-gray-300 hover:translate-x-1' }}">
                             <i class="bi bi-layout-text-window-reverse text-lg mr-3 group-hover:text-blue-400"></i>
-                            <span class="group-hover:text-blue-300">Content Management</span>
+                            <span class="group-hover:text-blue-300">Manajemen Konten</span>
                             <i class="bi bi-chevron-right ml-auto transition-transform duration-300 transform" :class="{'rotate-90': open}"></i>
                         </button>
                         <div x-show="open"
@@ -71,18 +71,18 @@
                              x-transition:leave-start="opacity-100 transform translate-y-0"
                              x-transition:leave-end="opacity-0 transform -translate-y-4"
                              class="mt-1 space-y-1 pl-6">
-                            <x-sidebar-link route="admin.facilities.index" icon="bi-building" label="Facilities" match="admin.facilities.*"/>
-                            <x-sidebar-link route="admin.background-videos.index" icon="bi-camera-video" label="Background Video" match="admin.background-videos.*"/>
-                            <x-sidebar-link route="admin.gallery.index" icon="bi-image" label="Gallery" match="admin.gallery.*"/>
+                            <x-sidebar-link route="admin.facilities.index" icon="bi-building" label="Fasilitas" match="admin.facilities.*"/>
+                            <x-sidebar-link route="admin.background-videos.index" icon="bi-camera-video" label="Video Latar Belakang" match="admin.background-videos.*"/>
+                            <x-sidebar-link route="admin.gallery.index" icon="bi-image" label="Galeri" match="admin.gallery.*"/>
                         </div>
                     </div>
-                    
+
                     <!-- Booking System Dropdown -->
                     <div x-data="{ open: {{ request()->routeIs('admin.fields.*') || request()->routeIs('admin.bookings.*') || request()->routeIs('admin.transactions.*') ? 'true' : 'false' }} }">
                         <button @click="open = !open"
                                 class="flex items-center w-full px-3 py-3 text-sm font-medium text-left rounded-md transition-all duration-200 hover:bg-gray-700/50 focus:outline-none group {{ request()->routeIs(['admin.fields.*', 'admin.bookings.*', 'admin.transactions.*']) ? 'bg-blue-600/20 text-blue-300 border-l-4 border-blue-500 pl-2' : 'text-gray-300 hover:translate-x-1' }}">
                             <i class="bi bi-calendar-week text-lg mr-3 group-hover:text-blue-400"></i>
-                            <span class="group-hover:text-blue-300">Booking System</span>
+                            <span class="group-hover:text-blue-300">Sistem Pemesanan</span>
                             <i class="bi bi-chevron-right ml-auto transition-transform duration-300 transform" :class="{'rotate-90': open}"></i>
                         </button>
                         <div x-show="open"
@@ -94,17 +94,17 @@
                              x-transition:leave-end="opacity-0 transform -translate-y-4"
                              class="mt-1 space-y-1 pl-6">
                             <x-sidebar-link route="admin.fields.index" icon="bi-grid-3x3" label="Lapangan" match="admin.fields.*"/>
-                            <x-sidebar-link route="admin.bookings.index" icon="bi-calendar-check" label="Booking" match="admin.bookings.*"/>
+                            <x-sidebar-link route="admin.bookings.index" icon="bi-calendar-check" label="Pemesanan" match="admin.bookings.*"/>
                             <x-sidebar-link route="admin.transactions.index" icon="bi-credit-card" label="Transaksi" match="admin.transactions.*"/>
                         </div>
                     </div>
-                    
+
                     <!-- External Link -->
                     <hr class="my-6 border-gray-700 mx-4 opacity-50">
                     <a href="{{ route('home') }}" target="_blank"
                        class="flex items-center px-4 py-3 rounded-md text-sm font-medium text-gray-300 hover:bg-blue-600/20 hover:text-blue-300 group transition-all duration-200">
                         <i class="bi bi-globe text-lg mr-3 group-hover:text-blue-400"></i>
-                        <span>View Site</span>
+                        <span>Lihat Situs</span>
                     </a>
                 </nav>
             </div>
@@ -126,7 +126,7 @@
                     <button type="submit"
                             class="flex items-center w-full p-3 rounded-md hover:bg-red-600/20 hover:text-red-300 text-left transition-all duration-200 group">
                         <i class="bi bi-box-arrow-right text-lg mr-3 group-hover:text-red-400"></i>
-                        <span class="font-medium">Logout</span>
+                        <span class="font-medium">Keluar</span>
                     </button>
                 </form>
             </div>
@@ -187,9 +187,9 @@
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between items-center">
                         <p class="text-sm text-gray-500">
-                            © {{ date('Y') }} {{ config('app.name', 'Laravel') }}. All rights reserved.
+                            © {{ date('Y') }} Karvin Badminton. All rights reserved.
                         </p>
-                        <a href="#" class="text-blue-500 hover:text-blue-600 text-sm">Back to top</a>
+                        <a href="#" class="text-blue-500 hover:text-blue-600 text-sm">Kembali Ke atas</a>
                     </div>
                 </div>
             </footer>
@@ -201,7 +201,7 @@
         function toggleSidebar() {
             const sidebar = document.getElementById('mobile-sidebar');
             const overlay = document.getElementById('overlay');
-            
+
             if (sidebar.classList.contains('-translate-x-full')) {
                 sidebar.classList.remove('-translate-x-full');
                 overlay.classList.remove('hidden');

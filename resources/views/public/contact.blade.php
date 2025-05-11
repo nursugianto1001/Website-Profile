@@ -159,7 +159,8 @@
                     data-aos="zoom-in" data-aos-duration="800">
                     <div class="relative bg-gray-100 h-96">
                         <!-- Placeholder Image -->
-                        <img src="/api/placeholder/1200/500" alt="Map Location" class="w-full h-full object-cover">
+                        <img src="{{ Vite::asset('resources/images/map.png') }}" alt="Map Location"
+                            class="w-full h-full object-cover">
 
                         <!-- Map Button Overlay -->
                         <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">

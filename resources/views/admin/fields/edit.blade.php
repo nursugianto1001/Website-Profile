@@ -4,15 +4,9 @@
 <div class="max-w-6xl mx-auto">
     <div class="mb-8 flex justify-between items-center">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800">Edit Lapangan</h1>
+            <h1 class="text-3xl font-bold text-indigo-800">Edit Lapangan</h1>
             <p class="text-gray-600 mt-1">Perbarui informasi untuk lapangan "{{ $field->name }}"</p>
         </div>
-        <a href="{{ route('admin.fields.index') }}" class="flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition-colors text-gray-700">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Kembali
-        </a>
     </div>
 
     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
@@ -28,7 +22,7 @@
         <form action="{{ route('admin.fields.update', $field->id) }}" method="POST" enctype="multipart/form-data" class="p-6 sm:p-8">
             @csrf
             @method('PUT')
-            
+
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div class="space-y-6">
                     <div>
@@ -38,8 +32,8 @@
                                 <span class="text-red-500 ml-1">*</span>
                             </span>
                         </label>
-                        <input type="text" name="name" id="name" 
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-shadow @error('name') border-red-500 @enderror" 
+                        <input type="text" name="name" id="name"
+                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-shadow @error('name') border-red-500 @enderror"
                             value="{{ old('name', $field->name) }}" required>
                         @error('name')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -57,8 +51,8 @@
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <span class="text-gray-500 sm:text-sm">Rp</span>
                             </div>
-                            <input type="number" name="price_per_hour" id="price_per_hour" 
-                                class="pl-12 w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-shadow @error('price_per_hour') border-red-500 @enderror" 
+                            <input type="number" name="price_per_hour" id="price_per_hour"
+                                class="pl-12 w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-shadow @error('price_per_hour') border-red-500 @enderror"
                                 value="{{ old('price_per_hour', $field->price_per_hour) }}" required>
                         </div>
                         @error('price_per_hour')
@@ -68,8 +62,8 @@
 
                     <div>
                         <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
-                        <textarea name="description" id="description" rows="5" 
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-shadow @error('description') border-red-500 @enderror" 
+                        <textarea name="description" id="description" rows="5"
+                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-shadow @error('description') border-red-500 @enderror"
                             placeholder="Masukkan deskripsi singkat tentang lapangan ini...">{{ old('description', $field->description) }}</textarea>
                         @error('description')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -86,8 +80,8 @@
                         <div class="mt-2">
                             <div class="flex items-center">
                                 <div class="relative inline-block w-10 mr-2 align-middle select-none">
-                                    <input type="checkbox" name="is_active" id="is_active" 
-                                        class="absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform duration-200 ease-in-out checked:right-0 checked:border-blue-600 checked:bg-blue-600" 
+                                    <input type="checkbox" name="is_active" id="is_active"
+                                        class="absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform duration-200 ease-in-out checked:right-0 checked:border-blue-600 checked:bg-blue-600"
                                         value="1" {{ old('is_active', $field->is_active) ? 'checked' : '' }}>
                                     <label for="is_active" class="block h-6 overflow-hidden bg-gray-300 rounded-full cursor-pointer"></label>
                                 </div>
@@ -113,7 +107,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                 </div>
-                                <select name="opening_hour" id="opening_hour" 
+                                <select name="opening_hour" id="opening_hour"
                                     class="pl-10 w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-shadow @error('opening_hour') border-red-500 @enderror">
                                     @for($i = 0; $i < 24; $i++)
                                         <option value="{{ $i }}" {{ old('opening_hour', $field->opening_hour) == $i ? 'selected' : '' }}>
@@ -140,7 +134,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                 </div>
-                                <select name="closing_hour" id="closing_hour" 
+                                <select name="closing_hour" id="closing_hour"
                                     class="pl-10 w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-shadow @error('closing_hour') border-red-500 @enderror">
                                     @for($i = 0; $i < 24; $i++)
                                         <option value="{{ $i }}" {{ old('closing_hour', $field->closing_hour) == $i ? 'selected' : '' }}>
@@ -157,7 +151,7 @@
 
                     <div>
                         <label for="image_url" class="block text-sm font-medium text-gray-700 mb-2">Gambar Lapangan</label>
-                        
+
                         <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:bg-gray-50 transition-colors">
                             <div class="space-y-2 text-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -175,7 +169,7 @@
                                 </p>
                             </div>
                         </div>
-                        
+
                         @error('image_url')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -206,15 +200,9 @@
                 </div>
                 <div class="flex space-x-3">
                     <a href="{{ route('admin.fields.index') }}" class="inline-flex justify-center items-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
                         Batal
                     </a>
                     <button type="submit" class="inline-flex justify-center items-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                        </svg>
                         Simpan Perubahan
                     </button>
                 </div>

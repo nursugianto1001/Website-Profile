@@ -163,7 +163,11 @@ class BookingService
                 throw new \Exception("Waktu akhir harus setelah waktu awal");
             }
 
-            $duration = $endTime->diffInHours($startTime);
+            // Perbaikan perhitungan durasi
+            $duration = $startTime->diffInHours($endTime);
+            // Atau gunakan parameter absolut
+            // $duration = $endTime->diffInHours($startTime, false);
+
             $totalPrice = $field->price_per_hour * $duration;
 
             // Generate booking code hanya untuk yang sudah dikonfirmasi
@@ -213,6 +217,7 @@ class BookingService
             return null;
         }
     }
+
 
     /**
      * Membatalkan booking dengan menghapus data dari database

@@ -8,9 +8,25 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
+<style>
+    /* Tambahkan di bagian <style> atau file CSS Anda */
+.field-checkbox {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Opsional: Tambahkan styling untuk label agar tetap terlihat clickable */
+label.flex.items-center {
+    cursor: pointer;
+}
+
+</style>
+
 <body class="bg-[#fdf8f2]">
     <div class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold mb-6 text-[#A66E38]">Book Your Field</h1>
+        <h1 class="text-3xl font-bold mb-6 text-[#A66E38]">Pesan Lapangan Badminton Karvin</h1>
         <div id="error-container" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 hidden">
             <span id="error-message"></span>
         </div>
@@ -24,125 +40,6 @@
                 <div class="flex flex-wrap gap-2" id="date-selector-container"></div>
                 <input type="hidden" name="booking_date" id="booking_date" required>
             </div> -->
-
-            <!-- Customer Information -->
-<div class="bg-gradient-to-br from-amber-50 via-amber-100/30 to-[#fdf5e9] rounded-lg shadow-md p-6 border border-amber-100">
-    <div class="flex items-center mb-4">
-        <div class="bg-[#faebd7] p-2 rounded-full mr-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#A66E38]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-        </div>
-        <h2 class="text-xl font-semibold text-[#8B5A2B]">Informasi Pelanggan</h2>
-    </div>
-    
-    <p class="text-sm text-gray-600 mb-4">Silakan berikan detail kontak Anda untuk konfirmasi pemesanan.</p>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div class="space-y-1">
-            <label for="customer_name" class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
-            <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                </div>
-                <input type="text" name="customer_name" id="customer_name" placeholder="John Doe"
-                    class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#A66E38] focus:border-[#A66E38]"
-                    required>
-            </div>
-            <span class="text-red-500 text-sm customer_name-error"></span>
-        </div>
-        
-        <div class="space-y-1">
-            <label for="customer_email" class="block text-sm font-medium text-gray-700">Email</label>
-            <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                </div>
-                <input type="email" name="customer_email" id="customer_email" placeholder="johndoe@example.com"
-                    class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#A66E38] focus:border-[#A66E38]"
-                    required>
-            </div>
-            <p class="text-xs text-gray-500">Kami akan mengirimkan konfirmasi pemesanan ke email ini</p>
-            <span class="text-red-500 text-sm customer_email-error"></span>
-        </div>
-        
-        <div class="space-y-1">
-            <label for="customer_phone" class="block text-sm font-medium text-gray-700">Nomor Handphone</label>
-            <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                    </svg>
-                </div>
-                <input type="text" name="customer_phone" id="customer_phone" placeholder="+62 812-3456-7890"
-                    class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#A66E38] focus:border-[#A66E38]"
-                    required>
-            </div>
-            <p class="text-xs text-gray-500">Untuk pemberitahuan mendesak tentang pemesanan Anda</p>
-            <span class="text-red-500 text-sm customer_phone-error"></span>
-        </div>
-    </div>
-</div>
-
-            <!-- Payment Method -->
-<div class="bg-gradient-to-br from-amber-50 via-amber-100/30 to-[#fdf5e9] rounded-lg shadow-md p-6 border border-amber-100">
-    <div class="flex items-center mb-4">
-        <div class="bg-[#faebd7] p-2 rounded-full mr-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#A66E38]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-            </svg>
-        </div>
-        <h2 class="text-xl font-semibold text-[#A66E38]">Metode Pembayaran</h2>
-    </div>
-    
-    <div class="space-y-3">
-        <label class="block p-4 border rounded-lg transition-all hover:border-blue-300 hover:bg-blue-50 cursor-pointer">
-            <div class="flex items-center">
-                <input type="radio" name="payment_method" value="online" checked class="h-5 w-5 text-[#A66E38] focus:ring-[#A66E38]">
-                <div class="ml-3 flex-1">
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-800 font-medium">Pembayaran Online (Midtrans)</span>
-                        <div class="flex space-x-2">
-                            <img src="https://cdn.brandfetch.io/id6lAOk8E4/w/400/h/400/theme/dark/icon.jpeg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Midtrans" class="h-10">
-                        </div>
-                    </div>
-                    <p class="text-gray-500 text-sm mt-1">Bayar dengan aman secara online dengan kartu kredit, transfer bank, atau dompet elektronik</p>
-                    <div class="mt-2 flex flex-wrap gap-2">
-                        <span class="inline-block px-2 py-1 bg-gray-100 text-xs rounded">Credit Card</span>
-                        <span class="inline-block px-2 py-1 bg-gray-100 text-xs rounded">Bank Transfer</span>
-                        <span class="inline-block px-2 py-1 bg-gray-100 text-xs rounded">GoPay</span>
-                        <span class="inline-block px-2 py-1 bg-gray-100 text-xs rounded">OVO</span>
-                    </div>
-                </div>
-            </div>
-        </label>
-        
-        <label class="block p-4 border rounded-lg transition-all hover:border-blue-300 hover:bg-blue-50 cursor-pointer">
-            <div class="flex items-center">
-                <input type="radio" name="payment_method" value="cash" class="h-5 w-5 text-[#A66E38] focus:ring-[#A66E38]">
-                <div class="ml-3 flex-1">
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-800 font-medium">Pembayaran Tunai</span>
-                        <div class="flex items-center text-xs text-white bg-[#A66E38] px-2 py-1 rounded-full">
-                            Hanya Hari Ini
-                        </div>
-                    </div>
-                    <p class="text-gray-500 text-sm mt-1">Bayar tunai saat Anda tiba di tempat (Pembayaran tunai hanya tersedia untuk pemesanan hari ini)</p>
-                    <div class="mt-2 text-sm text-[#A66E38]">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Catatan: Pembayaran tunai mengharuskan Anda tiba 15 menit sebelum waktu pemesanan Anda
-                    </div>
-                </div>
-            </div>
-        </label>
-    </div>
-</div>
 
             <!-- Date Selection -->
 <div class="bg-gradient-to-br from-amber-50 via-amber-100/30 to-[#fdf5e9] rounded-lg shadow-md p-6 border border-amber-100">
@@ -254,20 +151,122 @@
     </div>
 </div>
 
-            <!-- Payment Method -->
-            <!-- <div class="bg-white rounded-lg shadow p-6">
-                <h2 class="text-xl font-semibold mb-4">Payment Method</h2>
-                <div class="space-y-2">
-                    <label class="flex items-center">
-                        <input type="radio" name="payment_method" value="online" checked class="mr-2">
-                        <span>Online Payment (Midtrans)</span>
-                    </label>
-                    <label class="flex items-center">
-                        <input type="radio" name="payment_method" value="cash" class="mr-2">
-                        <span>Cash Payment</span>
-                    </label>
+ <!-- Customer Information -->
+<div class="bg-gradient-to-br from-amber-50 via-amber-100/30 to-[#fdf5e9] rounded-lg shadow-md p-6 border border-amber-100">
+    <div class="flex items-center mb-4">
+        <div class="bg-[#faebd7] p-2 rounded-full mr-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#A66E38]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+        </div>
+        <h2 class="text-xl font-semibold text-[#8B5A2B]">Informasi Pelanggan</h2>
+    </div>
+    
+    <p class="text-sm text-gray-600 mb-4">Silakan berikan detail kontak Anda untuk konfirmasi pemesanan.</p>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div class="space-y-1">
+            <label for="customer_name" class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
                 </div>
-            </div> -->
+                <input type="text" name="customer_name" id="customer_name" placeholder="John Doe"
+                    class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#A66E38] focus:border-[#A66E38]"
+                    required>
+            </div>
+            <span class="text-red-500 text-sm customer_name-error"></span>
+        </div>
+        
+        <div class="space-y-1">
+            <label for="customer_email" class="block text-sm font-medium text-gray-700">Email</label>
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <input type="email" name="customer_email" id="customer_email" placeholder="johndoe@example.com"
+                    class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#A66E38] focus:border-[#A66E38]"
+                    required>
+            </div>
+            <p class="text-xs text-gray-500">Kami akan mengirimkan konfirmasi pemesanan ke email ini</p>
+            <span class="text-red-500 text-sm customer_email-error"></span>
+        </div>
+        
+        <div class="space-y-1">
+            <label for="customer_phone" class="block text-sm font-medium text-gray-700">Nomor Handphone</label>
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                </div>
+                <input type="text" name="customer_phone" id="customer_phone" placeholder="+62 812-3456-7890"
+                    class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#A66E38] focus:border-[#A66E38]"
+                    required>
+            </div>
+            <p class="text-xs text-gray-500">Untuk pemberitahuan mendesak tentang pemesanan Anda</p>
+            <span class="text-red-500 text-sm customer_phone-error"></span>
+        </div>
+    </div>
+</div>
+
+            <!-- Payment Method -->
+<div class="bg-gradient-to-br from-amber-50 via-amber-100/30 to-[#fdf5e9] rounded-lg shadow-md p-6 border border-amber-100">
+    <div class="flex items-center mb-4">
+        <div class="bg-[#faebd7] p-2 rounded-full mr-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#A66E38]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+            </svg>
+        </div>
+        <h2 class="text-xl font-semibold text-[#A66E38]">Metode Pembayaran</h2>
+    </div>
+    
+    <div class="space-y-3">
+        <label class="block p-4 border rounded-lg transition-all hover:border-blue-300 hover:bg-blue-50 cursor-pointer">
+            <div class="flex items-center">
+                <input type="radio" name="payment_method" value="online" checked class="h-5 w-5 text-[#A66E38] focus:ring-[#A66E38]">
+                <div class="ml-3 flex-1">
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-800 font-medium">Pembayaran Online</span>
+                        
+                    </div>
+                    <p class="text-gray-500 text-sm mt-1">Bayar dengan aman secara online dengan kartu kredit, transfer bank, atau dompet elektronik</p>
+                    <div class="mt-2 flex flex-wrap gap-2">
+                        <span class="inline-block px-2 py-1 bg-gray-100 text-xs rounded">Credit Card</span>
+                        <span class="inline-block px-2 py-1 bg-gray-100 text-xs rounded">Bank Transfer</span>
+                        <span class="inline-block px-2 py-1 bg-gray-100 text-xs rounded">GoPay</span>
+                        <span class="inline-block px-2 py-1 bg-gray-100 text-xs rounded">OVO</span>
+                    </div>
+                </div>
+            </div>
+        </label>
+        
+        <label class="block p-4 border rounded-lg transition-all hover:border-blue-300 hover:bg-blue-50 cursor-pointer">
+            <div class="flex items-center">
+                <input type="radio" name="payment_method" value="cash" class="h-5 w-5 text-[#A66E38] focus:ring-[#A66E38]">
+                <div class="ml-3 flex-1">
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-800 font-medium">Pembayaran Tunai</span>
+                        <div class="flex items-center text-xs text-white bg-[#A66E38] px-2 py-1 rounded-full">
+                            Hanya Hari Ini
+                        </div>
+                    </div>
+                    <p class="text-gray-500 text-sm mt-1">Bayar tunai saat Anda tiba di tempat (Pembayaran tunai hanya tersedia untuk pemesanan hari ini)</p>
+                    <div class="mt-2 text-sm text-[#A66E38]">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Catatan: Pembayaran tunai mengharuskan Anda tiba 15 menit sebelum waktu pemesanan Anda
+                    </div>
+                </div>
+            </div>
+        </label>
+    </div>
+</div>
 
             <!-- Booking Summary and Total -->
 <div class="bg-gradient-to-br from-amber-50 via-amber-100/30 to-[#fdf5e9] rounded-lg shadow-md p-6 border border-amber-100">
@@ -412,7 +411,6 @@ fields.forEach(field => {
                     data-field-price="${field.price_per_hour}"
                     name="selected_fields[]"
                     value="${field.id}">
-                <span>Select All</span>
             </label>
         </div>
     `;
@@ -506,7 +504,23 @@ fields.forEach(field => {
     addSlotClickEvents();
 }
 
-
+// Fungsi untuk mereset semua pilihan slot
+function clearAllSelections() {
+    // Kosongkan object selectedSlots
+    for (const fieldId in selectedSlots) {
+        delete selectedSlots[fieldId];
+    }
+    // Reset total amount
+    totalAmount = 0;
+    // Hilangkan centang semua checkbox lapangan
+    document.querySelectorAll('.field-checkbox').forEach(cb => cb.checked = false);
+    // Render ulang tampilan slot, ringkasan, dan form inputs
+    renderTimeSlots();
+    updateSelectedSlotsDisplay();
+    updateBookingSummary();
+    updateTotalPrice();
+    updateFormInputs();
+}
 
             function addSlotClickEvents() {
                 document.querySelectorAll(".time-slot[data-available='true']").forEach(slot => {
@@ -578,17 +592,33 @@ fields.forEach(field => {
 }
 
 
-            document.querySelectorAll(".date-selector").forEach((button) => {
-    button.addEventListener("click", function() {
-        document.querySelectorAll(".date-selector").forEach(btn => {
-            btn.classList.remove("bg-[#A66E38]", "text-white", "border-[#8B5A2B]");
-            btn.classList.add("bg-white", "text-gray-700", "border-gray-300", "hover:bg-amber-50");
+            document.querySelectorAll('.date-selector').forEach(btn => {
+    btn.addEventListener('click', function() {
+        // Jika tanggal lalu, abort
+        if (this.dataset.past === 'true') return;
+
+        // **RESET pilihan sebelum beralih tanggal**
+        clearAllSelections();
+
+        // Hide pesan error jika ada
+        document.getElementById('error-container')?.classList.add('hidden');
+
+        // Reset style semua tombol non-past
+        document.querySelectorAll('.date-selector[data-past="false"]').forEach(b => {
+            b.className = 'date-selector px-4 py-2 border rounded-md bg-white text-gray-700 border-gray-300 hover:bg-amber-50';
         });
-        this.classList.remove("bg-white", "text-gray-700", "border-gray-300", "hover:bg-amber-50");
-        this.classList.add("bg-[#A66E38]", "text-white", "border-[#8B5A2B]");
-        // ...
+
+        // Highlight tombol terpilih
+        this.classList.remove('bg-white','text-gray-700','border-gray-300','hover:bg-amber-50');
+        this.classList.add('bg-[#A66E38]','text-white','border-[#8B5A2B]');
+
+        // Update tanggal terpilih dan muat ulang ketersediaan
+        currentDate = this.dataset.date;
+        document.getElementById('booking_date').value = currentDate;
+        fetchAvailability(currentDate);
     });
 });
+
 
 
             function fetchAvailability(date) {

@@ -55,10 +55,11 @@ class BookingPageController extends Controller
     public function bookingForm()
     {
         $today = Carbon::today();
-        $weeklyDates = [];
-        for ($i = 0; $i < 7; $i++) {
+        $monthDates = [];
+        // Ubah dari 7 hari ke 30 hari (1 bulan ke depan)
+        for ($i = 0; $i < 30; $i++) {
             $date = $today->copy()->addDays($i);
-            $weeklyDates[] = [
+            $monthDates[] = [
                 'date' => $date->format('Y-m-d'),
                 'day' => $date->format('D'),
                 'day_name' => $date->format('l'),
@@ -83,8 +84,13 @@ class BookingPageController extends Controller
             ];
         }
 
-        return view('pages.booking-form', compact('weeklyDates', 'slots', 'fields'));
+        return view('pages.booking-form', [
+            'monthDates' => $monthDates,
+            'slots' => $slots,
+            'fields' => $fields
+        ]);
     }
+
 
     /**
      * Get available slots for a specific date and all fields (AJAX)
@@ -95,15 +101,9 @@ class BookingPageController extends Controller
         $fields = \App\Models\Field::where('is_active', true)->get();
         $fieldAvailability = [];
 
-        // Pastikan waktu server benar
         $currentTime = now('Asia/Jakarta');
         $isToday = $date === $currentTime->format('Y-m-d');
         $currentHour = (int) $currentTime->format('H');
-
-        // Debug info
-        Log::info("Current date: {$date}, Server time: {$currentTime->format('Y-m-d H:i:s')}, isToday: " . ($isToday ? 'true' : 'false'));
-        // Di dalam method getAvailableSlots() - BookingPageController.php
-        Log::info("IsToday: " . ($isToday ? 'YES' : 'NO') . " | Current Hour: $currentHour | Date: $date");
 
         foreach ($fields as $field) {
             $fieldId = $field->id;
@@ -119,17 +119,21 @@ class BookingPageController extends Controller
                 ->toArray();
 
             for ($hour = $openingHour; $hour < $closingHour; $hour++) {
-                Log::info("Processing hour: $hour");
                 $slotTime = sprintf('%02d:00:00', $hour);
-                $isBooked = in_array($slotTime, $bookedSlots, true);
 
-                // PAKSAKAN slot yang jam-nya < jam sekarang untuk jadi false
-                $isPast = $isToday && ($hour <= $currentHour);
-
-                // Debug slot 14 dan 15
-                if ($isToday && ($hour == 14 || $hour == 15)) {
-                    Log::info("Slot {$hour}:00: currentHour={$currentHour}, isPast=" . ($isPast ? 'true' : 'false'));
+                if (in_array($hour, [17, 18, 19])) {
+                    Log::info("Blocking slot {$slotTime} for field {$fieldId}");
+                    $fieldAvailability[$fieldId][$slotTime] = false;
+                    continue;
                 }
+
+                if (in_array($hour, [17, 18, 19])) {
+                    $fieldAvailability[$fieldId][$slotTime] = false;
+                    continue;
+                }
+
+                $isBooked = in_array($slotTime, $bookedSlots, true);
+                $isPast = $isToday && ($hour <= $currentHour);
 
                 $fieldAvailability[$fieldId][$slotTime] = !$isBooked && !$isPast;
             }
@@ -145,7 +149,53 @@ class BookingPageController extends Controller
             ->header('Expires', '0');
     }
 
+    public function getAllAvailableSlots(Request $request)
+    {
+        $date = $request->input('date', now('Asia/Jakarta')->format('Y-m-d'));
+        $fields = \App\Models\Field::where('is_active', true)->get();
+        $fieldAvailability = [];
 
+        $currentTime = now('Asia/Jakarta');
+        $isToday = $date === $currentTime->format('Y-m-d');
+        $currentHour = (int) $currentTime->format('H');
+
+        foreach ($fields as $field) {
+            $fieldId = $field->id;
+            $openingHour = $field->opening_hour ?? 8;
+            $closingHour = $field->closing_hour ?? 22;
+
+            $bookedSlots = DB::table('booking_slots')
+                ->join('bookings', 'booking_slots.booking_id', '=', 'bookings.id')
+                ->where('bookings.field_id', $fieldId)
+                ->where('bookings.booking_date', $date)
+                ->whereNotIn('bookings.payment_status', ['expired', 'cancel'])
+                ->pluck('booking_slots.slot_time')
+                ->toArray();
+
+            for ($hour = $openingHour; $hour < $closingHour; $hour++) {
+                $slotTime = sprintf('%02d:00:00', $hour);
+
+                if (in_array($hour, [17, 18, 19])) {
+                    $fieldAvailability[$fieldId][$slotTime] = false;
+                    continue;
+                }
+
+                $isBooked = in_array($slotTime, $bookedSlots, true);
+                $isPast = $isToday && ($hour <= $currentHour);
+
+                $fieldAvailability[$fieldId][$slotTime] = !$isBooked && !$isPast;
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'date' => $date,
+            'fieldAvailability' => $fieldAvailability,
+            'current_time' => $currentTime->format('Y-m-d H:i:s')
+        ])->header('Cache-Control', 'no-store, no-cache, must-revalidate')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
+    }
 
     /**
      * Process booking submission
@@ -159,7 +209,7 @@ class BookingPageController extends Controller
             'booking_date' => 'required|date|date_format:Y-m-d',
             'selected_fields' => 'required|array|min:1',
             'selected_slots' => 'required|array|min:1',
-            'payment_method' => 'required|in:online,cash',
+            'payment_method' => 'required|in:online',
         ]);
 
         if ($validator->fails()) {
@@ -171,42 +221,9 @@ class BookingPageController extends Controller
         $selectedSlots = $request->selected_slots;
         $paymentMethod = $request->payment_method;
 
-        // Handle Cash Payment
-        if ($paymentMethod === 'cash') {
-            // Simpan data sementara di session
-            Session::put('pending_cash_booking', [
-                'customer_name' => $request->customer_name,
-                'customer_phone' => $request->customer_phone,
-                'booking_date' => $bookingDate,
-                'selected_fields' => $selectedFields,
-                'selected_slots' => $selectedSlots,
-                'payment_method' => 'cash'
-            ]);
-
-            // Generate invoice WA untuk admin
-            $invoiceResult = $this->bookingService->generateCashInvoiceWhatsApp([
-                'customer_name' => $request->customer_name,
-                'customer_phone' => $request->customer_phone,
-                'booking_date' => $bookingDate,
-                'selected_fields' => $selectedFields,
-                'selected_slots' => $selectedSlots,
-            ]);
-
-            return view('pages.payment-cash', [
-                'waUrl' => $invoiceResult['wa_url'],
-                'customer_name' => $request->customer_name,
-                'customer_email' => $request->customer_email,
-                'customer_phone' => $request->customer_phone,
-                'booking_date' => $request->booking_date,
-                'selected_fields' => $request->selected_fields,
-                'selected_slots' => $request->selected_slots, // Tambahkan ini
-                'total_price' => $invoiceResult['total_price'] // Tambahkan ini
-            ]);
-        }
-
-        // --- Flow ONLINE tetap seperti biasa ---
         $bookings = [];
         $totalPrice = 0;
+
         DB::beginTransaction();
         try {
             foreach ($selectedFields as $fieldId) {
@@ -214,18 +231,32 @@ class BookingPageController extends Controller
                 $timeSlots = $selectedSlots[$fieldId];
                 sort($timeSlots);
                 if (empty($timeSlots)) continue;
+
+                foreach ($timeSlots as $slot) {
+                    $slotHour = (int) \Carbon\Carbon::parse($slot)->format('H');
+                    if (in_array($slotHour, [17, 18, 19])) {
+                        return redirect()->back()->with('error', 'Slot jam 17:00–20:00 tidak tersedia untuk booking online.')->withInput();
+                    }
+                }
+
                 $startTime = $timeSlots[0];
                 $endTime = Carbon::parse($timeSlots[count($timeSlots) - 1])->addHour()->format('H:i:s');
+
                 $isAvailable = $this->bookingService->areSlotsAvailable(
                     $fieldId,
                     $bookingDate,
                     $startTime,
                     $endTime
                 );
+
                 if (!$isAvailable) {
                     DB::rollBack();
-                    return redirect()->back()->with('error', "Lapangan {$fieldId} tidak tersedia untuk slot waktu yang dipilih. Silakan pilih slot waktu lain.")->withInput();
+                    return redirect()->back()->with(
+                        'error',
+                        "Lapangan {$fieldId} tidak tersedia untuk slot waktu yang dipilih. Silakan pilih slot waktu lain."
+                    )->withInput();
                 }
+
                 $bookingData = [
                     'field_id' => $fieldId,
                     'customer_name' => $request->customer_name,
@@ -236,44 +267,59 @@ class BookingPageController extends Controller
                     'end_time' => $endTime,
                     'payment_method' => $paymentMethod
                 ];
+
                 $booking = $this->bookingService->createBooking($bookingData);
+
                 if (!$booking) {
                     DB::rollBack();
-                    return redirect()->back()->with('error', "Gagal membuat booking untuk lapangan {$fieldId}. Silakan coba lagi.")->withInput();
+                    return redirect()->back()->with(
+                        'error',
+                        "Gagal membuat booking untuk lapangan {$fieldId}. Silakan coba lagi."
+                    )->withInput();
                 }
+
                 $bookings[] = $booking;
                 $totalPrice += $booking->total_price;
             }
+
             DB::commit();
 
-            // Pembayaran Online: buat transaksi Midtrans
-            if ($paymentMethod === 'online') {
-                $orderId = 'ORD-MULTI-' . implode('-', array_map(fn($b) => $b->id, $bookings)) . '-' . time();
-                $midtransResponse = app('App\Providers\MidtransService')->createTransaction([
-                    'booking_id' => implode(',', array_map(fn($b) => $b->id, $bookings)),
-                    'customer_name' => $request->customer_name,
-                    'customer_email' => $request->customer_email,
-                    'customer_phone' => $request->customer_phone,
-                    'total_price' => (int)$totalPrice,
-                    'items' => [
-                        [
-                            'id' => 'MULTI',
-                            'name' => 'Multi Booking',
-                            'price' => (int)$totalPrice,
-                            'quantity' => 1
-                        ]
+            $orderId = 'ORD-MULTI-' . implode('-', array_map(fn($b) => $b->id, $bookings)) . '-' . time();
+            $midtransResponse = app('App\Providers\MidtransService')->createTransaction([
+                'booking_id' => implode(',', array_map(fn($b) => $b->id, $bookings)),
+                'customer_name' => $request->customer_name,
+                'customer_email' => $request->customer_email,
+                'customer_phone' => $request->customer_phone,
+                'total_price' => (int)$totalPrice,
+                'items' => [
+                    [
+                        'id' => 'MULTI',
+                        'name' => 'Multi Booking',
+                        'price' => (int)$totalPrice,
+                        'quantity' => 1
                     ]
+                ]
+            ]);
+
+            foreach ($bookings as $booking) {
+                $booking->update([
+                    'snap_token' => $midtransResponse['token'],
+                    'booking_code' => $midtransResponse['order_id']
                 ]);
-                foreach ($bookings as $booking) {
-                    $booking->update([
-                        'snap_token' => $midtransResponse['token'],
-                        'booking_code' => $midtransResponse['order_id']
-                    ]);
-                }
-                Session::put('booking_ids', array_map(fn($b) => $b->id, $bookings));
-                $paymentUrl = URL::signedRoute('booking.payment', ['booking' => $bookings[0]->id]);
-                return redirect()->to($paymentUrl);
             }
+
+            // Kirim konfirmasi WA
+            $this->sendWhatsAppConfirmation([
+                'booking_ids' => array_map(fn($b) => $b->id, $bookings),
+                'customer_name' => $request->customer_name,
+                'customer_phone' => $request->customer_phone,
+                'total_price' => $totalPrice
+            ]);
+
+            Session::put('booking_ids', array_map(fn($b) => $b->id, $bookings));
+            $paymentUrl = URL::signedRoute('booking.payment', ['booking' => $bookings[0]->id]);
+
+            return redirect()->to($paymentUrl);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Booking error: ' . $e->getMessage());
@@ -281,66 +327,22 @@ class BookingPageController extends Controller
         }
     }
 
-    /**
-     * Konfirmasi booking cash oleh admin (atau endpoint khusus)
-     */
-    public function confirmCashBooking(Request $request)
+    private function sendWhatsAppConfirmation($data)
     {
-        $data = Session::get('pending_cash_booking');
-        if (!$data) {
-            return redirect('/')->with('error', 'Data booking tidak ditemukan.');
-        }
-
-        $bookings = [];
-        $totalPrice = 0;
-        DB::beginTransaction();
         try {
-            foreach ($data['selected_fields'] as $fieldId) {
-                if (!isset($data['selected_slots'][$fieldId]) || empty($data['selected_slots'][$fieldId])) continue;
-                $timeSlots = $data['selected_slots'][$fieldId];
-                sort($timeSlots);
-                if (empty($timeSlots)) continue;
-                $startTime = $timeSlots[0];
-                $endTime = Carbon::parse($timeSlots[count($timeSlots) - 1])->addHour()->format('H:i:s');
-                $isAvailable = $this->bookingService->areSlotsAvailable(
-                    $fieldId,
-                    $data['booking_date'],
-                    $startTime,
-                    $endTime
-                );
-                if (!$isAvailable) {
-                    DB::rollBack();
-                    return redirect()->back()->with('error', "Lapangan {$fieldId} tidak tersedia untuk slot waktu yang dipilih. Silakan pilih slot waktu lain.");
-                }
-                $bookingData = [
-                    'field_id' => $fieldId,
-                    'customer_name' => $data['customer_name'],
-                    'customer_email' => $data['customer_email'],
-                    'customer_phone' => $data['customer_phone'],
-                    'booking_date' => $data['booking_date'],
-                    'start_time' => $startTime,
-                    'end_time' => $endTime,
-                    'payment_method' => 'cash'
-                ];
-                $booking = $this->bookingService->createBooking($bookingData);
-                if (!$booking) {
-                    DB::rollBack();
-                    return redirect()->back()->with('error', "Gagal membuat booking untuk lapangan {$fieldId}. Silakan coba lagi.");
-                }
-                $bookings[] = $booking;
-                $totalPrice += $booking->total_price;
-            }
-            DB::commit();
-            Session::forget('pending_cash_booking');
-            Session::put('booking_ids', array_map(fn($b) => $b->id, $bookings));
-            $successUrl = URL::signedRoute('booking.success', ['booking' => implode(',', array_map(fn($b) => $b->id, $bookings))]);
-            return redirect()->to($successUrl)
-                ->with('multipleBookings', count($bookings) > 1)
-                ->with('totalBookings', count($bookings));
+            $message = "📌 *Konfirmasi Booking Berhasil* \n\n" .
+                "Nama: {$data['customer_name']}\n" .
+                "No. HP: {$data['customer_phone']}\n" .
+                "Total Pembayaran: Rp " . number_format($data['total_price'], 0, ',', '.') . "\n\n" .
+                "Silakan selesaikan pembayaran melalui link berikut:\n" .
+                route('booking.payment', ['booking' => $data['booking_ids'][0]]);
+
+            app('App\Services\WhatsAppService')->sendMessage(
+                $data['customer_phone'],
+                $message
+            );
         } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Booking cash confirm error: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            Log::error('Gagal mengirim WA: ' . $e->getMessage());
         }
     }
 

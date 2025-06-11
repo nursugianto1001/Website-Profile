@@ -164,26 +164,51 @@ class BookingPageController extends Controller
             $openingHour = $field->opening_hour ?? 8;
             $closingHour = $field->closing_hour ?? 22;
 
-            $bookedSlots = DB::table('booking_slots')
+            $bookedSlotsWithCustomer = DB::table('booking_slots')
                 ->join('bookings', 'booking_slots.booking_id', '=', 'bookings.id')
                 ->where('bookings.field_id', $fieldId)
                 ->where('bookings.booking_date', $date)
                 ->whereNotIn('bookings.payment_status', ['expired', 'cancel'])
-                ->pluck('booking_slots.slot_time')
-                ->toArray();
+                ->select('booking_slots.slot_time', 'bookings.customer_name')
+                ->get()
+                ->keyBy('slot_time');
 
             for ($hour = $openingHour; $hour < $closingHour; $hour++) {
                 $slotTime = sprintf('%02d:00:00', $hour);
 
                 if (in_array($hour, [17, 18, 19])) {
-                    $fieldAvailability[$fieldId][$slotTime] = false;
+                    $fieldAvailability[$fieldId][$slotTime] = [
+                        'available' => false,
+                        'type' => 'member_manual',
+                        'customer_name' => 'Member Manual'
+                    ];
                     continue;
                 }
 
-                $isBooked = in_array($slotTime, $bookedSlots, true);
-                $isPast = $isToday && ($hour <= $currentHour);
+                if (isset($bookedSlotsWithCustomer[$slotTime])) {
+                    $fieldAvailability[$fieldId][$slotTime] = [
+                        'available' => false,
+                        'type' => 'booked',
+                        'customer_name' => $bookedSlotsWithCustomer[$slotTime]->customer_name
+                    ];
+                    continue;
+                }
 
-                $fieldAvailability[$fieldId][$slotTime] = !$isBooked && !$isPast;
+                $isPast = $isToday && ($hour <= $currentHour);
+                if ($isPast) {
+                    $fieldAvailability[$fieldId][$slotTime] = [
+                        'available' => false,
+                        'type' => 'past',
+                        'customer_name' => 'Waktu Terlewat'
+                    ];
+                    continue;
+                }
+
+                $fieldAvailability[$fieldId][$slotTime] = [
+                    'available' => true,
+                    'type' => 'available',
+                    'customer_name' => null
+                ];
             }
         }
 
@@ -196,6 +221,7 @@ class BookingPageController extends Controller
             ->header('Pragma', 'no-cache')
             ->header('Expires', '0');
     }
+
 
     /**
      * Process booking submission

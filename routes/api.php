@@ -7,9 +7,10 @@ use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\API\Admin\AdminBookingController;
 use App\Http\Controllers\API\Admin\AdminFieldController;
 use App\Http\Controllers\API\Admin\AdminTransactionController;
+use App\Http\Controllers\Web\BookingPageController;
 
 // Public API
-Route::get('/available-slots', [FieldController::class, 'getAllAvailableSlots']);
+Route::get('/available-slots', [BookingPageController::class, 'getAllAvailableSlots']);
 Route::get('/fields', [FieldController::class, 'index']);
 Route::get('/fields/{field}', [FieldController::class, 'show']);
 Route::get('/fields/{field}/available-slots', [FieldController::class, 'getAvailableSlots']);

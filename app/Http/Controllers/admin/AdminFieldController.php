@@ -123,7 +123,7 @@ class AdminFieldController extends Controller
                 'price_per_hour' => 'required|numeric|min:0',
                 'opening_hour' => 'required|integer|min:0|max:23',
                 'closing_hour' => 'required|integer|min:0|max:23|gt:opening_hour',
-                'is_active' => 'boolean',
+                'is_active' => 'required|in:true,false',
                 'image_url' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             ]);
 
@@ -133,7 +133,7 @@ class AdminFieldController extends Controller
                 'price_per_hour' => $validated['price_per_hour'],
                 'opening_hour' => $validated['opening_hour'],
                 'closing_hour' => $validated['closing_hour'],
-                'is_active' => $request->has('is_active'),
+                'is_active' => $validated['is_active'] === 'true',
             ];
 
             // Handle image upload if provided

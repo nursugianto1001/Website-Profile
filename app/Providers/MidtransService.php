@@ -25,8 +25,6 @@ class MidtransService
 
     /**
      * Get Midtrans client key
-     *
-     * @return string
      */
     public function getClientKey()
     {
@@ -35,25 +33,24 @@ class MidtransService
 
     /**
      * Create Midtrans Snap transaction
-     *
-     * @param array $params
-     * @return array|null Snap token dan order_id
      */
     public function createTransaction($params)
     {
         try {
-            // Verify configuration
             if (empty($this->serverKey)) {
                 Log::error('Midtrans Error: Server key is not configured');
                 return null;
             }
 
+            // ✅ PERBAIKAN: Generate order_id yang konsisten
+            $orderId = 'ORDER-' . $params['booking_id'] . '-' . time();
+
             $transaction_details = [
-                'order_id' => 'ORD-' . $params['booking_id'] . '-' . time(),
+                'order_id' => $orderId,
                 'gross_amount' => abs((int)$params['total_price']),
             ];
 
-            // Process item details to ensure valid values
+            // ✅ PERBAIKAN: Process item details dengan benar
             $item_details = [];
             foreach ($params['items'] as $item) {
                 $item_details[] = [
@@ -81,11 +78,7 @@ class MidtransService
                 'transaction_details' => $transaction_details,
                 'item_details' => $item_details,
                 'customer_details' => $customer_details,
-                'callbacks' => [
-                    'finish' => 'https://fe5d-118-99-64-209.ngrok-free.app/payment/finish'
-                ]
             ];
-
 
             Log::info('Midtrans Request: ' . json_encode($transaction_data));
             $snapToken = \Midtrans\Snap::getSnapToken($transaction_data);
@@ -93,19 +86,16 @@ class MidtransService
 
             return [
                 'token' => $snapToken,
-                'order_id' => $transaction_details['order_id']
+                'order_id' => $orderId  // ✅ Return order_id yang benar
             ];
         } catch (\Exception $e) {
-            Log::error('Midtrans Error: ' . $e->getMessage() . ' - ' . $e->getTraceAsString());
+            Log::error('Midtrans Error: ' . $e->getMessage());
             return null;
         }
     }
 
     /**
      * Cancel transaction in Midtrans
-     *
-     * @param string $orderId
-     * @return array|null
      */
     public function cancelTransaction($orderId)
     {
@@ -120,9 +110,6 @@ class MidtransService
 
     /**
      * Get transaction status from Midtrans
-     *
-     * @param string $orderId
-     * @return array|null
      */
     public function getTransactionStatus($orderId)
     {
@@ -137,9 +124,6 @@ class MidtransService
 
     /**
      * Get transaction notification from Midtrans
-     *
-     * @param array $input
-     * @return array
      */
     public function parseNotification($input)
     {

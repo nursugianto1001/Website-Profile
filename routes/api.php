@@ -10,7 +10,8 @@ use App\Http\Controllers\API\Admin\AdminTransactionController;
 use App\Http\Controllers\Web\BookingPageController;
 
 // Public API
-Route::get('/available-slots', [BookingPageController::class, 'getAllAvailableSlots']);
+Route::get('/available-slots', [BookingPageController::class, 'getAvailableSlots']); // untuk boolean saja
+Route::get('/all-available-slots', [BookingPageController::class, 'getAllAvailableSlots']);
 Route::get('/fields', [FieldController::class, 'index']);
 Route::get('/fields/{field}', [FieldController::class, 'show']);
 Route::get('/fields/{field}/available-slots', [FieldController::class, 'getAvailableSlots']);
@@ -18,6 +19,7 @@ Route::get('/fields/{field}/weekly-slots', [FieldController::class, 'getWeeklySl
 Route::post('/bookings/check-availability', [BookingController::class, 'checkAvailability']);
 Route::post('/bookings', [BookingController::class, 'store']);
 Route::get('/bookings/{booking}', [BookingController::class, 'show']);
+Route::get('/all-available-slots', [BookingPageController::class, 'getAllAvailableSlots']);
 
 Route::post('/transactions/notification', [TransactionController::class, 'handleNotification']);
 

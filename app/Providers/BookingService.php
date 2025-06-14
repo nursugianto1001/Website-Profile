@@ -5,12 +5,21 @@ namespace App\Providers;
 use App\Models\Booking;
 use App\Models\BookingSlot;
 use App\Models\Field;
+use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class BookingService
 {
+    protected $midtransService;
+
+    public function __construct(MidtransService $midtransService)
+    {
+        $this->midtransService = $midtransService;
+    }
+
     /**
      * Cek ketersediaan slot dengan validasi waktu real-time
      */
@@ -34,7 +43,6 @@ class BookingService
             ->pluck('booking_slots.slot_time')
             ->toArray();
 
-        $requestedSlots = [];
         $currentSlot = $startDateTime->copy();
 
         // Generate slot per jam dengan validasi waktu
@@ -163,20 +171,17 @@ class BookingService
                 throw new \Exception("Waktu akhir harus setelah waktu awal");
             }
 
-            // Perbaikan perhitungan durasi
             $duration = $startTime->diffInHours($endTime);
-            // Atau gunakan parameter absolut
-            // $duration = $endTime->diffInHours($startTime, false);
-
             $totalPrice = $field->price_per_hour * $duration;
 
             // Generate booking code hanya untuk yang sudah dikonfirmasi
             $bookingCode = $isConfirmed
                 ? 'CASH-' . Carbon::now()->format('YmdHis') . '-' . strtoupper(uniqid())
-                : null;
+                : 'BK-' . strtoupper(Str::random(8));
 
             $bookingData = [
                 'field_id' => $field->id,
+                'booking_code' => $bookingCode,
                 'customer_name' => $data['customer_name'],
                 'customer_email' => $data['customer_email'] ?? null,
                 'customer_phone' => $data['customer_phone'],
@@ -188,28 +193,32 @@ class BookingService
                 'payment_method' => $data['payment_method'],
                 'payment_status' => $isConfirmed ? 'settlement' : 'pending',
                 'status' => $isConfirmed ? 'booked' : 'pending',
-                'booking_code' => $bookingCode
             ];
 
             $booking = Booking::create($bookingData);
 
+            if (!$booking) {
+                throw new \Exception('Failed to create booking');
+            }
+
+            Log::info('Booking created:', ['booking_id' => $booking->id]);
+
+            // ✅ PERBAIKAN: Selalu buat transaction record
+            $this->createTransactionRecord($booking);
+
             // Hanya buat slot jika booking dikonfirmasi
             if ($isConfirmed) {
-                $currentSlot = $startTime->copy();
-                while ($currentSlot < $endTime) {
-                    BookingSlot::create([
-                        'booking_id' => $booking->id,
-                        'field_id' => $field->id,
-                        'booking_date' => $bookingDate,
-                        'slot_time' => $currentSlot->format('H:i:s'),
-                        'start_time' => $currentSlot->format('Y-m-d H:i:s'),
-                        'end_time' => $currentSlot->addHour()->format('Y-m-d H:i:s'),
-                        'status' => 'booked'
-                    ]);
-                }
+                $this->createBookingSlots($booking);
+            }
+
+            // For online payment, create Midtrans transaction
+            if ($data['payment_method'] === 'online') {
+                $this->createMidtransTransaction($booking);
             }
 
             DB::commit();
+            Log::info('Booking process completed:', ['booking_id' => $booking->id]);
+            
             return $booking;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -218,12 +227,104 @@ class BookingService
         }
     }
 
+    /**
+     * Create transaction record for any booking
+     */
+    private function createTransactionRecord($booking)
+    {
+        $orderId = 'ORDER-' . $booking->id . '-' . time();
+        
+        $transaction = Transaction::create([
+            'booking_id' => $booking->id,
+            'order_id' => $orderId,
+            'payment_type' => $booking->payment_method === 'online' ? 'midtrans' : 'cash',
+            'transaction_status' => $booking->payment_status === 'settlement' ? 'settlement' : 'pending',
+            'gross_amount' => $booking->total_price,
+            'payment_channel' => $booking->payment_method === 'online' ? 'Midtrans' : 'Manual',
+            'transaction_time' => now(),
+        ]);
+
+        Log::info('Transaction record created:', [
+            'transaction_id' => $transaction->id,
+            'booking_id' => $booking->id,
+            'order_id' => $orderId
+        ]);
+
+        return $transaction;
+    }
+
+    /**
+     * Create booking slots for a booking
+     */
+    private function createBookingSlots($booking)
+    {
+        $startTime = Carbon::parse($booking->start_time);
+        $endTime = Carbon::parse($booking->end_time);
+        $currentTime = $startTime->copy();
+
+        while ($currentTime < $endTime) {
+            BookingSlot::create([
+                'booking_id' => $booking->id,
+                'field_id' => $booking->field_id,
+                'booking_date' => $booking->booking_date,
+                'slot_time' => $currentTime->format('H:i:s'),
+                'start_time' => $currentTime->format('Y-m-d H:i:s'),
+                'end_time' => $currentTime->copy()->addHour()->format('Y-m-d H:i:s'),
+                'status' => 'booked',
+            ]);
+
+            $currentTime->addHour();
+        }
+    }
+
+    /**
+     * Create Midtrans transaction for a booking
+     */
+    private function createMidtransTransaction($booking)
+    {
+        $booking->load('field');
+
+        // ✅ PERBAIKAN: Siapkan data sesuai format MidtransService
+        $transactionData = [
+            'booking_id' => $booking->id,
+            'customer_name' => $booking->customer_name,
+            'customer_email' => $booking->customer_email,
+            'customer_phone' => $booking->customer_phone,
+            'total_price' => $booking->total_price,
+            'items' => [
+                [
+                    'id' => $booking->field_id,
+                    'name' => $booking->field->name,
+                    'price' => $booking->field->price_per_hour,
+                    'quantity' => $booking->duration_hours
+                ]
+            ]
+        ];
+
+        $midtransResponse = $this->midtransService->createTransaction($transactionData);
+
+        if ($midtransResponse && isset($midtransResponse['token'])) {
+            // Update booking dengan snap token
+            $booking->update(['snap_token' => $midtransResponse['token']]);
+
+            // ✅ PERBAIKAN: Update transaction yang sudah dibuat dengan order_id dari Midtrans
+            $transaction = Transaction::where('booking_id', $booking->id)->first();
+            if ($transaction) {
+                $transaction->update([
+                    'order_id' => $midtransResponse['order_id'],
+                    'payment_type' => 'midtrans',
+                ]);
+            }
+
+            Log::info('Midtrans transaction created successfully', [
+                'booking_id' => $booking->id,
+                'order_id' => $midtransResponse['order_id']
+            ]);
+        }
+    }
 
     /**
      * Membatalkan booking dengan menghapus data dari database
-     * 
-     * @param Booking $booking
-     * @return bool
      */
     public function cancelBooking(Booking $booking)
     {

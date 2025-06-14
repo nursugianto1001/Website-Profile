@@ -31,43 +31,95 @@ class TransactionController extends Controller
 
         $orderId = $payload['order_id'] ?? '';
         $transactionStatus = $payload['transaction_status'] ?? '';
-        $fraudStatus = $payload['fraud_status'] ?? '';
         $paymentType = $payload['payment_type'] ?? '';
 
-        // Find the related booking by order ID
-        $booking = Booking::whereHas('transaction', function ($query) use ($orderId) {
-            $query->where('order_id', $orderId);
-        })->first();
+        // PERBAIKAN: Cari transaction berdasarkan order_id
+        $transaction = Transaction::where('order_id', $orderId)->first();
 
-        if (!$booking) {
-            Log::error('Booking not found for order ID: ' . $orderId);
-            return response()->json(['success' => false, 'message' => 'Booking not found'], 404);
+        if (!$transaction) {
+            // PERBAIKAN: Cari booking berdasarkan snap_token atau booking_code
+            // Asumsi order_id format: BOOKING-{booking_id}-{timestamp}
+            $bookingId = $this->extractBookingIdFromOrderId($orderId);
+            $booking = Booking::find($bookingId);
+
+            // Alternatif: Cari berdasarkan snap_token jika tersimpan
+            if (!$booking) {
+                $booking = Booking::where('snap_token', 'LIKE', "%{$orderId}%")->first();
+            }
+
+            // Alternatif: Cari berdasarkan booking_code
+            if (!$booking) {
+                $booking = Booking::where('booking_code', $orderId)->first();
+            }
+
+            if (!$booking) {
+                Log::error('Booking not found for order ID: ' . $orderId);
+                return response()->json(['success' => false, 'message' => 'Booking not found'], 404);
+            }
+
+            // Buat transaksi baru
+            $transaction = Transaction::create([
+                'booking_id' => $booking->id,
+                'order_id' => $orderId,
+                'payment_type' => $paymentType,
+                'transaction_status' => $transactionStatus,
+                'gross_amount' => $booking->total_price,
+                'payment_channel' => $payload['payment_channel'] ?? null,
+                'transaction_time' => now(),
+            ]);
+
+            Log::info('New transaction created:', [
+                'transaction_id' => $transaction->id,
+                'booking_id' => $booking->id,
+                'order_id' => $orderId
+            ]);
+        } else {
+            // Update transaksi yang sudah ada
+            $transaction->update([
+                'transaction_status' => $transactionStatus,
+                'payment_type' => $paymentType,
+                'payment_channel' => $payload['payment_channel'] ?? null,
+            ]);
+
+            Log::info('Existing transaction updated:', [
+                'transaction_id' => $transaction->id,
+                'status' => $transactionStatus
+            ]);
         }
 
-        // Update transaction status
-        $transaction = $booking->transaction;
-        $transaction->update([
-            'transaction_status' => $transactionStatus,
-            'payment_type' => $paymentType,
-        ]);
-
-        // Update booking payment status based on transaction status
+        // Update booking payment status
         $paymentStatus = 'pending';
-
         if ($transactionStatus == 'capture' || $transactionStatus == 'settlement') {
             $paymentStatus = 'settlement';
-        } elseif ($transactionStatus == 'cancel' || $transactionStatus == 'deny' || $transactionStatus == 'expire') {
+        } elseif (in_array($transactionStatus, ['cancel', 'deny', 'expire'])) {
             $paymentStatus = 'expired';
-            // Update booking slots status to cancelled
-            $booking->slots()->update(['status' => 'cancelled']);
-        } elseif ($transactionStatus == 'pending') {
-            $paymentStatus = 'pending';
         }
 
-        $booking->update(['payment_status' => $paymentStatus]);
+        $transaction->booking->update(['payment_status' => $paymentStatus]);
 
-        Log::info('Payment status updated: ' . $paymentStatus . ' for booking ID: ' . $booking->id);
+        Log::info('Payment status updated:', [
+            'booking_id' => $transaction->booking->id,
+            'payment_status' => $paymentStatus
+        ]);
 
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Extract booking ID from order ID
+     */
+    private function extractBookingIdFromOrderId($orderId)
+    {
+        // Contoh format: BOOKING-123-1640995200
+        if (preg_match('/BOOKING-(\d+)-\d+/', $orderId, $matches)) {
+            return $matches[1];
+        }
+
+        // Contoh format lain: ORDER-123-1640995200
+        if (preg_match('/ORDER-(\d+)-\d+/', $orderId, $matches)) {
+            return $matches[1];
+        }
+
+        return null;
     }
 }

@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
 
         $fields = [
             [
-                'name' => 'Lapangan Badmin 1',
+                'name' => 'Lapangan Badminton 1',
                 'description' => 'Lapangan Badmin berukuran standar dengan karet berkualitas tinggi',
                 'price_per_hour' => 40000,
                 'image_url' => '/storage/fields/futsal-a.jpg',

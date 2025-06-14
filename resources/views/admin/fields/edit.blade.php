@@ -78,17 +78,31 @@
                             <span class="font-medium text-blue-800">Informasi Status</span>
                         </div>
                         <div class="mt-2">
-                            <div class="flex items-center">
-                                <div class="relative inline-block w-10 mr-2 align-middle select-none">
-                                    <input type="checkbox" name="is_active" id="is_active"
-                                        class="absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform duration-200 ease-in-out checked:right-0 checked:border-blue-600 checked:bg-blue-600"
-                                        value="1" {{ old('is_active', $field->is_active) ? 'checked' : '' }}>
-                                    <label for="is_active" class="block h-6 overflow-hidden bg-gray-300 rounded-full cursor-pointer"></label>
+                            <label class="inline-flex items-center cursor-pointer">
+                                <div class="relative">
+                                    <input type="hidden" name="is_active" value="false">
+                                    <input type="checkbox" 
+                                           name="is_active" 
+                                           value="true"
+                                           {{ $field->is_active ? 'checked' : '' }}
+                                           class="hidden">
+                                    <div class="toggle-bg w-11 h-6 bg-gray-200 rounded-full border border-gray-200 relative">
+                                        <div class="toggle-dot absolute w-5 h-5 bg-white rounded-full shadow left-0.5 top-0.5 transition-transform duration-200 transform"></div>
+                                    </div>
                                 </div>
-                                <label for="is_active" class="text-sm font-medium text-gray-700 cursor-pointer">Lapangan Aktif</label>
-                            </div>
+                                <span class="ml-3 text-sm font-medium text-gray-700">Lapangan Aktif</span>
+                            </label>
                             <p class="mt-1 text-xs text-gray-600">Jika diaktifkan, lapangan dapat dipesan oleh pengguna</p>
                         </div>
+
+                        <style>
+                            input:checked + .toggle-bg {
+                                background-color: #2563eb;
+                            }
+                            input:checked + .toggle-bg .toggle-dot {
+                                transform: translateX(100%);
+                            }
+                        </style>
                     </div>
                 </div>
 

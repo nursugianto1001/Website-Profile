@@ -2,13 +2,26 @@
 
 @section('content')
 <div class="bg-gradient-to-br from-white to-gray-50 p-6 rounded-xl shadow-lg border border-gray-100">
+    <!-- Debug Info (Hapus setelah testing) -->
+    @if(config('app.debug'))
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <h4 class="font-semibold text-blue-800">Debug Information:</h4>
+        <p class="text-sm text-blue-700">Total transaksi: {{ $transactions->total() }}</p>
+        <p class="text-sm text-blue-700">Current page: {{ $transactions->currentPage() }}</p>
+        <p class="text-sm text-blue-700">Per page: {{ $transactions->perPage() }}</p>
+        <p class="text-sm text-blue-700">Settlement: {{ $totalSettlement ?? 'undefined' }}</p>
+        <p class="text-sm text-blue-700">Pending: {{ $totalPending ?? 'undefined' }}</p>
+        <p class="text-sm text-blue-700">Failed: {{ $totalFailed ?? 'undefined' }}</p>
+    </div>
+    @endif
+
     <!-- Header dan Filter -->
     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-6">
         <!-- Header -->
         <div class="flex items-center">
             <div>
                 <h2 class="text-2xl font-bold text-indigo-800">Daftar Transaksi</h2>
-                <p class="text-sm text-gray-500 mt-1">Kelola dan pantau semua transaksi pembayaran</p>
+                <p class="text-sm text-gray-500 mt-1">Kelola dan pantau semua transaksi pembayaran (Terbaru ke Lama)</p>
             </div>
         </div>
 
@@ -20,7 +33,7 @@
                 </div>
                 <div>
                     <p class="text-xs text-gray-500">Berhasil</p>
-                    <p class="text-lg font-semibold text-green-600">{{ $transactions->where('transaction_status', 'settlement')->count() + $transactions->where('transaction_status', 'capture')->count() }}</p>
+                    <p class="text-lg font-semibold text-green-600">{{ $totalSettlement ?? 0 }}</p>
                 </div>
             </div>
             <div class="flex items-center p-3 bg-white rounded-lg shadow-sm border border-gray-100">
@@ -29,7 +42,7 @@
                 </div>
                 <div>
                     <p class="text-xs text-gray-500">Pending</p>
-                    <p class="text-lg font-semibold text-yellow-600">{{ $transactions->where('transaction_status', 'pending')->count() }}</p>
+                    <p class="text-lg font-semibold text-yellow-600">{{ $totalPending ?? 0 }}</p>
                 </div>
             </div>
             <div class="flex items-center p-3 bg-white rounded-lg shadow-sm border border-gray-100">
@@ -38,7 +51,7 @@
                 </div>
                 <div>
                     <p class="text-xs text-gray-500">Gagal</p>
-                    <p class="text-lg font-semibold text-red-600">{{ $transactions->whereIn('transaction_status', ['cancel', 'deny', 'expire'])->count() }}</p>
+                    <p class="text-lg font-semibold text-red-600">{{ $totalFailed ?? 0 }}</p>
                 </div>
             </div>
         </div>
@@ -120,21 +133,36 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-indigo-50">
                     <tr>
-                        <th scope="col" class="px-4 py-3.5 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wider">ID</th>
+                        <th scope="col" class="px-4 py-3.5 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wider">
+                            ID
+                            <i class="bi bi-arrow-down text-indigo-600 ml-1" title="Terbaru ke Lama"></i>
+                        </th>
                         <th scope="col" class="px-4 py-3.5 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wider">Order ID</th>
                         <th scope="col" class="px-4 py-3.5 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wider">Pelanggan</th>
                         <th scope="col" class="px-4 py-3.5 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wider">Status</th>
                         <th scope="col" class="px-4 py-3.5 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wider">Pembayaran</th>
                         <th scope="col" class="px-4 py-3.5 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wider">Jumlah</th>
-                        <th scope="col" class="px-4 py-3.5 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wider">Waktu</th>
+                        <th scope="col" class="px-4 py-3.5 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wider">
+                            Waktu Transaksi
+                            <i class="bi bi-arrow-down text-indigo-600 ml-1" title="Terbaru ke Lama"></i>
+                        </th>
                         <th scope="col" class="px-4 py-3.5 text-center text-xs font-semibold text-indigo-800 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($transactions as $transaction)
                     <tr class="hover:bg-blue-50 transition duration-150 ease-in-out">
-                        <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $transaction->id }}</td>
-                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-700">{{ $transaction->order_id }}</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            <div class="flex items-center">
+                                {{ $transaction->id }}
+                                @if($loop->first)
+                                <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                    <i class="bi bi-clock mr-1"></i>Terbaru
+                                </span>
+                                @endif
+                            </div>
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-700 font-mono">{{ $transaction->order_id }}</td>
                         <td class="px-4 py-4 whitespace-nowrap">
                             @if($transaction->booking)
                             <div class="flex flex-col">
@@ -170,15 +198,16 @@
                                 @else
                                 <i class="bi bi-cash mr-2 text-gray-500"></i>
                                 @endif
-                                <span class="capitalize">{{ str_replace('_', ' ', $transaction->payment_type) }}</span>
+                                <span class="capitalize">{{ $transaction->payment_type ? str_replace('_', ' ', $transaction->payment_type) : 'Belum ditentukan' }}</span>
                             </div>
                         </td>
                         <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-blue-600">Rp {{ number_format($transaction->gross_amount, 0, ',', '.') }}</td>
                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-700">
                             @if($transaction->transaction_time)
                             <div class="flex flex-col">
-                                <span>{{ $transaction->transaction_time->format('d/m/Y') }}</span>
-                                <span class="text-xs text-gray-500">{{ $transaction->transaction_time->format('H:i') }}</span>
+                                <span class="font-medium">{{ $transaction->transaction_time->format('d/m/Y') }}</span>
+                                <span class="text-xs text-gray-500">{{ $transaction->transaction_time->format('H:i:s') }}</span>
+                                <span class="text-xs text-blue-600">{{ $transaction->transaction_time->diffForHumans() }}</span>
                             </div>
                             @else
                             <span class="text-gray-400">-</span>
@@ -207,7 +236,13 @@
                             <div class="flex flex-col items-center justify-center">
                                 <i class="bi bi-inbox text-5xl text-gray-300 mb-3"></i>
                                 <p class="text-lg font-medium text-gray-500">Tidak ada data transaksi ditemukan</p>
-                                <p class="text-sm text-gray-400 mt-1">Coba ubah filter pencarian Anda</p>
+                                <p class="text-sm text-gray-400 mt-1">
+                                    @if(request()->hasAny(['search', 'status', 'date_from', 'date_to']))
+                                        Coba ubah filter pencarian Anda atau
+                                    @else
+                                        Belum ada transaksi yang dibuat. Silakan
+                                    @endif
+                                </p>
                                 <a href="{{ route('admin.transactions.index') }}" class="mt-4 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                     <i class="bi bi-arrow-repeat mr-2"></i>
                                     Reset Filter
@@ -223,7 +258,7 @@
 
     <!-- Pagination -->
     <div class="mt-6">
-        {{ $transactions->links() }}
+        {{ $transactions->appends(request()->query())->links() }}
     </div>
 
     <!-- Footer Info -->

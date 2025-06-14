@@ -164,18 +164,18 @@ class BookingPageController extends Controller
             $openingHour = $field->opening_hour ?? 8;
             $closingHour = $field->closing_hour ?? 22;
 
-            $bookedSlotsWithCustomer = DB::table('booking_slots')
-                ->join('bookings', 'booking_slots.booking_id', '=', 'bookings.id')
-                ->where('bookings.field_id', $fieldId)
-                ->where('bookings.booking_date', $date)
-                ->whereNotIn('bookings.payment_status', ['expired', 'cancel'])
-                ->select('booking_slots.slot_time', 'bookings.customer_name')
-                ->get()
-                ->keyBy('slot_time');
+            // PERBAIKAN: Ambil data langsung dari tabel bookings
+            $bookedSlotsWithCustomer = DB::table('bookings')
+                ->where('field_id', $fieldId)
+                ->where('booking_date', $date)
+                ->whereNotIn('payment_status', ['expired', 'cancel', 'failed'])
+                ->select('start_time', 'end_time', 'customer_name')
+                ->get();
 
             for ($hour = $openingHour; $hour < $closingHour; $hour++) {
                 $slotTime = sprintf('%02d:00:00', $hour);
 
+                // Cek slot member manual
                 if (in_array($hour, [17, 18, 19])) {
                     $fieldAvailability[$fieldId][$slotTime] = [
                         'available' => false,
@@ -185,15 +185,31 @@ class BookingPageController extends Controller
                     continue;
                 }
 
-                if (isset($bookedSlotsWithCustomer[$slotTime])) {
+                // PERBAIKAN: Cek apakah slot ini termasuk dalam range booking
+                $isBooked = false;
+                $customerName = null;
+
+                foreach ($bookedSlotsWithCustomer as $booking) {
+                    $startHour = (int) Carbon::parse($booking->start_time)->format('H');
+                    $endHour = (int) Carbon::parse($booking->end_time)->format('H');
+
+                    if ($hour >= $startHour && $hour < $endHour) {
+                        $isBooked = true;
+                        $customerName = $booking->customer_name;
+                        break;
+                    }
+                }
+
+                if ($isBooked) {
                     $fieldAvailability[$fieldId][$slotTime] = [
                         'available' => false,
                         'type' => 'booked',
-                        'customer_name' => $bookedSlotsWithCustomer[$slotTime]->customer_name
+                        'customer_name' => $customerName
                     ];
                     continue;
                 }
 
+                // Cek slot yang sudah terlewat
                 $isPast = $isToday && ($hour <= $currentHour);
                 if ($isPast) {
                     $fieldAvailability[$fieldId][$slotTime] = [
@@ -204,6 +220,7 @@ class BookingPageController extends Controller
                     continue;
                 }
 
+                // Slot tersedia
                 $fieldAvailability[$fieldId][$slotTime] = [
                     'available' => true,
                     'type' => 'available',
@@ -221,7 +238,6 @@ class BookingPageController extends Controller
             ->header('Pragma', 'no-cache')
             ->header('Expires', '0');
     }
-
 
     /**
      * Process booking submission

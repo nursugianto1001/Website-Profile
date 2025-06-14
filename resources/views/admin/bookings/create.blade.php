@@ -14,7 +14,8 @@
         </a>
     </div>
 
-    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+    <!-- Form Booking Reguler (kode yang sudah ada tetap sama) -->
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mb-6">
         <form action="{{ route('admin.bookings.store') }}" method="POST">
             @csrf
 
@@ -80,7 +81,6 @@
                                         @endfor
                                 </select>
                             </div>
-
                             <div>
                                 <label for="end_time" class="block text-sm font-medium text-gray-700 mb-1">Waktu Selesai <span class="text-red-600">*</span></label>
                                 <select name="end_time" id="end_time" required
@@ -150,6 +150,97 @@
                 <button type="submit" class="inline-flex items-center px-6 py-3 bg-indigo-600 border border-transparent rounded-lg text-white font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-sm transition-colors duration-150 ease-in-out">
                     <i class="bi bi-save mr-2"></i>
                     Buat Booking
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Form Member Booking Khusus Slot 17-19 -->
+    <div class="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl border border-yellow-200 p-6 shadow-sm">
+        <div class="flex items-center mb-4">
+            <i class="bi bi-star-fill text-yellow-500 mr-2"></i>
+            <h3 class="text-lg font-semibold text-yellow-800">Booking Member Khusus (17:00 - 20:00)</h3>
+        </div>
+        <p class="text-yellow-700 text-sm mb-6">Form khusus untuk membuat booking member pada slot waktu 17:00-20:00</p>
+        
+        <form action="{{ route('admin.bookings.store-member') }}" method="POST">
+            @csrf
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="text-md font-semibold text-yellow-800 mb-4 flex items-center">
+                        <i class="bi bi-calendar-event mr-2 text-yellow-600"></i>
+                        Informasi Booking Member
+                    </h4>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label for="member_field_id" class="block text-sm font-medium text-gray-700 mb-1">Lapangan <span class="text-red-600">*</span></label>
+                            <select name="field_id" id="member_field_id" required
+                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                <option value="">Pilih Lapangan</option>
+                                @foreach($fields as $field)
+                                <option value="{{ $field->id }}">{{ $field->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="member_booking_date" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Booking <span class="text-red-600">*</span></label>
+                            <input type="date" name="booking_date" id="member_booking_date" required
+                                min="{{ date('Y-m-d') }}"
+                                value="{{ date('Y-m-d') }}"
+                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                        </div>
+
+                        <div>
+                            <label for="member_start_time" class="block text-sm font-medium text-gray-700 mb-1">Jam Member <span class="text-red-600">*</span></label>
+                            <select name="start_time" id="member_start_time" required
+                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                <option value="">Pilih Jam</option>
+                                <option value="17:00:00">17:00 - 18:00</option>
+                                <option value="18:00:00">18:00 - 19:00</option>
+                                <option value="19:00:00">19:00 - 20:00</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-md font-semibold text-yellow-800 mb-4 flex items-center">
+                        <i class="bi bi-person-badge mr-2 text-yellow-600"></i>
+                        Informasi Member
+                    </h4>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label for="member_customer_name" class="block text-sm font-medium text-gray-700 mb-1">Nama Member <span class="text-red-600">*</span></label>
+                            <input type="text" name="customer_name" id="member_customer_name" required
+                                placeholder="Masukkan nama member"
+                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                        </div>
+
+                        <div>
+                            <label for="member_customer_email" class="block text-sm font-medium text-gray-700 mb-1">Email Member</label>
+                            <input type="email" name="customer_email" id="member_customer_email"
+                                placeholder="member@example.com (opsional)"
+                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                        </div>
+
+                        <div>
+                            <label for="member_customer_phone" class="block text-sm font-medium text-gray-700 mb-1">Nomor Telepon Member</label>
+                            <input type="text" name="customer_phone" id="member_customer_phone"
+                                placeholder="08xxxxxxxxxx (opsional)"
+                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end mt-6">
+                <button type="submit" class="inline-flex items-center px-6 py-3 bg-yellow-600 border border-transparent rounded-lg text-white font-medium hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 shadow-sm transition-colors duration-150 ease-in-out">
+                    <i class="bi bi-star mr-2"></i>
+                    Buat Booking Member
                 </button>
             </div>
         </form>

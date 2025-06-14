@@ -164,7 +164,7 @@ class BookingPageController extends Controller
             $openingHour = $field->opening_hour ?? 8;
             $closingHour = $field->closing_hour ?? 22;
 
-            // PERBAIKAN: Ambil data langsung dari tabel bookings
+            // Ambil booking reguler dengan nama customer
             $bookedSlotsWithCustomer = DB::table('bookings')
                 ->where('field_id', $fieldId)
                 ->where('booking_date', $date)
@@ -172,20 +172,36 @@ class BookingPageController extends Controller
                 ->select('start_time', 'end_time', 'customer_name')
                 ->get();
 
+            // Ambil booking member manual untuk slot 17-19 yang dibuat oleh admin
+            $memberBookings = DB::table('bookings')
+                ->where('field_id', $fieldId)
+                ->where('booking_date', $date)
+                ->where('payment_method', 'cash') // Asumsi booking admin menggunakan cash
+                ->where('payment_status', 'settlement') // Booking yang sudah dikonfirmasi admin
+                ->whereRaw('HOUR(start_time) IN (17, 18, 19)')
+                ->select('start_time', 'customer_name')
+                ->get()
+                ->keyBy(function ($item) {
+                    return sprintf('%02d:00:00', (int) Carbon::parse($item->start_time)->format('H'));
+                });
+
             for ($hour = $openingHour; $hour < $closingHour; $hour++) {
                 $slotTime = sprintf('%02d:00:00', $hour);
 
-                // Cek slot member manual
+                // Cek slot member manual dengan nama member
                 if (in_array($hour, [17, 18, 19])) {
+                    $memberBooking = $memberBookings->get($slotTime);
+                    $memberName = $memberBooking ? $memberBooking->customer_name : 'Slot Member';
+
                     $fieldAvailability[$fieldId][$slotTime] = [
                         'available' => false,
                         'type' => 'member_manual',
-                        'customer_name' => 'Member Manual'
+                        'customer_name' => $memberName
                     ];
                     continue;
                 }
 
-                // PERBAIKAN: Cek apakah slot ini termasuk dalam range booking
+                // Cek booking reguler
                 $isBooked = false;
                 $customerName = null;
 
@@ -238,6 +254,7 @@ class BookingPageController extends Controller
             ->header('Pragma', 'no-cache')
             ->header('Expires', '0');
     }
+
 
     /**
      * Process booking submission

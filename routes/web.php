@@ -74,6 +74,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/admin/confirm-cash-booking', [AdminBookingController::class, 'confirmCashBooking'])
         ->name('admin.confirm-cash-booking');
 
+    Route::post('bookings/member', [AdminBookingController::class, 'storeMemberBooking'])->name('bookings.store-member');
 });
 
 // Profile Routes

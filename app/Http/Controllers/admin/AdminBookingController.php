@@ -52,29 +52,29 @@ class AdminBookingController extends Controller
                 $search = $request->input('search');
                 $query->where(function ($q) use ($search) {
                     $q->where('customer_name', 'like', "%{$search}%")
-                      ->orWhere('customer_email', 'like', "%{$search}%")
-                      ->orWhere('customer_phone', 'like', "%{$search}%");
+                        ->orWhere('customer_email', 'like', "%{$search}%")
+                        ->orWhere('customer_phone', 'like', "%{$search}%");
                 });
             }
 
             $bookings = $query->latest()->paginate(10);
-            
+
             // Log for debugging
             Log::info('Bookings query executed', [
                 'search' => $request->input('search'),
                 'status' => $request->input('status'),
                 'field_id' => $request->input('field_id'),
                 'date_range' => [
-                    'start' => $request->input('start_date'), 
+                    'start' => $request->input('start_date'),
                     'end' => $request->input('end_date')
                 ],
                 'count' => $bookings->count(),
                 'total' => $bookings->total()
             ]);
-            
+
             // Get all fields for filter dropdown
             $fields = Field::all();
-            
+
             return view('admin.bookings.index', compact('bookings', 'fields'));
         } catch (\Exception $e) {
             Log::error('AdminBookingController index error: ' . $e->getMessage());
@@ -213,16 +213,16 @@ class AdminBookingController extends Controller
             if ($request->has('payment_status')) {
                 if ($request->payment_status === 'settlement') {
                     $booking->slots()->update(['status' => 'booked']);
-                    
+
                     // Update transaction if exists
                     if ($booking->transaction) {
                         $booking->transaction->update(['transaction_status' => 'settlement']);
                     }
-                } 
+                }
                 // If payment status is updated to cancelled or expired, update slots too
                 elseif (in_array($request->payment_status, ['cancel', 'expired'])) {
                     $booking->slots()->update(['status' => 'cancelled']);
-                    
+
                     // Update transaction if exists
                     if ($booking->transaction) {
                         $booking->transaction->update(['transaction_status' => $request->payment_status]);
@@ -255,15 +255,14 @@ class AdminBookingController extends Controller
             // Update booking slots status accordingly
             if ($validated['status'] === 'settlement') {
                 $booking->slots()->update(['status' => 'booked']);
-                
+
                 // Update transaction if exists
                 if ($booking->transaction) {
                     $booking->transaction->update(['transaction_status' => 'settlement']);
                 }
-            } 
-            elseif (in_array($validated['status'], ['expired', 'cancel'])) {
+            } elseif (in_array($validated['status'], ['expired', 'cancel'])) {
                 $booking->slots()->update(['status' => 'cancelled']);
-                
+
                 // Update transaction if exists
                 if ($booking->transaction) {
                     $booking->transaction->update(['transaction_status' => $validated['status']]);
@@ -315,7 +314,7 @@ class AdminBookingController extends Controller
             }
 
             DB::beginTransaction();
-            
+
             // Delete related slots first
             $booking->slots()->delete();
 
@@ -326,7 +325,7 @@ class AdminBookingController extends Controller
 
             // Delete the booking
             $booking->delete();
-            
+
             DB::commit();
 
             return redirect()->route('admin.bookings.index')
@@ -383,6 +382,68 @@ class AdminBookingController extends Controller
             DB::rollBack();
             Log::error('Gagal konfirmasi booking cash: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Gagal mengonfirmasi booking: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Store member booking for slots 17-19
+     */
+    public function storeMemberBooking(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'field_id' => 'required|exists:fields,id',
+                'customer_name' => 'required|string|max:255',
+                'booking_date' => 'required|date|date_format:Y-m-d',
+                'start_time' => 'required|date_format:H:i:s|in:17:00:00,18:00:00,19:00:00',
+            ]);
+
+            if ($validator->fails()) {
+                return redirect()->back()
+                    ->withErrors($validator)
+                    ->withInput();
+            }
+
+            // Hitung end_time (1 jam setelah start_time)
+            $startTime = Carbon::parse($request->start_time);
+            $endTime = $startTime->copy()->addHour();
+
+            // Cek apakah slot sudah ada booking
+            $existingBooking = Booking::where('field_id', $request->field_id)
+                ->where('booking_date', $request->booking_date)
+                ->where('start_time', $request->start_time)
+                ->first();
+
+            if ($existingBooking) {
+                return redirect()->back()
+                    ->with('error', 'Slot waktu tersebut sudah dibooking')
+                    ->withInput();
+            }
+
+            // Buat booking member dengan status confirmed
+            $booking = Booking::create([
+                'field_id' => $request->field_id,
+                'booking_code' => 'MBR-' . time() . '-' . $request->field_id,
+                'customer_name' => $request->customer_name,
+                'customer_email' => $request->customer_email ?? 'member@admin.com',
+                'customer_phone' => $request->customer_phone ?? '000000000000',
+                'booking_date' => $request->booking_date,
+                'start_time' => $request->start_time,
+                'end_time' => $endTime->format('H:i:s'),
+                'duration_hours' => 1,
+                'total_price' => 0, // Member booking gratis atau sesuai kebijakan
+                'payment_method' => 'cash',
+                'payment_status' => 'settlement', // Langsung confirmed
+                'status' => 'confirmed'
+            ]);
+
+            return redirect()->route('admin.bookings.index')
+                ->with('success', 'Booking member berhasil dibuat untuk ' . $request->customer_name);
+        } catch (\Exception $e) {
+            Log::error('AdminBookingController storeMemberBooking error: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
+                ->withInput();
         }
     }
 }

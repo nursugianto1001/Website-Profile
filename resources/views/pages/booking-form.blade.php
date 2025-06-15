@@ -19,6 +19,37 @@
     label.flex.items-center {
         cursor: pointer;
     }
+
+    /* Styling khusus untuk member slots */
+    .member-slot {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border: 2px solid #f59e0b;
+    }
+
+    .member-slot:hover {
+        background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%);
+    }
+
+    /* Tooltip styling */
+    [title] {
+        position: relative;
+    }
+
+    [title]:hover::after {
+        content: attr(title);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        white-space: nowrap;
+        z-index: 1000;
+        pointer-events: none;
+    }
 </style>
 
 <body class="bg-[#fdf8f2]">
@@ -56,6 +87,23 @@
         </div>
     </div>
 
+    <!-- Error Container -->
+    <div id="error-container" class="hidden mb-4 bg-red-50 border border-red-200 text-red-800 rounded-lg p-4">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-red-800">Terjadi Kesalahan</h3>
+                <div class="mt-2 text-sm text-red-700">
+                    <p id="error-message">Gagal mengambil data slot. Silakan refresh halaman.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <form id="bookingForm" action="/booking/process" method="POST" class="space-y-6">
         @csrf
 
@@ -83,7 +131,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span>hari ini Tanggal: <span class="font-medium" id="today-date">11 Mei, 2025</span></span>
+                    <span>hari ini Tanggal: <span class="font-medium" id="today-date">{{ date('d M, Y') }}</span></span>
                 </div>
             </div>
 
@@ -115,9 +163,10 @@
                         d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <p class="text-sm text-blue-700">Klik pada slot waktu yang tersedia untuk memesan. <span
-                        class="font-medium">Slot hijau tersedia</span>.</p>
+                        class="font-medium">Slot hijau tersedia</span>, <span class="font-medium">slot kuning untuk member</span>.</p>
             </div>
 
+            <!-- Legend dengan keterangan member -->
             <div class="flex flex-wrap gap-3 mb-4">
                 <div class="flex items-center px-3 py-1 bg-green-100 rounded-full text-sm text-green-800">
                     <span class="w-3 h-3 bg-green-100 rounded-full mr-2"></span>
@@ -130,6 +179,10 @@
                 <div class="flex items-center px-3 py-1 bg-red-100 rounded-full text-sm text-red-800">
                     <span class="w-3 h-3 bg-red-100 rounded-full mr-2"></span>
                     <span>Tidak Tersedia</span>
+                </div>
+                <div class="flex items-center px-3 py-1 bg-yellow-100 rounded-full text-sm text-yellow-700">
+                    <span class="w-3 h-3 bg-yellow-400 rounded-full mr-2"></span>
+                    <span>Member Booking</span>
                 </div>
             </div>
 
@@ -424,6 +477,9 @@
                     currentDate = this.getAttribute('data-date');
                     document.getElementById('booking_date').value = currentDate;
 
+                    // Clear selections saat ganti tanggal
+                    clearAllSelections();
+
                     // Muat ulang ketersediaan lapangan untuk tanggal yang dipilih
                     fetchAvailability(currentDate);
                 });
@@ -456,6 +512,7 @@
                                 data-field-price="${field.price_per_hour}"
                                 name="selected_fields[]"
                                 value="${field.id}">
+                            <span class="text-gray-600">Pilih</span>
                         </label>
                     </div>
                 `;
@@ -502,12 +559,11 @@
                         td.setAttribute('data-time-slot', slot.time);
 
                         const div = document.createElement('div');
-                        div.className =
-                            'flex flex-col items-center justify-center rounded-md text-xs font-medium h-12 transition duration-200 shadow-sm';
+                        div.className = 'flex flex-col items-center justify-center rounded-md text-xs font-medium h-12 transition duration-200 shadow-sm';
 
                         if (isSelected) {
-                            div.classList.add('bg-blue-500', 'text-white', 'border',
-                                'border-blue-600');
+                            // Slot terpilih
+                            div.classList.add('bg-blue-500', 'text-white', 'border', 'border-blue-600');
                             div.innerHTML = `
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -517,9 +573,8 @@
                             td.setAttribute('data-available', 'true');
                             td.classList.add('time-slot');
                         } else if (slotData && slotData.available) {
-                            div.classList.add('bg-green-100', 'hover:bg-green-200',
-                                'text-green-800', 'cursor-pointer', 'border',
-                                'border-green-200', 'hover:border-green-300');
+                            // Slot tersedia
+                            div.classList.add('bg-green-100', 'hover:bg-green-200', 'text-green-800', 'cursor-pointer', 'border', 'border-green-200', 'hover:border-green-300');
                             div.innerHTML = `
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -529,24 +584,39 @@
                             td.setAttribute('data-available', 'true');
                             td.classList.add('time-slot');
                         } else {
-                            // Tampilkan nama customer atau status lainnya
+                            // Slot tidak tersedia - tampilkan nama customer/member
                             const customerName = slotData?.customer_name || 'Tidak Tersedia';
-                            const displayName = customerName.length > 12 ?
-                                customerName.substring(0, 12) + '...' : customerName;
+                            const displayName = customerName.length > 12 ? 
+                                              customerName.substring(0, 12) + '...' : customerName;
 
-                            div.classList.add('bg-red-100', 'text-red-600', 'cursor-not-allowed',
-                                'border', 'border-red-200');
+                            // Tentukan warna berdasarkan tipe booking
+                            let bgColor = 'bg-red-100';
+                            let textColor = 'text-red-600';
+                            let borderColor = 'border-red-200';
+                            let icon = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />`;
+
+                            // Jika ini adalah slot member (jam 17-19)
+                            if (slotData?.type === 'member_manual') {
+                                bgColor = 'bg-yellow-100';
+                                textColor = 'text-yellow-700';
+                                borderColor = 'border-yellow-200';
+                                icon = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />`;
+                            }
+
+                            div.classList.add(bgColor, textColor, 'cursor-not-allowed', 'border', borderColor);
                             div.innerHTML = `
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    ${icon}
                                 </svg>
-                                <span class="text-center leading-tight">${displayName}</span>
+                                <span class="text-center leading-tight font-semibold">${displayName}</span>
                             `;
                             td.setAttribute('data-available', 'false');
 
                             // Tambahkan tooltip untuk nama lengkap jika dipotong
                             if (customerName.length > 12) {
-                                td.setAttribute('title', customerName);
+                                td.setAttribute('title', `${customerName} - ${slotData?.type === 'member_manual' ? 'Member Booking' : 'Regular Booking'}`);
+                            } else {
+                                td.setAttribute('title', `${customerName} - ${slotData?.type === 'member_manual' ? 'Member Booking' : 'Regular Booking'}`);
                             }
                         }
 
@@ -613,7 +683,7 @@
                 updateFormInputs();
             }
 
-            // Fungsi fetchAvailability yang sudah diperbarui
+            // Fungsi fetchAvailability yang sudah diperbarui untuk menggunakan endpoint yang benar
             function fetchAvailability(date) {
                 document.getElementById("error-container")?.classList.add("hidden");
                 fetch(`/api/all-available-slots?date=${date}`)
@@ -634,9 +704,12 @@
                     })
                     .catch(error => {
                         console.error("Error fetching availability:", error);
-                        document.getElementById("error-message").textContent =
-                            "Gagal mengambil data slot. Silakan refresh halaman.";
-                        document.getElementById("error-container")?.classList.remove("hidden");
+                        // Tampilkan error message jika ada
+                        const errorContainer = document.getElementById("error-container");
+                        if (errorContainer) {
+                            document.getElementById("error-message").textContent = "Gagal mengambil data slot. Silakan refresh halaman.";
+                            errorContainer.classList.remove("hidden");
+                        }
                     });
             }
 
@@ -769,6 +842,7 @@
                                 'hover:bg-amber-50');
                             currentDate = today;
                             document.getElementById('booking_date').value = today;
+                            clearAllSelections();
                             fetchAvailability(today);
                         }
                     });

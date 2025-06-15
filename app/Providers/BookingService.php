@@ -21,9 +21,9 @@ class BookingService
     }
 
     /**
-     * Cek ketersediaan slot dengan validasi waktu real-time
+     * Cek ketersediaan slot dengan validasi waktu real-time dan konflik booking
      */
-    public function areSlotsAvailable($fieldId, $bookingDate, $startTime, $endTime)
+    public function areSlotsAvailable($fieldId, $bookingDate, $startTime, $endTime, $excludeBookingId = null)
     {
         $bookingDate = Carbon::parse($bookingDate)->format('Y-m-d');
         $startDateTime = Carbon::parse("$bookingDate $startTime");
@@ -35,34 +35,173 @@ class BookingService
             return false;
         }
 
-        $bookedSlots = DB::table('booking_slots')
+        // VALIDASI KONFLIK DENGAN TABEL BOOKINGS
+        $conflictBooking = Booking::where('field_id', $fieldId)
+            ->where('booking_date', $bookingDate)
+            ->where(function ($query) use ($startTime, $endTime) {
+                $query->where(function ($q) use ($startTime, $endTime) {
+                    // Booking baru dimulai di tengah booking yang ada
+                    $q->where('start_time', '<=', $startTime)
+                      ->where('end_time', '>', $startTime);
+                })
+                ->orWhere(function ($q) use ($startTime, $endTime) {
+                    // Booking baru berakhir di tengah booking yang ada
+                    $q->where('start_time', '<', $endTime)
+                      ->where('end_time', '>=', $endTime);
+                })
+                ->orWhere(function ($q) use ($startTime, $endTime) {
+                    // Booking baru mencakup booking yang ada
+                    $q->where('start_time', '>=', $startTime)
+                      ->where('end_time', '<=', $endTime);
+                })
+                ->orWhere(function ($q) use ($startTime, $endTime) {
+                    // Booking yang ada mencakup booking baru
+                    $q->where('start_time', '<=', $startTime)
+                      ->where('end_time', '>=', $endTime);
+                });
+            })
+            ->whereNotIn('payment_status', ['expired', 'cancel', 'failed']);
+
+        if ($excludeBookingId) {
+            $conflictBooking->where('id', '!=', $excludeBookingId);
+        }
+
+        if ($conflictBooking->exists()) {
+            return false;
+        }
+
+        // VALIDASI KONFLIK DENGAN BOOKING SLOTS
+        $conflictSlot = DB::table('booking_slots')
             ->join('bookings', 'booking_slots.booking_id', '=', 'bookings.id')
-            ->where('bookings.field_id', $fieldId)
-            ->where('bookings.booking_date', $bookingDate)
-            ->whereNotIn('bookings.payment_status', ['expired', 'cancel'])
-            ->pluck('booking_slots.slot_time')
-            ->toArray();
+            ->where('booking_slots.field_id', $fieldId)
+            ->where('booking_slots.booking_date', $bookingDate)
+            ->where('booking_slots.status', 'booked')
+            ->where(function ($query) use ($startTime, $endTime) {
+                $query->where(function ($q) use ($startTime, $endTime) {
+                    $q->where('booking_slots.start_time', '<=', $startTime)
+                      ->where('booking_slots.end_time', '>', $startTime);
+                })
+                ->orWhere(function ($q) use ($startTime, $endTime) {
+                    $q->where('booking_slots.start_time', '<', $endTime)
+                      ->where('booking_slots.end_time', '>=', $endTime);
+                })
+                ->orWhere(function ($q) use ($startTime, $endTime) {
+                    $q->where('booking_slots.start_time', '>=', $startTime)
+                      ->where('booking_slots.end_time', '<=', $endTime);
+                })
+                ->orWhere(function ($q) use ($startTime, $endTime) {
+                    $q->where('booking_slots.start_time', '<=', $startTime)
+                      ->where('booking_slots.end_time', '>=', $endTime);
+                });
+            })
+            ->whereNotIn('bookings.payment_status', ['expired', 'cancel', 'failed']);
 
-        $currentSlot = $startDateTime->copy();
+        if ($excludeBookingId) {
+            $conflictSlot->where('bookings.id', '!=', $excludeBookingId);
+        }
 
-        // Generate slot per jam dengan validasi waktu
-        while ($currentSlot < $endDateTime) {
-            $slotTime = $currentSlot->format('H:i:s');
+        if ($conflictSlot->exists()) {
+            return false;
+        }
 
-            // Validasi slot hari ini yang sudah lewat
-            if ($isToday && $currentSlot->lt(now())) {
+        // VALIDASI SLOT MEMBER (17-19) UNTUK PUBLIC
+        $startHour = (int) Carbon::parse($startTime)->format('H');
+        $endHour = (int) Carbon::parse($endTime)->format('H');
+        
+        for ($hour = $startHour; $hour < $endHour; $hour++) {
+            if (in_array($hour, [17, 18, 19])) {
+                // Slot member hanya bisa dibooking oleh admin
                 return false;
             }
+        }
 
-            // Validasi konflik dengan booking lain
-            if (in_array($slotTime, $bookedSlots)) {
+        // VALIDASI WAKTU YANG SUDAH LEWAT
+        if ($isToday) {
+            $currentTime = now('Asia/Jakarta');
+            if ($startDateTime->lte($currentTime)) {
                 return false;
             }
-
-            $currentSlot->addHour();
         }
 
         return true;
+    }
+
+    /**
+     * Validasi khusus untuk admin booking
+     */
+    public function areSlotsAvailableForAdmin($fieldId, $bookingDate, $startTime, $endTime, $excludeBookingId = null)
+    {
+        $bookingDate = Carbon::parse($bookingDate)->format('Y-m-d');
+        $startDateTime = Carbon::parse("$bookingDate $startTime");
+        $endDateTime = Carbon::parse("$bookingDate $endTime");
+
+        // Validasi waktu tidak valid
+        if ($startDateTime->gte($endDateTime)) {
+            return false;
+        }
+
+        // VALIDASI KONFLIK DENGAN TABEL BOOKINGS (SEMUA BOOKING)
+        $conflictBooking = Booking::where('field_id', $fieldId)
+            ->where('booking_date', $bookingDate)
+            ->where(function ($query) use ($startTime, $endTime) {
+                $query->where(function ($q) use ($startTime, $endTime) {
+                    $q->where('start_time', '<=', $startTime)
+                      ->where('end_time', '>', $startTime);
+                })
+                ->orWhere(function ($q) use ($startTime, $endTime) {
+                    $q->where('start_time', '<', $endTime)
+                      ->where('end_time', '>=', $endTime);
+                })
+                ->orWhere(function ($q) use ($startTime, $endTime) {
+                    $q->where('start_time', '>=', $startTime)
+                      ->where('end_time', '<=', $endTime);
+                })
+                ->orWhere(function ($q) use ($startTime, $endTime) {
+                    $q->where('start_time', '<=', $startTime)
+                      ->where('end_time', '>=', $endTime);
+                });
+            })
+            ->whereNotIn('payment_status', ['expired', 'cancel', 'failed']);
+
+        if ($excludeBookingId) {
+            $conflictBooking->where('id', '!=', $excludeBookingId);
+        }
+
+        if ($conflictBooking->exists()) {
+            return false;
+        }
+
+        // VALIDASI KONFLIK DENGAN BOOKING SLOTS
+        $conflictSlot = DB::table('booking_slots')
+            ->join('bookings', 'booking_slots.booking_id', '=', 'bookings.id')
+            ->where('booking_slots.field_id', $fieldId)
+            ->where('booking_slots.booking_date', $bookingDate)
+            ->where('booking_slots.status', 'booked')
+            ->where(function ($query) use ($startTime, $endTime) {
+                $query->where(function ($q) use ($startTime, $endTime) {
+                    $q->where('booking_slots.start_time', '<=', $startTime)
+                      ->where('booking_slots.end_time', '>', $startTime);
+                })
+                ->orWhere(function ($q) use ($startTime, $endTime) {
+                    $q->where('booking_slots.start_time', '<', $endTime)
+                      ->where('booking_slots.end_time', '>=', $endTime);
+                })
+                ->orWhere(function ($q) use ($startTime, $endTime) {
+                    $q->where('booking_slots.start_time', '>=', $startTime)
+                      ->where('booking_slots.end_time', '<=', $endTime);
+                })
+                ->orWhere(function ($q) use ($startTime, $endTime) {
+                    $q->where('booking_slots.start_time', '<=', $startTime)
+                      ->where('booking_slots.end_time', '>=', $endTime);
+                });
+            })
+            ->whereNotIn('bookings.payment_status', ['expired', 'cancel', 'failed']);
+
+        if ($excludeBookingId) {
+            $conflictSlot->where('bookings.id', '!=', $excludeBookingId);
+        }
+
+        return !$conflictSlot->exists();
     }
 
     /**
@@ -81,12 +220,12 @@ class BookingService
             $openingHour = $field->opening_hour ?? 8;
             $closingHour = $field->closing_hour ?? 22;
 
-            $bookedSlots = DB::table('booking_slots')
-                ->join('bookings', 'booking_slots.booking_id', '=', 'bookings.id')
-                ->where('bookings.field_id', $fieldId)
-                ->where('bookings.booking_date', $date)
-                ->whereNotIn('bookings.payment_status', ['expired', 'cancel'])
-                ->pluck('booking_slots.slot_time')
+            // Ambil semua booking yang konflik
+            $bookedSlots = DB::table('bookings')
+                ->where('field_id', $fieldId)
+                ->where('booking_date', $date)
+                ->whereNotIn('payment_status', ['expired', 'cancel', 'failed'])
+                ->get(['start_time', 'end_time'])
                 ->toArray();
 
             $slots = [];
@@ -96,11 +235,23 @@ class BookingService
                 $slotEnd = $slotStart->copy()->addHour();
 
                 $isPast = $isToday && $slotEnd->lte($currentTime);
-                $isBooked = in_array($slotTime, $bookedSlots, true);
+                $isMemberSlot = in_array($hour, [17, 18, 19]);
+                
+                // Cek konflik dengan booking yang ada
+                $isBooked = false;
+                foreach ($bookedSlots as $booking) {
+                    $bookingStart = Carbon::parse($booking->start_time);
+                    $bookingEnd = Carbon::parse($booking->end_time);
+                    
+                    if ($slotStart->lt($bookingEnd) && $slotEnd->gt($bookingStart)) {
+                        $isBooked = true;
+                        break;
+                    }
+                }
 
                 $slots[$slotTime] = [
                     'formatted_time' => $slotStart->format('H:i') . '-' . $slotEnd->format('H:i'),
-                    'is_available' => !$isBooked && !$isPast
+                    'is_available' => !$isBooked && !$isPast && !$isMemberSlot
                 ];
             }
 
@@ -171,6 +322,11 @@ class BookingService
                 throw new \Exception("Waktu akhir harus setelah waktu awal");
             }
 
+            // Validasi ketersediaan slot
+            if (!$this->areSlotsAvailable($data['field_id'], $bookingDate, $startTime->format('H:i:s'), $endTime->format('H:i:s'))) {
+                throw new \Exception("Slot waktu tidak tersedia");
+            }
+
             $duration = $startTime->diffInHours($endTime);
             $totalPrice = $field->price_per_hour * $duration;
 
@@ -203,7 +359,7 @@ class BookingService
 
             Log::info('Booking created:', ['booking_id' => $booking->id]);
 
-            // ✅ PERBAIKAN: Selalu buat transaction record
+            // Selalu buat transaction record
             $this->createTransactionRecord($booking);
 
             // Hanya buat slot jika booking dikonfirmasi
@@ -267,86 +423,87 @@ class BookingService
                 'booking_id' => $booking->id,
                 'field_id' => $booking->field_id,
                 'booking_date' => $booking->booking_date,
+                'start_time' => $currentTime->format('H:i:s'),
+                'end_time' => $currentTime->copy()->addHour()->format('H:i:s'),
                 'slot_time' => $currentTime->format('H:i:s'),
-                'start_time' => $currentTime->format('Y-m-d H:i:s'),
-                'end_time' => $currentTime->copy()->addHour()->format('Y-m-d H:i:s'),
-                'status' => 'booked',
+                'status' => 'booked'
             ]);
 
             $currentTime->addHour();
         }
+
+        Log::info('Booking slots created for booking:', ['booking_id' => $booking->id]);
     }
 
     /**
-     * Create Midtrans transaction for a booking
+     * Create Midtrans transaction
      */
     private function createMidtransTransaction($booking)
     {
-        $booking->load('field');
-
-        // ✅ PERBAIKAN: Siapkan data sesuai format MidtransService
-        $transactionData = [
-            'booking_id' => $booking->id,
-            'customer_name' => $booking->customer_name,
-            'customer_email' => $booking->customer_email,
-            'customer_phone' => $booking->customer_phone,
-            'total_price' => $booking->total_price,
-            'items' => [
-                [
-                    'id' => $booking->field_id,
-                    'name' => $booking->field->name,
-                    'price' => $booking->field->price_per_hour,
-                    'quantity' => $booking->duration_hours
+        try {
+            $midtransData = [
+                'booking_id' => $booking->id,
+                'customer_name' => $booking->customer_name,
+                'customer_email' => $booking->customer_email,
+                'customer_phone' => $booking->customer_phone,
+                'total_price' => (int)$booking->total_price,
+                'items' => [
+                    [
+                        'id' => $booking->field->id,
+                        'name' => $booking->field->name,
+                        'price' => (int)$booking->total_price,
+                        'quantity' => 1
+                    ]
                 ]
-            ]
-        ];
+            ];
 
-        $midtransResponse = $this->midtransService->createTransaction($transactionData);
+            $midtransResponse = $this->midtransService->createTransaction($midtransData);
+            
+            $booking->update([
+                'snap_token' => $midtransResponse['token'],
+                'booking_code' => $midtransResponse['order_id']
+            ]);
 
-        if ($midtransResponse && isset($midtransResponse['token'])) {
-            // Update booking dengan snap token
-            $booking->update(['snap_token' => $midtransResponse['token']]);
-
-            // ✅ PERBAIKAN: Update transaction yang sudah dibuat dengan order_id dari Midtrans
-            $transaction = Transaction::where('booking_id', $booking->id)->first();
-            if ($transaction) {
-                $transaction->update([
-                    'order_id' => $midtransResponse['order_id'],
-                    'payment_type' => 'midtrans',
-                ]);
-            }
-
-            Log::info('Midtrans transaction created successfully', [
+            Log::info('Midtrans transaction created:', [
                 'booking_id' => $booking->id,
                 'order_id' => $midtransResponse['order_id']
             ]);
+
+        } catch (\Exception $e) {
+            Log::error('Midtrans transaction failed: ' . $e->getMessage());
+            throw $e;
         }
     }
 
     /**
-     * Membatalkan booking dengan menghapus data dari database
+     * Cancel booking
      */
-    public function cancelBooking(Booking $booking)
+    public function cancelBooking(Booking $booking): bool
     {
         try {
             DB::beginTransaction();
 
-            // Hapus slot booking terlebih dahulu
-            BookingSlot::where('booking_id', $booking->id)->delete();
+            // Update booking status
+            $booking->update([
+                'payment_status' => 'cancel',
+                'status' => 'cancelled'
+            ]);
 
-            // Hapus transaksi terkait jika ada
+            // Cancel related slots
+            $booking->slots()->update(['status' => 'cancelled']);
+
+            // Update transaction if exists
             if ($booking->transaction) {
-                $booking->transaction->delete();
+                $booking->transaction->update(['transaction_status' => 'cancel']);
             }
 
-            // Hapus booking dari database
-            $result = $booking->delete();
-
             DB::commit();
-            return $result;
+            Log::info('Booking cancelled:', ['booking_id' => $booking->id]);
+            
+            return true;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Gagal membatalkan booking: ' . $e->getMessage());
+            Log::error('Booking cancellation failed: ' . $e->getMessage());
             return false;
         }
     }

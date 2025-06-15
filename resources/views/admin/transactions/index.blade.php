@@ -2,19 +2,6 @@
 
 @section('content')
 <div class="bg-gradient-to-br from-white to-gray-50 p-6 rounded-xl shadow-lg border border-gray-100">
-    <!-- Debug Info (Hapus setelah testing) -->
-    @if(config('app.debug'))
-    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-        <h4 class="font-semibold text-blue-800">Debug Information:</h4>
-        <p class="text-sm text-blue-700">Total transaksi: {{ $transactions->total() }}</p>
-        <p class="text-sm text-blue-700">Current page: {{ $transactions->currentPage() }}</p>
-        <p class="text-sm text-blue-700">Per page: {{ $transactions->perPage() }}</p>
-        <p class="text-sm text-blue-700">Settlement: {{ $totalSettlement ?? 'undefined' }}</p>
-        <p class="text-sm text-blue-700">Pending: {{ $totalPending ?? 'undefined' }}</p>
-        <p class="text-sm text-blue-700">Failed: {{ $totalFailed ?? 'undefined' }}</p>
-    </div>
-    @endif
-
     <!-- Header dan Filter -->
     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-6">
         <!-- Header -->

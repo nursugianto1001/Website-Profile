@@ -42,23 +42,23 @@ class BookingService
                 $query->where(function ($q) use ($startTime, $endTime) {
                     // Booking baru dimulai di tengah booking yang ada
                     $q->where('start_time', '<=', $startTime)
-                      ->where('end_time', '>', $startTime);
+                        ->where('end_time', '>', $startTime);
                 })
-                ->orWhere(function ($q) use ($startTime, $endTime) {
-                    // Booking baru berakhir di tengah booking yang ada
-                    $q->where('start_time', '<', $endTime)
-                      ->where('end_time', '>=', $endTime);
-                })
-                ->orWhere(function ($q) use ($startTime, $endTime) {
-                    // Booking baru mencakup booking yang ada
-                    $q->where('start_time', '>=', $startTime)
-                      ->where('end_time', '<=', $endTime);
-                })
-                ->orWhere(function ($q) use ($startTime, $endTime) {
-                    // Booking yang ada mencakup booking baru
-                    $q->where('start_time', '<=', $startTime)
-                      ->where('end_time', '>=', $endTime);
-                });
+                    ->orWhere(function ($q) use ($startTime, $endTime) {
+                        // Booking baru berakhir di tengah booking yang ada
+                        $q->where('start_time', '<', $endTime)
+                            ->where('end_time', '>=', $endTime);
+                    })
+                    ->orWhere(function ($q) use ($startTime, $endTime) {
+                        // Booking baru mencakup booking yang ada
+                        $q->where('start_time', '>=', $startTime)
+                            ->where('end_time', '<=', $endTime);
+                    })
+                    ->orWhere(function ($q) use ($startTime, $endTime) {
+                        // Booking yang ada mencakup booking baru
+                        $q->where('start_time', '<=', $startTime)
+                            ->where('end_time', '>=', $endTime);
+                    });
             })
             ->whereNotIn('payment_status', ['expired', 'cancel', 'failed']);
 
@@ -79,20 +79,20 @@ class BookingService
             ->where(function ($query) use ($startTime, $endTime) {
                 $query->where(function ($q) use ($startTime, $endTime) {
                     $q->where('booking_slots.start_time', '<=', $startTime)
-                      ->where('booking_slots.end_time', '>', $startTime);
+                        ->where('booking_slots.end_time', '>', $startTime);
                 })
-                ->orWhere(function ($q) use ($startTime, $endTime) {
-                    $q->where('booking_slots.start_time', '<', $endTime)
-                      ->where('booking_slots.end_time', '>=', $endTime);
-                })
-                ->orWhere(function ($q) use ($startTime, $endTime) {
-                    $q->where('booking_slots.start_time', '>=', $startTime)
-                      ->where('booking_slots.end_time', '<=', $endTime);
-                })
-                ->orWhere(function ($q) use ($startTime, $endTime) {
-                    $q->where('booking_slots.start_time', '<=', $startTime)
-                      ->where('booking_slots.end_time', '>=', $endTime);
-                });
+                    ->orWhere(function ($q) use ($startTime, $endTime) {
+                        $q->where('booking_slots.start_time', '<', $endTime)
+                            ->where('booking_slots.end_time', '>=', $endTime);
+                    })
+                    ->orWhere(function ($q) use ($startTime, $endTime) {
+                        $q->where('booking_slots.start_time', '>=', $startTime)
+                            ->where('booking_slots.end_time', '<=', $endTime);
+                    })
+                    ->orWhere(function ($q) use ($startTime, $endTime) {
+                        $q->where('booking_slots.start_time', '<=', $startTime)
+                            ->where('booking_slots.end_time', '>=', $endTime);
+                    });
             })
             ->whereNotIn('bookings.payment_status', ['expired', 'cancel', 'failed']);
 
@@ -107,7 +107,7 @@ class BookingService
         // VALIDASI SLOT MEMBER (17-19) UNTUK PUBLIC
         $startHour = (int) Carbon::parse($startTime)->format('H');
         $endHour = (int) Carbon::parse($endTime)->format('H');
-        
+
         for ($hour = $startHour; $hour < $endHour; $hour++) {
             if (in_array($hour, [17, 18, 19])) {
                 // Slot member hanya bisa dibooking oleh admin
@@ -146,20 +146,20 @@ class BookingService
             ->where(function ($query) use ($startTime, $endTime) {
                 $query->where(function ($q) use ($startTime, $endTime) {
                     $q->where('start_time', '<=', $startTime)
-                      ->where('end_time', '>', $startTime);
+                        ->where('end_time', '>', $startTime);
                 })
-                ->orWhere(function ($q) use ($startTime, $endTime) {
-                    $q->where('start_time', '<', $endTime)
-                      ->where('end_time', '>=', $endTime);
-                })
-                ->orWhere(function ($q) use ($startTime, $endTime) {
-                    $q->where('start_time', '>=', $startTime)
-                      ->where('end_time', '<=', $endTime);
-                })
-                ->orWhere(function ($q) use ($startTime, $endTime) {
-                    $q->where('start_time', '<=', $startTime)
-                      ->where('end_time', '>=', $endTime);
-                });
+                    ->orWhere(function ($q) use ($startTime, $endTime) {
+                        $q->where('start_time', '<', $endTime)
+                            ->where('end_time', '>=', $endTime);
+                    })
+                    ->orWhere(function ($q) use ($startTime, $endTime) {
+                        $q->where('start_time', '>=', $startTime)
+                            ->where('end_time', '<=', $endTime);
+                    })
+                    ->orWhere(function ($q) use ($startTime, $endTime) {
+                        $q->where('start_time', '<=', $startTime)
+                            ->where('end_time', '>=', $endTime);
+                    });
             })
             ->whereNotIn('payment_status', ['expired', 'cancel', 'failed']);
 
@@ -180,20 +180,20 @@ class BookingService
             ->where(function ($query) use ($startTime, $endTime) {
                 $query->where(function ($q) use ($startTime, $endTime) {
                     $q->where('booking_slots.start_time', '<=', $startTime)
-                      ->where('booking_slots.end_time', '>', $startTime);
+                        ->where('booking_slots.end_time', '>', $startTime);
                 })
-                ->orWhere(function ($q) use ($startTime, $endTime) {
-                    $q->where('booking_slots.start_time', '<', $endTime)
-                      ->where('booking_slots.end_time', '>=', $endTime);
-                })
-                ->orWhere(function ($q) use ($startTime, $endTime) {
-                    $q->where('booking_slots.start_time', '>=', $startTime)
-                      ->where('booking_slots.end_time', '<=', $endTime);
-                })
-                ->orWhere(function ($q) use ($startTime, $endTime) {
-                    $q->where('booking_slots.start_time', '<=', $startTime)
-                      ->where('booking_slots.end_time', '>=', $endTime);
-                });
+                    ->orWhere(function ($q) use ($startTime, $endTime) {
+                        $q->where('booking_slots.start_time', '<', $endTime)
+                            ->where('booking_slots.end_time', '>=', $endTime);
+                    })
+                    ->orWhere(function ($q) use ($startTime, $endTime) {
+                        $q->where('booking_slots.start_time', '>=', $startTime)
+                            ->where('booking_slots.end_time', '<=', $endTime);
+                    })
+                    ->orWhere(function ($q) use ($startTime, $endTime) {
+                        $q->where('booking_slots.start_time', '<=', $startTime)
+                            ->where('booking_slots.end_time', '>=', $endTime);
+                    });
             })
             ->whereNotIn('bookings.payment_status', ['expired', 'cancel', 'failed']);
 
@@ -236,13 +236,13 @@ class BookingService
 
                 $isPast = $isToday && $slotEnd->lte($currentTime);
                 $isMemberSlot = in_array($hour, [17, 18, 19]);
-                
+
                 // Cek konflik dengan booking yang ada
                 $isBooked = false;
                 foreach ($bookedSlots as $booking) {
                     $bookingStart = Carbon::parse($booking->start_time);
                     $bookingEnd = Carbon::parse($booking->end_time);
-                    
+
                     if ($slotStart->lt($bookingEnd) && $slotEnd->gt($bookingStart)) {
                         $isBooked = true;
                         break;
@@ -374,7 +374,7 @@ class BookingService
 
             DB::commit();
             Log::info('Booking process completed:', ['booking_id' => $booking->id]);
-            
+
             return $booking;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -386,27 +386,43 @@ class BookingService
     /**
      * Create transaction record for any booking
      */
+    /**
+     * Create transaction record for any booking
+     */
     private function createTransactionRecord($booking)
     {
-        $orderId = 'ORDER-' . $booking->id . '-' . time();
-        
-        $transaction = Transaction::create([
-            'booking_id' => $booking->id,
-            'order_id' => $orderId,
+        // PERBAIKAN: Cek duplicate sebelum create
+        $existingTransaction = Transaction::where('booking_id', $booking->id)->first();
+
+        if ($existingTransaction) {
+            Log::warning('Transaction already exists for booking:', [
+                'booking_id' => $booking->id,
+                'existing_transaction_id' => $existingTransaction->id,
+                'existing_order_id' => $existingTransaction->order_id
+            ]);
+            return $existingTransaction;
+        }
+
+        // Gunakan method baru dari Transaction model
+        $transactionData = [
+            'order_id' => 'ORDER-' . $booking->id . '-' . time(),
             'payment_type' => $booking->payment_method === 'online' ? 'midtrans' : 'cash',
             'transaction_status' => $booking->payment_status === 'settlement' ? 'settlement' : 'pending',
             'gross_amount' => $booking->total_price,
             'payment_channel' => $booking->payment_method === 'online' ? 'Midtrans' : 'Manual',
             'transaction_time' => now(),
-        ]);
+        ];
 
-        Log::info('Transaction record created:', [
-            'transaction_id' => $transaction->id,
-            'booking_id' => $booking->id,
-            'order_id' => $orderId
-        ]);
-
-        return $transaction;
+        try {
+            return Transaction::createForBooking($booking->id, $transactionData);
+        } catch (\Exception $e) {
+            Log::error('Failed to create transaction record:', [
+                'booking_id' => $booking->id,
+                'error' => $e->getMessage(),
+                'data' => $transactionData
+            ]);
+            throw $e;
+        }
     }
 
     /**
@@ -458,7 +474,7 @@ class BookingService
             ];
 
             $midtransResponse = $this->midtransService->createTransaction($midtransData);
-            
+
             $booking->update([
                 'snap_token' => $midtransResponse['token'],
                 'booking_code' => $midtransResponse['order_id']
@@ -468,7 +484,6 @@ class BookingService
                 'booking_id' => $booking->id,
                 'order_id' => $midtransResponse['order_id']
             ]);
-
         } catch (\Exception $e) {
             Log::error('Midtrans transaction failed: ' . $e->getMessage());
             throw $e;
@@ -499,7 +514,7 @@ class BookingService
 
             DB::commit();
             Log::info('Booking cancelled:', ['booking_id' => $booking->id]);
-            
+
             return true;
         } catch (\Exception $e) {
             DB::rollBack();

@@ -155,17 +155,17 @@
         </form>
     </div>
 
-    <!-- Form Member Booking Khusus Slot 17-19 -->
+    <!-- Form Member Booking Khusus Slot 17-19 dengan Jam Fleksibel -->
     <div class="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl border border-yellow-200 p-6 shadow-sm">
         <div class="flex items-center mb-4">
             <i class="bi bi-star-fill text-yellow-500 mr-2"></i>
             <h3 class="text-lg font-semibold text-yellow-800">Booking Member Khusus (17:00 - 20:00)</h3>
         </div>
-        <p class="text-yellow-700 text-sm mb-6">Form khusus untuk membuat booking member pada slot waktu 17:00-20:00</p>
-        
-        <form action="{{ route('admin.bookings.store-member') }}" method="POST">
+        <p class="text-yellow-700 text-sm mb-6">Form khusus untuk membuat booking member pada slot waktu 17:00-20:00 dengan durasi fleksibel</p>
+
+        <form action="{{ route('admin.bookings.store-member') }}" method="POST" id="memberBookingForm">
             @csrf
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <h4 class="text-md font-semibold text-yellow-800 mb-4 flex items-center">
@@ -180,7 +180,9 @@
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
                                 <option value="">Pilih Lapangan</option>
                                 @foreach($fields as $field)
-                                <option value="{{ $field->id }}">{{ $field->name }}</option>
+                                <option value="{{ $field->id }}" data-price="{{ $field->price_per_hour }}">
+                                    {{ $field->name }} - Rp {{ number_format($field->price_per_hour, 0, ',', '.') }}/jam
+                                </option>
                                 @endforeach
                             </select>
                         </div>
@@ -193,15 +195,50 @@
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
                         </div>
 
-                        <div>
-                            <label for="member_start_time" class="block text-sm font-medium text-gray-700 mb-1">Jam Member <span class="text-red-600">*</span></label>
-                            <select name="start_time" id="member_start_time" required
-                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
-                                <option value="">Pilih Jam</option>
-                                <option value="17:00:00">17:00 - 18:00</option>
-                                <option value="18:00:00">18:00 - 19:00</option>
-                                <option value="19:00:00">19:00 - 20:00</option>
-                            </select>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="member_start_time" class="block text-sm font-medium text-gray-700 mb-1">Waktu Mulai <span class="text-red-600">*</span></label>
+                                <select name="start_time" id="member_start_time" required
+                                    class="w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                    <option value="">Pilih Waktu Mulai</option>
+                                    <option value="17:00:00">17:00</option>
+                                    <option value="18:00:00">18:00</option>
+                                    <option value="19:00:00">19:00</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="member_end_time" class="block text-sm font-medium text-gray-700 mb-1">Waktu Selesai <span class="text-red-600">*</span></label>
+                                <select name="end_time" id="member_end_time" required
+                                    class="w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                    <option value="">Pilih Waktu Selesai</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="bg-yellow-100 border border-yellow-300 rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-yellow-800">Durasi Booking</p>
+                                    <p class="text-xs text-yellow-600">Durasi akan dihitung otomatis</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-lg font-bold text-yellow-800" id="member_duration_display">0 jam</p>
+                                    <input type="hidden" name="duration_hours" id="member_duration_hours" value="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-green-100 border border-green-300 rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-green-800">Total Harga</p>
+                                    <p class="text-xs text-green-600">Harga per jam × Durasi</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-lg font-bold text-green-800" id="member_total_price_display">Rp 0</p>
+                                    <input type="hidden" name="total_price" id="member_total_price" value="0">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -221,17 +258,40 @@
                         </div>
 
                         <div>
-                            <label for="member_customer_email" class="block text-sm font-medium text-gray-700 mb-1">Email Member</label>
-                            <input type="email" name="customer_email" id="member_customer_email"
-                                placeholder="member@example.com (opsional)"
+                            <label for="member_customer_email" class="block text-sm font-medium text-gray-700 mb-1">Email Member <span class="text-red-600">*</span></label>
+                            <input type="email" name="customer_email" id="member_customer_email" required
+                                placeholder="member@example.com"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
                         </div>
 
                         <div>
-                            <label for="member_customer_phone" class="block text-sm font-medium text-gray-700 mb-1">Nomor Telepon Member</label>
-                            <input type="text" name="customer_phone" id="member_customer_phone"
-                                placeholder="08xxxxxxxxxx (opsional)"
+                            <label for="member_customer_phone" class="block text-sm font-medium text-gray-700 mb-1">Nomor Telepon Member <span class="text-red-600">*</span></label>
+                            <input type="text" name="customer_phone" id="member_customer_phone" required
+                                placeholder="08xxxxxxxxxx"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                        </div>
+
+                        <div>
+                            <label for="member_payment_method" class="block text-sm font-medium text-gray-700 mb-1">Metode Pembayaran <span class="text-red-600">*</span></label>
+                            <div class="flex space-x-4 mt-1">
+                                <div class="flex items-center">
+                                    <input type="radio" name="payment_method" id="member_payment_online" value="online"
+                                        class="h-4 w-4 text-yellow-600 border-gray-300 focus:ring-yellow-500">
+                                    <label for="member_payment_online" class="ml-2 block text-sm text-gray-700">Online</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="payment_method" id="member_payment_cash" value="cash" checked
+                                        class="h-4 w-4 text-yellow-600 border-gray-300 focus:ring-yellow-500">
+                                    <label for="member_payment_cash" class="ml-2 block text-sm text-gray-700">Cash</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="member_notes" class="block text-sm font-medium text-gray-700 mb-1">Catatan</label>
+                            <textarea name="notes" id="member_notes" rows="3"
+                                placeholder="Catatan tambahan untuk booking member"
+                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50"></textarea>
                         </div>
                     </div>
                 </div>
@@ -249,14 +309,12 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // JavaScript untuk form booking reguler (tetap sama)
         const startTimeSelect = document.getElementById('start_time');
         const endTimeSelect = document.getElementById('end_time');
 
-        // Update end time options based on start time
         startTimeSelect.addEventListener('change', function() {
             const selectedStartHour = parseInt(this.value.split(':')[0]);
-
-            // Clear and rebuild end time options
             endTimeSelect.innerHTML = '<option value="">Pilih Waktu</option>';
 
             for (let hour = selectedStartHour + 1; hour <= 24; hour++) {
@@ -265,10 +323,66 @@
                 option.textContent = `${hour.toString().padStart(2, '0')}:00`;
                 endTimeSelect.appendChild(option);
             }
-
-            // Reset selection
             endTimeSelect.value = '';
         });
+
+        // JavaScript untuk form member booking
+        const memberStartTimeSelect = document.getElementById('member_start_time');
+        const memberEndTimeSelect = document.getElementById('member_end_time');
+        const memberFieldSelect = document.getElementById('member_field_id');
+        const memberDurationDisplay = document.getElementById('member_duration_display');
+        const memberDurationHours = document.getElementById('member_duration_hours');
+        const memberTotalPriceDisplay = document.getElementById('member_total_price_display');
+        const memberTotalPrice = document.getElementById('member_total_price');
+
+        // Update end time options based on start time for member booking
+        memberStartTimeSelect.addEventListener('change', function() {
+            const selectedStartHour = parseInt(this.value.split(':')[0]);
+            memberEndTimeSelect.innerHTML = '<option value="">Pilih Waktu Selesai</option>';
+
+            // Batasi end time hingga maksimal jam 20:00 (karena slot member 17-19)
+            const maxEndHour = Math.min(20, 24);
+
+            for (let hour = selectedStartHour + 1; hour <= maxEndHour; hour++) {
+                const option = document.createElement('option');
+                option.value = `${hour.toString().padStart(2, '0')}:00:00`;
+                option.textContent = `${hour.toString().padStart(2, '0')}:00`;
+                memberEndTimeSelect.appendChild(option);
+            }
+
+            memberEndTimeSelect.value = '';
+            updateMemberCalculation();
+        });
+
+        // Update calculation when end time changes
+        memberEndTimeSelect.addEventListener('change', updateMemberCalculation);
+        memberFieldSelect.addEventListener('change', updateMemberCalculation);
+
+        function updateMemberCalculation() {
+            const startTime = memberStartTimeSelect.value;
+            const endTime = memberEndTimeSelect.value;
+            const fieldOption = memberFieldSelect.options[memberFieldSelect.selectedIndex];
+
+            if (startTime && endTime && fieldOption.value) {
+                const startHour = parseInt(startTime.split(':')[0]);
+                const endHour = parseInt(endTime.split(':')[0]);
+                const duration = endHour - startHour;
+                const pricePerHour = parseFloat(fieldOption.dataset.price) || 0;
+                const totalPrice = duration * pricePerHour;
+
+                // Update display
+                memberDurationDisplay.textContent = `${duration} jam`;
+                memberDurationHours.value = duration;
+                memberTotalPriceDisplay.textContent = `Rp ${totalPrice.toLocaleString('id-ID')}`;
+                memberTotalPrice.value = totalPrice;
+            } else {
+                memberDurationDisplay.textContent = '0 jam';
+                memberDurationHours.value = 0;
+                memberTotalPriceDisplay.textContent = 'Rp 0';
+                memberTotalPrice.value = 0;
+            }
+        }
     });
 </script>
+
 @endsection

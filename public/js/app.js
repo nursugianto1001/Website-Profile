@@ -20,13 +20,13 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Generate tanggal 7 hari ke depan untuk pemilih tanggal
-    function generateWeeklyDates() {
-        const weeklyDates = [];
+    function generateMonthlyDates() {
+        const monthlyDates = [];
         const today = new Date();
-        for (let i = 0; i < 7; i++) {
+        for (let i = 0; i < 30; i++) {
             const date = new Date(today);
             date.setDate(today.getDate() + i);
-            weeklyDates.push({
+            monthlyDates.push({
                 date: date.toISOString().split("T")[0],
                 day: date.toLocaleDateString("en-US", { weekday: "short" }),
                 formatted_date: date.toLocaleDateString("en-US", {
@@ -35,13 +35,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 }),
             });
         }
-        return weeklyDates;
+        return monthlyDates;
     }
 
     // Render tombol pemilih tanggal
-    const weeklyDates = generateWeeklyDates();
+    const monthlyDates = generateMonthlyDates();
     const dateContainer = document.getElementById("date-selector-container");
-    weeklyDates.forEach((dateObj, index) => {
+    monthlyDates.forEach((dateObj, index) => {
         const dateButton = document.createElement("button");
         dateButton.type = "button";
         dateButton.className = `date-selector px-4 py-2 border rounded-md transition-colors ${
@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Set tanggal awal ke tanggal pertama di daftar
-    currentDate = weeklyDates[0].date;
+    currentDate = monthlyDates[0].date;
     document.getElementById("booking_date").value = currentDate;
 
     // Render header tabel lapangan (field)

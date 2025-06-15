@@ -176,22 +176,31 @@ class BookingPageController extends Controller
             $memberBookings = DB::table('bookings')
                 ->where('field_id', $fieldId)
                 ->where('booking_date', $date)
-                ->where('payment_method', 'cash') // Asumsi booking admin menggunakan cash
-                ->where('payment_status', 'settlement') // Booking yang sudah dikonfirmasi admin
+                ->where('payment_method', 'cash')
+                ->where('payment_status', 'settlement')
                 ->whereRaw('HOUR(start_time) IN (17, 18, 19)')
-                ->select('start_time', 'customer_name')
-                ->get()
-                ->keyBy(function ($item) {
-                    return sprintf('%02d:00:00', (int) Carbon::parse($item->start_time)->format('H'));
-                });
+                ->select('start_time', 'end_time', 'customer_name')
+                ->get();
+
+            // Buat array untuk menyimpan slot member dengan durasi penuh
+            $memberSlots = [];
+            foreach ($memberBookings as $memberBooking) {
+                $startHour = (int) Carbon::parse($memberBooking->start_time)->format('H');
+                $endHour = (int) Carbon::parse($memberBooking->end_time)->format('H');
+
+                // Isi semua slot dari start_time sampai end_time
+                for ($hour = $startHour; $hour < $endHour; $hour++) {
+                    $slotTime = sprintf('%02d:00:00', $hour);
+                    $memberSlots[$slotTime] = $memberBooking->customer_name;
+                }
+            }
 
             for ($hour = $openingHour; $hour < $closingHour; $hour++) {
                 $slotTime = sprintf('%02d:00:00', $hour);
 
-                // Cek slot member manual dengan nama member
+                // Cek slot member manual dengan nama member (untuk durasi penuh)
                 if (in_array($hour, [17, 18, 19])) {
-                    $memberBooking = $memberBookings->get($slotTime);
-                    $memberName = $memberBooking ? $memberBooking->customer_name : 'Slot Member';
+                    $memberName = $memberSlots[$slotTime] ?? 'Slot Member';
 
                     $fieldAvailability[$fieldId][$slotTime] = [
                         'available' => false,
@@ -254,7 +263,6 @@ class BookingPageController extends Controller
             ->header('Pragma', 'no-cache')
             ->header('Expires', '0');
     }
-
 
     /**
      * Process booking submission

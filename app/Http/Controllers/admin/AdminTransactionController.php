@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;  
+use Illuminate\Support\Facades\DB;
+use App\Exports\TransactionsExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AdminTransactionController extends Controller
 {
@@ -79,6 +81,23 @@ class AdminTransactionController extends Controller
         } catch (\Exception $e) {
             Log::error('AdminTransactionController show error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Export transactions to Excel
+     */
+    public function export(Request $request)
+    {
+        try {
+            $filters = $request->only(['search', 'status', 'date_from', 'date_to']);
+
+            $filename = 'transactions_' . date('Y-m-d_H-i-s') . '.xlsx';
+
+            return Excel::download(new TransactionsExport($filters), $filename);
+        } catch (\Exception $e) {
+            Log::error('Transaction export error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal mengexport data: ' . $e->getMessage());
         }
     }
 }

@@ -67,6 +67,8 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::resource('fields', AdminFieldController::class);
     Route::resource('bookings', AdminBookingController::class);
     Route::put('bookings/{booking}/cancel', [AdminBookingController::class, 'cancel'])->name('bookings.cancel');
+    Route::get('/admin/transactions/export', [AdminTransactionController::class, 'export'])
+        ->name('transactions.export');
     Route::resource('transactions', AdminTransactionController::class)->only(['index', 'show']);
 
 

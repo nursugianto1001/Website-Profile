@@ -159,17 +159,19 @@ class AdminBookingController extends Controller
                     throw new \Exception('Gagal membuat booking');
                 }
 
-                // Buat transaction record untuk admin booking
-                if ($directConfirm) {
-                    Transaction::create([
-                        'booking_id' => $booking->id,
-                        'order_id' => 'ADMIN-' . $booking->booking_code,
-                        'payment_type' => 'cash',
-                        'transaction_status' => 'settlement',
-                        'gross_amount' => $booking->total_price,
-                        'payment_channel' => 'cash_payment',
-                        'transaction_time' => now(),
-                    ]);
+                // PERBAIKAN: Hanya buat transaction jika belum ada dan untuk cash payment
+                if ($directConfirm && $request->payment_method === 'cash') {
+                    // Cek dulu apakah sudah ada transaction
+                    if (!Transaction::existsForBooking($booking->id)) {
+                        Transaction::createForBooking($booking->id, [
+                            'order_id' => 'ADMIN-' . $booking->booking_code,
+                            'payment_type' => 'cash',
+                            'transaction_status' => 'settlement',
+                            'gross_amount' => $booking->total_price,
+                            'payment_channel' => 'cash_payment',
+                            'transaction_time' => now(),
+                        ]);
+                    }
                 }
 
                 DB::commit();
@@ -466,24 +468,19 @@ class AdminBookingController extends Controller
             $conflictBooking = Booking::where('field_id', $request->field_id)
                 ->where('booking_date', $request->booking_date)
                 ->where(function ($query) use ($startTime, $endTime) {
-                    // Cek overlap dengan berbagai skenario
                     $query->where(function ($q) use ($startTime, $endTime) {
-                        // Booking baru dimulai di tengah booking yang ada
                         $q->where('start_time', '<=', $startTime->format('H:i:s'))
                             ->where('end_time', '>', $startTime->format('H:i:s'));
                     })
                         ->orWhere(function ($q) use ($startTime, $endTime) {
-                            // Booking baru berakhir di tengah booking yang ada
                             $q->where('start_time', '<', $endTime->format('H:i:s'))
                                 ->where('end_time', '>=', $endTime->format('H:i:s'));
                         })
                         ->orWhere(function ($q) use ($startTime, $endTime) {
-                            // Booking baru mencakup booking yang ada
                             $q->where('start_time', '>=', $startTime->format('H:i:s'))
                                 ->where('end_time', '<=', $endTime->format('H:i:s'));
                         })
                         ->orWhere(function ($q) use ($startTime, $endTime) {
-                            // Booking yang ada mencakup booking baru
                             $q->where('start_time', '<=', $startTime->format('H:i:s'))
                                 ->where('end_time', '>=', $endTime->format('H:i:s'));
                         });
@@ -557,9 +554,8 @@ class AdminBookingController extends Controller
                     'payment_instruction' => $request->notes
                 ]);
 
-                // Buat transaction record untuk admin booking
-                $transaction = Transaction::create([
-                    'booking_id' => $booking->id,
+                // PERBAIKAN: Gunakan method baru untuk create transaction
+                Transaction::createForBooking($booking->id, [
                     'order_id' => 'ADMIN-' . $booking->booking_code,
                     'payment_type' => $request->payment_method === 'cash' ? 'cash' : 'admin_booking',
                     'transaction_status' => $paymentStatus,

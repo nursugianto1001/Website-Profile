@@ -334,7 +334,7 @@
                     </div>
                 </label>
 
-                <label
+                <!-- <label
                     class="block p-4 border rounded-lg transition-all hover:border-blue-300 hover:bg-blue-50 cursor-pointer">
                     <div class="flex items-center">
                         <input type="radio" name="payment_method" value="cash"
@@ -358,7 +358,7 @@
                             </div>
                         </div>
                     </div>
-                </label>
+                </label> -->
             </div>
         </div>
 

@@ -101,12 +101,12 @@
                                             class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none">
                                             <span>Unggah video Baru</span>
                                             <input id="video" name="video" type="file" class="sr-only"
-                                                accept="video/mp4,video/webm,video/ogg">
+                                                accept="video/mp4,video/webm,video/ogg,video/quicktime">
                                         </label>
                                         <p class="pl-1">atau seret dan lepas</p>
                                     </div>
                                     <p class="text-xs text-gray-500">
-                                        MP4, WebM, Ogg up to 20MB
+                                        MP4, WebM, Ogg, MOV up to 20MB
                                     </p>
                                 </div>
                             </div>

@@ -1,329 +1,491 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="bg-gradient-to-br from-white to-gray-50 p-6 md:p-8 rounded-xl shadow-lg ml-24 mb-8">
-    <div class="flex items-center justify-between mb-8">
-        <h2 class="text-3xl font-bold text-indigo-800">Dashboard Admin</h2>
-        <div class="hidden md:flex items-center space-x-2 bg-white py-2 px-4 rounded-lg shadow-sm">
-            <i class="bi bi-calendar-event text-blue-600"></i>
-            <span class="text-gray-700">{{ now()->format('l, d F Y') }}</span>
-        </div>
+    {{-- Toggle Button - Compatible with existing sidebar logic --}}
+    <div class="fixed top-4 left-4 z-50 lg:hidden">
+        <button id="mobileSidebarToggle"
+            class="bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg shadow-lg transition-all duration-300">
+            <i class="bi bi-list text-xl"></i>
+        </button>
     </div>
 
-    {{-- Main Stats --}}
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        <div class="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all p-6 border-l-4 border-blue-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-indigo-500 mb-1">Total Fasilitas</p>
-                    <h3 class="text-3xl font-extrabold text-gray-800">{{ \App\Models\Facility::count() }}</h3>
-                </div>
-                <div class="bg-blue-100 p-4 rounded-xl">
-                    <i class="bi bi-building text-blue-600 text-2xl"></i>
-                </div>
-            </div>
-            <div class="mt-4">
-                <a href="{{ route('admin.facilities.index') }}" class="text-blue-600 text-sm font-medium hover:underline flex items-center">
-                    Kelola Fasilitas <i class="bi bi-arrow-right ml-1"></i>
-                </a>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all p-6 border-l-4 border-green-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-500 mb-1">Poster</p>
-                    <h3 class="text-3xl font-extrabold text-gray-800">{{ \App\Models\Gallery::where('type', 'poster')->count() }}</h3>
-                </div>
-                <div class="bg-green-100 p-4 rounded-xl">
-                    <i class="bi bi-image text-green-600 text-2xl"></i>
-                </div>
-            </div>
-            <div class="mt-4">
-                <a href="{{ route('admin.gallery.index') }}?type=poster" class="text-green-600 text-sm font-medium hover:underline flex items-center">
-                    Lihat Poster <i class="bi bi-arrow-right ml-1"></i>
-                </a>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all p-6 border-l-4 border-purple-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-500 mb-1">Foto Dokumentasi</p>
-                    <h3 class="text-3xl font-extrabold text-gray-800">{{ \App\Models\Gallery::where('type', 'dokumentasi')->count() }}</h3>
-                </div>
-                <div class="bg-purple-100 p-4 rounded-xl">
-                    <i class="bi bi-camera text-purple-600 text-2xl"></i>
-                </div>
-            </div>
-            <div class="mt-4">
-                <a href="{{ route('admin.gallery.index') }}?type=documentation" class="text-purple-600 text-sm font-medium hover:underline flex items-center">
-                    Lihat Dokumentasi <i class="bi bi-arrow-right ml-1"></i>
-                </a>
-            </div>
-        </div>
-    </div>
-
-    {{-- Booking System Stats --}}
-    <div class="mb-12">
-        <div class="flex items-center justify-between mb-6">
-            <h3 class="text-xl font-bold text-indigo-800">Sistem Analitik Pemesanan</h3>
-            <a href="{{ route('admin.bookings.index') }}" class="text-blue-600 text-sm font-medium hover:underline flex items-center">
-                Lihat Selengkapnya <i class="bi bi-arrow-right ml-1"></i>
-            </a>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all p-6">
-                <div class="flex items-center space-x-4">
-                    <div class="bg-blue-100 p-3 rounded-xl">
-                        <i class="bi bi-calendar-check text-blue-600 text-2xl"></i>
-                    </div>
+    {{-- Main Content - Full Width --}}
+    <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 w-full">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+            {{-- Header Section --}}
+            <div class="bg-white rounded-2xl shadow-xl p-6 lg:p-8 mb-8">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                     <div>
-                        <p class="text-sm font-medium text-gray-500">Total Pemesanan</p>
-                        <h3 class="text-2xl font-bold text-gray-800">{{ \App\Models\Booking::count() }}</h3>
+                        <h1
+                            class="text-2xl lg:text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                            Dashboard Admin
+                        </h1>
+                        <p class="text-gray-600 mt-2">Kelola semua aktivitas dan data sistem</p>
                     </div>
-                </div>
-                <div class="mt-4 pt-4 border-t border-gray-100">
-                    <div class="flex items-center text-sm">
-                        @php
-                            $lastMonth = \App\Models\Booking::whereMonth('created_at', now()->subMonth()->month)->count();
-                            $thisMonth = \App\Models\Booking::whereMonth('created_at', now()->month)->count();
-                            $percentChange = $lastMonth > 0 ? (($thisMonth - $lastMonth) / $lastMonth) * 100 : 0;
-                        @endphp
-                        @if($percentChange > 0)
-                            <span class="text-green-600 flex items-center"><i class="bi bi-graph-up-arrow mr-1"></i> {{ number_format(abs($percentChange), 1) }}%</span>
-                        @elseif($percentChange < 0)
-                            <span class="text-red-600 flex items-center"><i class="bi bi-graph-down-arrow mr-1"></i> {{ number_format(abs($percentChange), 1) }}%</span>
-                        @else
-                            <span class="text-gray-600 flex items-center"><i class="bi bi-dash mr-1"></i> 0%</span>
-                        @endif
-                        <span class="text-gray-500 ml-2">dari bulan lalu</span>
+                    <div
+                        class="flex items-center space-x-2 bg-gradient-to-r from-blue-50 to-indigo-50 py-3 px-4 rounded-xl border border-blue-100">
+                        <i class="bi bi-calendar-event text-blue-600"></i>
+                        <span class="text-gray-700 font-medium">{{ now()->format('l, d F Y') }}</span>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all p-6">
-                <div class="flex items-center space-x-4">
-                    <div class="bg-yellow-100 p-3 rounded-xl">
-                        <i class="bi bi-hourglass-split text-yellow-600 text-2xl"></i>
+            {{-- Main Stats - Responsive Grid --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 mb-8">
+                {{-- Total Fasilitas --}}
+                <div
+                    class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border-l-4 border-blue-500 group">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-blue-600 mb-2">Total Fasilitas</p>
+                            <h3 class="text-2xl lg:text-3xl font-bold text-gray-800">{{ \App\Models\Facility::count() }}
+                            </h3>
+                        </div>
+                        <div class="bg-blue-100 group-hover:bg-blue-200 p-4 rounded-xl transition-colors">
+                            <i class="bi bi-building text-blue-600 text-xl lg:text-2xl"></i>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-sm font-medium text-gray-500">Pemesanan Tertunda</p>
-                        <h3 class="text-2xl font-bold text-gray-800">{{ \App\Models\Booking::where('payment_status', 'pending')->count() }}</h3>
+                    <div class="mt-4 pt-4 border-t border-gray-100">
+                        <a href="{{ route('admin.facilities.index') }}"
+                            class="text-blue-600 text-sm font-medium hover:text-blue-800 flex items-center group-hover:translate-x-1 transition-transform">
+                            Kelola Fasilitas <i class="bi bi-arrow-right ml-1"></i>
+                        </a>
                     </div>
                 </div>
-                <div class="mt-4 pt-4 border-t border-gray-100">
-                    <div class="flex items-center text-sm">
-                        <span class="text-yellow-600 flex items-center">
-                            <i class="bi bi-exclamation-circle mr-1"></i> perlu perhatian
-                        </span>
-                    </div>
-                </div>
-            </div>
 
-            <div class="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all p-6">
-                <div class="flex items-center space-x-4">
-                    <div class="bg-green-100 p-3 rounded-xl">
-                        <i class="bi bi-check-circle text-green-600 text-2xl"></i>
+                {{-- Poster --}}
+                <div
+                    class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border-l-4 border-green-500 group">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-green-600 mb-2">Poster</p>
+                            <h3 class="text-2xl lg:text-3xl font-bold text-gray-800">
+                                {{ \App\Models\Gallery::where('type', 'poster')->count() }}</h3>
+                        </div>
+                        <div class="bg-green-100 group-hover:bg-green-200 p-4 rounded-xl transition-colors">
+                            <i class="bi bi-image text-green-600 text-xl lg:text-2xl"></i>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-sm font-medium text-gray-500">Pemesanan Berhasil</p>
-                        <h3 class="text-2xl font-bold text-gray-800">{{ \App\Models\Booking::where('payment_status', 'settlement')->count() }}</h3>
-                    </div>
-                </div>
-                <div class="mt-4 pt-4 border-t border-gray-100">
-                    <div class="flex items-center text-sm">
-                        @php
-                            $completionRate = \App\Models\Booking::count() > 0 ?
-                                (\App\Models\Booking::where('payment_status', 'settlement')->count() / \App\Models\Booking::count()) * 100 : 0;
-                        @endphp
-                        <span class="text-green-600 flex items-center">
-                            <i class="bi bi-bar-chart-fill mr-1"></i> {{ number_format($completionRate, 1) }}%
-                        </span>
-                        <span class="text-gray-500 ml-2">tingkat penyelesaian</span>
+                    <div class="mt-4 pt-4 border-t border-gray-100">
+                        <a href="{{ route('admin.gallery.index') }}?type=poster"
+                            class="text-green-600 text-sm font-medium hover:text-green-800 flex items-center group-hover:translate-x-1 transition-transform">
+                            Lihat Poster <i class="bi bi-arrow-right ml-1"></i>
+                        </a>
                     </div>
                 </div>
-            </div>
 
-            <div class="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all p-6">
-                <div class="flex items-center space-x-4">
-                    <div class="bg-red-100 p-3 rounded-xl">
-                        <i class="bi bi-currency-dollar text-red-600 text-2xl"></i>
+                {{-- Foto Dokumentasi --}}
+                <div
+                    class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border-l-4 border-purple-500 group sm:col-span-2 lg:col-span-1">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-purple-600 mb-2">Foto Dokumentasi</p>
+                            <h3 class="text-2xl lg:text-3xl font-bold text-gray-800">
+                                {{ \App\Models\Gallery::where('type', 'dokumentasi')->count() }}</h3>
+                        </div>
+                        <div class="bg-purple-100 group-hover:bg-purple-200 p-4 rounded-xl transition-colors">
+                            <i class="bi bi-camera text-purple-600 text-xl lg:text-2xl"></i>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-sm font-medium text-gray-500">Total Pendapatan</p>
-                        <h3 class="text-2xl font-bold text-gray-800">Rp {{ number_format(\App\Models\Transaction::whereIn('transaction_status', ['settlement', 'capture'])->sum('gross_amount'), 0, ',', '.') }}</h3>
-                    </div>
-                </div>
-                <div class="mt-4 pt-4 border-t border-gray-100">
-                    <div class="flex items-center text-sm">
-                        @php
-                            $lastMonthRevenue = \App\Models\Transaction::whereIn('transaction_status', ['settlement', 'capture'])
-                                                ->whereMonth('created_at', now()->subMonth()->month)
-                                                ->sum('gross_amount');
-                            $thisMonthRevenue = \App\Models\Transaction::whereIn('transaction_status', ['settlement', 'capture'])
-                                                ->whereMonth('created_at', now()->month)
-                                                ->sum('gross_amount');
-                            $revenuePercentChange = $lastMonthRevenue > 0 ? (($thisMonthRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100 : 0;
-                        @endphp
-                        @if($revenuePercentChange > 0)
-                            <span class="text-green-600 flex items-center"><i class="bi bi-graph-up-arrow mr-1"></i> {{ number_format(abs($revenuePercentChange), 1) }}%</span>
-                        @elseif($revenuePercentChange < 0)
-                            <span class="text-red-600 flex items-center"><i class="bi bi-graph-down-arrow mr-1"></i> {{ number_format(abs($revenuePercentChange), 1) }}%</span>
-                        @else
-                            <span class="text-gray-600 flex items-center"><i class="bi bi-dash mr-1"></i> 0%</span>
-                        @endif
-                        <span class="text-gray-500 ml-2">dari bulan lalu</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Featured Content Preview --}}
-    <div class="mb-12">
-        <div class="flex items-center justify-between mb-6">
-            <h3 class="text-xl font-bold text-indigo-800">Konten Unggulan</h3>
-            <a href="{{ route('admin.gallery.index') }}?featured=1" class="text-blue-600 text-sm font-medium hover:underline flex items-center">
-                Lihat Semua Konten <i class="bi bi-arrow-right ml-1"></i>
-            </a>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            @foreach(\App\Models\Gallery::where('is_featured', true)->take(3)->get() as $item)
-            <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all group">
-                <div class="h-48 overflow-hidden relative">
-                    <img src="{{ asset('storage/' . $item->image_path) }}" alt="{{ $item->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                    <div class="absolute top-3 right-3">
-                        <span class="bg-white bg-opacity-80 text-xs font-semibold px-2 py-1 rounded-full uppercase">{{ $item->type }}</span>
-                    </div>
-                </div>
-                <div class="p-5">
-                    <h4 class="font-semibold text-gray-800 text-lg mb-2">{{ $item->title }}</h4>
-                    <p class="text-gray-600 text-sm line-clamp-2 mb-4">{{ $item->description ?? 'Tidak ada deskripsi yang tersedia' }}</p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-gray-500">
-                            <i class="bi bi-calendar3 mr-1"></i> {{ \Carbon\Carbon::parse($item->created_at)->format('d M Y') }}
-                        </span>
-                        <a href="{{ route('admin.gallery.edit', $item->id) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                            <i class="bi bi-pencil-square mr-1"></i> Edit
+                    <div class="mt-4 pt-4 border-t border-gray-100">
+                        <a href="{{ route('admin.gallery.index') }}?type=documentation"
+                            class="text-purple-600 text-sm font-medium hover:text-purple-800 flex items-center group-hover:translate-x-1 transition-transform">
+                            Lihat Dokumentasi <i class="bi bi-arrow-right ml-1"></i>
                         </a>
                     </div>
                 </div>
             </div>
-            @endforeach
-        </div>
-    </div>
 
-    {{-- Recent Bookings --}}
-    <div class="mb-12">
-        <div class="flex items-center justify-between mb-6">
-            <h3 class="text-xl font-bold text-indigo-800">Daftar Pemesanan Terbaru</h3>
-            <a href="{{ route('admin.bookings.index') }}" class="text-blue-600 text-sm font-medium hover:underline flex items-center">
-                Lihat Semua Pemesanan <i class="bi bi-arrow-right ml-1"></i>
-            </a>
-        </div>
-        <div class="bg-white rounded-xl shadow-md overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="min-w-full">
-                    <thead>
-                        <tr class="bg-gray-50 text-gray-600 text-sm uppercase">
-                            <th class="py-4 px-6 text-left font-semibold">ID</th>
-                            <th class="py-4 px-6 text-left font-semibold">Pelanggan</th>
-                            <th class="py-4 px-6 text-left font-semibold">Lapangan</th>
-                            <th class="py-4 px-6 text-left font-semibold">Tanggal</th>
-                            <th class="py-4 px-6 text-left font-semibold">Status</th>
-                            <th class="py-4 px-6 text-center font-semibold">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100">
-                        @foreach(\App\Models\Booking::with('field')->latest()->take(5)->get() as $booking)
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="py-4 px-6 text-left">
-                                <span class="font-medium text-gray-700">#{{ $booking->id }}</span>
-                            </td>
-                            <td class="py-4 px-6 text-left">
-                                <div class="flex items-center">
-                                    <div class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center font-semibold mr-3">
-                                        {{ substr($booking->customer_name, 0, 1) }}
-                                    </div>
-                                    <div>
-                                        <p class="font-medium text-gray-800">{{ $booking->customer_name }}</p>
-                                        <p class="text-xs text-gray-500">{{ $booking->customer_email ?? 'No email' }}</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="py-4 px-6 text-left">
-                                <span class="font-medium text-gray-700">{{ $booking->field->name }}</span>
-                            </td>
-                            <td class="py-4 px-6 text-left">
-                                <div class="flex flex-col">
-                                    <span class="text-gray-700">{{ \Carbon\Carbon::parse($booking->booking_date)->format('d M Y') }}</span>
-                                    <span class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($booking->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($booking->end_time)->format('H:i') }}</span>
-                                </div>
-                            </td>
-                            <td class="py-4 px-6 text-left">
-                                <span class="px-3 py-1 rounded-full text-xs font-medium
-                                    @if($booking->payment_status == 'settlement') bg-green-100 text-green-800
-                                    @elseif($booking->payment_status == 'pending') bg-yellow-100 text-yellow-800
-                                    @elseif($booking->payment_status == 'expired') bg-red-100 text-red-800
-                                    @else bg-gray-100 text-gray-800 @endif">
-                                    {{ ucfirst($booking->payment_status) }}
+            {{-- Booking System Stats --}}
+            <div class="bg-white rounded-2xl shadow-xl p-6 lg:p-8 mb-8">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                    <h3 class="text-xl lg:text-2xl font-bold text-indigo-800">Sistem Analitik Pemesanan</h3>
+                    <a href="{{ route('admin.bookings.index') }}"
+                        class="text-blue-600 text-sm font-medium hover:text-blue-800 hover:underline flex items-center">
+                        Lihat Selengkapnya <i class="bi bi-arrow-right ml-1"></i>
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6">
+                    {{-- Total Pemesanan --}}
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
+                        <div class="flex items-center space-x-4">
+                            <div class="bg-blue-600 p-3 rounded-xl shadow-lg">
+                                <i class="bi bi-calendar-check text-white text-xl lg:text-2xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-blue-700">Total Pemesanan</p>
+                                <h3 class="text-xl lg:text-2xl font-bold text-blue-900">{{ \App\Models\Booking::count() }}
+                                </h3>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-blue-200">
+                            <div class="flex items-center text-sm">
+                                @php
+                                    $lastMonth = \App\Models\Booking::whereMonth(
+                                        'created_at',
+                                        now()->subMonth()->month,
+                                    )->count();
+                                    $thisMonth = \App\Models\Booking::whereMonth('created_at', now()->month)->count();
+                                    $percentChange =
+                                        $lastMonth > 0 ? (($thisMonth - $lastMonth) / $lastMonth) * 100 : 0;
+                                @endphp
+                                @if ($percentChange > 0)
+                                    <span class="text-green-700 flex items-center bg-green-100 px-2 py-1 rounded-full">
+                                        <i class="bi bi-graph-up-arrow mr-1"></i>
+                                        {{ number_format(abs($percentChange), 1) }}%
+                                    </span>
+                                @elseif($percentChange < 0)
+                                    <span class="text-red-700 flex items-center bg-red-100 px-2 py-1 rounded-full">
+                                        <i class="bi bi-graph-down-arrow mr-1"></i>
+                                        {{ number_format(abs($percentChange), 1) }}%
+                                    </span>
+                                @else
+                                    <span class="text-gray-700 flex items-center bg-gray-100 px-2 py-1 rounded-full">
+                                        <i class="bi bi-dash mr-1"></i> 0%
+                                    </span>
+                                @endif
+                                <span class="text-blue-600 ml-2">dari bulan lalu</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Pemesanan Tertunda --}}
+                    <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-6 border border-yellow-200">
+                        <div class="flex items-center space-x-4">
+                            <div class="bg-yellow-600 p-3 rounded-xl shadow-lg">
+                                <i class="bi bi-hourglass-split text-white text-xl lg:text-2xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-yellow-700">Pemesanan Tertunda</p>
+                                <h3 class="text-xl lg:text-2xl font-bold text-yellow-900">
+                                    {{ \App\Models\Booking::where('payment_status', 'pending')->count() }}</h3>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-yellow-200">
+                            <div class="flex items-center text-sm">
+                                <span class="text-yellow-700 flex items-center bg-yellow-200 px-2 py-1 rounded-full">
+                                    <i class="bi bi-exclamation-circle mr-1"></i> perlu perhatian
                                 </span>
-                            </td>
-                            <td class="py-4 px-6 text-center">
-                                <a href="{{ route('admin.bookings.show', $booking->id) }}" class="text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-lg text-sm transition-colors">
-                                    <i class="bi bi-eye mr-1"></i> Lihat
-                                </a>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-            @if(\App\Models\Booking::count() == 0)
-            <div class="text-center py-8">
-                <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
-                    <i class="bi bi-calendar-x text-gray-400 text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Pemesanan Berhasil --}}
+                    <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
+                        <div class="flex items-center space-x-4">
+                            <div class="bg-green-600 p-3 rounded-xl shadow-lg">
+                                <i class="bi bi-check-circle text-white text-xl lg:text-2xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-green-700">Pemesanan Berhasil</p>
+                                <h3 class="text-xl lg:text-2xl font-bold text-green-900">
+                                    {{ \App\Models\Booking::where('payment_status', 'settlement')->count() }}</h3>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-green-200">
+                            <div class="flex items-center text-sm">
+                                @php
+                                    $completionRate =
+                                        \App\Models\Booking::count() > 0
+                                            ? (\App\Models\Booking::where('payment_status', 'settlement')->count() /
+                                                    \App\Models\Booking::count()) *
+                                                100
+                                            : 0;
+                                @endphp
+                                <span class="text-green-700 flex items-center bg-green-200 px-2 py-1 rounded-full">
+                                    <i class="bi bi-bar-chart-fill mr-1"></i> {{ number_format($completionRate, 1) }}%
+                                </span>
+                                <span class="text-green-600 ml-2">tingkat penyelesaian</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Total Pendapatan --}}
+                    <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-6 border border-red-200">
+                        <div class="flex items-center space-x-4">
+                            <div class="bg-red-600 p-3 rounded-xl shadow-lg">
+                                <i class="bi bi-currency-dollar text-white text-xl lg:text-2xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-red-700">Total Pendapatan</p>
+                                <h3 class="text-lg lg:text-xl font-bold text-red-900">Rp
+                                    {{ number_format(\App\Models\Transaction::whereIn('transaction_status', ['settlement', 'capture'])->sum('gross_amount'), 0, ',', '.') }}
+                                </h3>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-red-200">
+                            <div class="flex items-center text-sm">
+                                @php
+                                    $lastMonthRevenue = \App\Models\Transaction::whereIn('transaction_status', [
+                                        'settlement',
+                                        'capture',
+                                    ])
+                                        ->whereMonth('created_at', now()->subMonth()->month)
+                                        ->sum('gross_amount');
+                                    $thisMonthRevenue = \App\Models\Transaction::whereIn('transaction_status', [
+                                        'settlement',
+                                        'capture',
+                                    ])
+                                        ->whereMonth('created_at', now()->month)
+                                        ->sum('gross_amount');
+                                    $revenuePercentChange =
+                                        $lastMonthRevenue > 0
+                                            ? (($thisMonthRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100
+                                            : 0;
+                                @endphp
+                                @if ($revenuePercentChange > 0)
+                                    <span class="text-green-700 flex items-center bg-green-100 px-2 py-1 rounded-full">
+                                        <i class="bi bi-graph-up-arrow mr-1"></i>
+                                        {{ number_format(abs($revenuePercentChange), 1) }}%
+                                    </span>
+                                @elseif($revenuePercentChange < 0)
+                                    <span class="text-red-700 flex items-center bg-red-100 px-2 py-1 rounded-full">
+                                        <i class="bi bi-graph-down-arrow mr-1"></i>
+                                        {{ number_format(abs($revenuePercentChange), 1) }}%
+                                    </span>
+                                @else
+                                    <span class="text-gray-700 flex items-center bg-gray-100 px-2 py-1 rounded-full">
+                                        <i class="bi bi-dash mr-1"></i> 0%
+                                    </span>
+                                @endif
+                                <span class="text-red-600 ml-2">dari bulan lalu</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <h4 class="text-gray-600 font-medium">Pemesanan tidak ditemukan</h4>
-                <p class="text-gray-500 text-sm mt-1">Pemesanan terbaru akan muncul disini</p>
             </div>
-            @endif
+
+            {{-- Featured Content Preview --}}
+            <div class="bg-white rounded-2xl shadow-xl p-6 lg:p-8 mb-8">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                    <h3 class="text-xl lg:text-2xl font-bold text-indigo-800">Konten Unggulan</h3>
+                    <a href="{{ route('admin.gallery.index') }}?featured=1"
+                        class="text-blue-600 text-sm font-medium hover:text-blue-800 hover:underline flex items-center">
+                        Lihat Semua Konten <i class="bi bi-arrow-right ml-1"></i>
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    @foreach (\App\Models\Gallery::where('is_featured', true)->take(3)->get() as $item)
+                        <div
+                            class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group border border-gray-100">
+                            <div class="h-48 lg:h-56 overflow-hidden relative">
+                                <img src="{{ asset('storage/' . $item->image_path) }}" alt="{{ $item->title }}"
+                                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                                </div>
+                                <div class="absolute top-4 right-4">
+                                    <span
+                                        class="bg-white/90 backdrop-blur-sm text-xs font-semibold px-3 py-1 rounded-full uppercase shadow-lg">{{ $item->type }}</span>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h4 class="font-bold text-gray-800 text-lg mb-3 line-clamp-1">{{ $item->title }}</h4>
+                                <p class="text-gray-600 text-sm line-clamp-2 mb-4">
+                                    {{ $item->description ?? 'Tidak ada deskripsi yang tersedia' }}</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-gray-500 flex items-center">
+                                        <i class="bi bi-calendar3 mr-1"></i>
+                                        {{ \Carbon\Carbon::parse($item->created_at)->format('d M Y') }}
+                                    </span>
+                                    <a href="{{ route('admin.gallery.edit', $item->id) }}"
+                                        class="text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-lg text-sm font-medium transition-colors">
+                                        <i class="bi bi-pencil-square mr-1"></i> Edit
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- Recent Bookings --}}
+            <div class="bg-white rounded-2xl shadow-xl p-6 lg:p-8 mb-8">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                    <h3 class="text-xl lg:text-2xl font-bold text-indigo-800">Daftar Pemesanan Terbaru</h3>
+                    <a href="{{ route('admin.bookings.index') }}"
+                        class="text-blue-600 text-sm font-medium hover:text-blue-800 hover:underline flex items-center">
+                        Lihat Semua Pemesanan <i class="bi bi-arrow-right ml-1"></i>
+                    </a>
+                </div>
+
+                <div class="overflow-x-auto bg-gray-50 rounded-xl">
+                    <table class="min-w-full">
+                        <thead>
+                            <tr class="bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 text-sm uppercase">
+                                <th class="py-4 px-6 text-left font-semibold">ID</th>
+                                <th class="py-4 px-6 text-left font-semibold">Pelanggan</th>
+                                <th class="py-4 px-6 text-left font-semibold hidden md:table-cell">Lapangan</th>
+                                <th class="py-4 px-6 text-left font-semibold">Tanggal</th>
+                                <th class="py-4 px-6 text-left font-semibold">Status</th>
+                                <th class="py-4 px-6 text-center font-semibold">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 bg-white">
+                            @foreach (\App\Models\Booking::with('field')->latest()->take(5)->get() as $booking)
+                                <tr class="hover:bg-blue-50 transition-colors">
+                                    <td class="py-4 px-6 text-left">
+                                        <span
+                                            class="font-bold text-gray-700 bg-gray-100 px-2 py-1 rounded">#{{ $booking->id }}</span>
+                                    </td>
+                                    <td class="py-4 px-6 text-left">
+                                        <div class="flex items-center">
+                                            <div
+                                                class="bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold mr-3 shadow-md">
+                                                {{ substr($booking->customer_name, 0, 1) }}
+                                            </div>
+                                            <div>
+                                                <p class="font-semibold text-gray-800">{{ $booking->customer_name }}</p>
+                                                <p class="text-xs text-gray-500">
+                                                    {{ $booking->customer_email ?? 'No email' }}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6 text-left hidden md:table-cell">
+                                        <span
+                                            class="font-medium text-gray-700 bg-gray-100 px-2 py-1 rounded">{{ $booking->field->name }}</span>
+                                    </td>
+                                    <td class="py-4 px-6 text-left">
+                                        <div class="flex flex-col">
+                                            <span
+                                                class="text-gray-800 font-medium">{{ \Carbon\Carbon::parse($booking->booking_date)->format('d M Y') }}</span>
+                                            <span
+                                                class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($booking->start_time)->format('H:i') }}
+                                                - {{ \Carbon\Carbon::parse($booking->end_time)->format('H:i') }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6 text-left">
+                                        <span
+                                            class="px-3 py-1 rounded-full text-xs font-bold shadow-sm
+                                    @if ($booking->payment_status == 'settlement') bg-green-100 text-green-800 border border-green-200
+                                    @elseif($booking->payment_status == 'pending') bg-yellow-100 text-yellow-800 border border-yellow-200
+                                    @elseif($booking->payment_status == 'expired') bg-red-100 text-red-800 border border-red-200
+                                    @else bg-gray-100 text-gray-800 border border-gray-200 @endif">
+                                            {{ ucfirst($booking->payment_status) }}
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-6 text-center">
+                                        <a href="{{ route('admin.bookings.show', $booking->id) }}"
+                                            class="text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm">
+                                            <i class="bi bi-eye mr-1"></i> Lihat
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                @if (\App\Models\Booking::count() == 0)
+                    <div class="text-center py-12">
+                        <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-4">
+                            <i class="bi bi-calendar-x text-gray-400 text-3xl"></i>
+                        </div>
+                        <h4 class="text-gray-600 font-semibold text-lg">Pemesanan tidak ditemukan</h4>
+                        <p class="text-gray-500 text-sm mt-2">Pemesanan terbaru akan muncul disini</p>
+                    </div>
+                @endif
+            </div>
+
+            {{-- Quick Actions --}}
+            <div class="bg-white rounded-2xl shadow-xl p-6 lg:p-8">
+                <h3 class="text-xl lg:text-2xl font-bold text-indigo-800 mb-6">Tindakan Cepat</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                    <a href="{{ route('admin.facilities.create') }}"
+                        class="group flex flex-col items-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 rounded-2xl hover:from-blue-100 hover:to-blue-200 hover:border-blue-300 transition-all duration-300 hover:scale-105">
+                        <div class="bg-white p-4 rounded-full shadow-lg mb-4 group-hover:shadow-xl transition-shadow">
+                            <i class="bi bi-building text-blue-600 text-2xl"></i>
+                        </div>
+                        <span class="text-blue-800 font-semibold text-center">Tambah Fasilitas Baru</span>
+                    </a>
+
+                    <a href="{{ route('admin.gallery.create') }}?type=poster"
+                        class="group flex flex-col items-center p-6 bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-200 rounded-2xl hover:from-green-100 hover:to-green-200 hover:border-green-300 transition-all duration-300 hover:scale-105">
+                        <div class="bg-white p-4 rounded-full shadow-lg mb-4 group-hover:shadow-xl transition-shadow">
+                            <i class="bi bi-image-fill text-green-600 text-2xl"></i>
+                        </div>
+                        <span class="text-green-800 font-semibold text-center">Tambah Poster Baru</span>
+                    </a>
+
+                    <a href="{{ route('admin.fields.create') }}"
+                        class="group flex flex-col items-center p-6 bg-gradient-to-br from-yellow-50 to-yellow-100 border-2 border-yellow-200 rounded-2xl hover:from-yellow-100 hover:to-yellow-200 hover:border-yellow-300 transition-all duration-300 hover:scale-105">
+                        <div class="bg-white p-4 rounded-full shadow-lg mb-4 group-hover:shadow-xl transition-shadow">
+                            <i class="bi bi-plus-square text-yellow-600 text-2xl"></i>
+                        </div>
+                        <span class="text-yellow-800 font-semibold text-center">Tambah Lapangan Baru</span>
+                    </a>
+
+                    <a href="{{ route('admin.bookings.index') }}"
+                        class="group flex flex-col items-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-200 rounded-2xl hover:from-purple-100 hover:to-purple-200 hover:border-purple-300 transition-all duration-300 hover:scale-105">
+                        <div class="bg-white p-4 rounded-full shadow-lg mb-4 group-hover:shadow-xl transition-shadow">
+                            <i class="bi bi-calendar-week text-purple-600 text-2xl"></i>
+                        </div>
+                        <span class="text-purple-800 font-semibold text-center">Kelola Pemesanan</span>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
-    {{-- Quick Actions --}}
-    <div class="bg-white rounded-xl shadow-md p-6">
-        <h3 class="text-xl font-bold text-indigo-800 mb-6">Tindakan Cepat</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <a href="{{ route('admin.facilities.create') }}" class="group flex flex-col items-center p-6 bg-blue-50 border border-blue-100 rounded-xl hover:bg-blue-100 hover:border-blue-200 transition-all">
-                <div class="bg-white p-4 rounded-full shadow-sm mb-4 group-hover:shadow-md transition-all">
-                    <i class="bi bi-building text-blue-600 text-2xl"></i>
-                </div>
-                <span class="text-blue-800 font-medium text-center">Tambah Fasilitas Baru</span>
-            </a>
+    {{-- Preserve existing toggle button logic - do not remove --}}
+    <script>
+        // Preserve any existing toggle button functionality from app.js
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait for any existing scripts to load first
+            setTimeout(function() {
+                const mobileSidebarToggle = document.getElementById('mobileSidebarToggle');
 
-            <a href="{{ route('admin.gallery.create') }}?type=poster" class="group flex flex-col items-center p-6 bg-green-50 border border-green-100 rounded-xl hover:bg-green-100 hover:border-green-200 transition-all">
-                <div class="bg-white p-4 rounded-full shadow-sm mb-4 group-hover:shadow-md transition-all">
-                    <i class="bi bi-image-fill text-green-600 text-2xl"></i>
-                </div>
-                <span class="text-green-800 font-medium text-center">Tambah Poster Baru</span>
-            </a>
+                if (mobileSidebarToggle) {
+                    mobileSidebarToggle.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
 
-            <a href="{{ route('admin.fields.create') }}" class="group flex flex-col items-center p-6 bg-yellow-50 border border-yellow-100 rounded-xl hover:bg-yellow-100 hover:border-yellow-200 transition-all">
-                <div class="bg-white p-4 rounded-full shadow-sm mb-4 group-hover:shadow-md transition-all">
-                    <i class="bi bi-plus-square text-yellow-600 text-2xl"></i>
-                </div>
-                <span class="text-yellow-800 font-medium text-center">Tambah Lapangan Baru</span>
-            </a>
+                        // Try to find existing sidebar toggle button and trigger it
+                        const existingToggle = document.querySelector('[data-widget="pushmenu"]') ||
+                            document.querySelector('.sidebar-toggle') ||
+                            document.querySelector('#sidebarToggle') ||
+                            document.querySelector('.menu-toggle');
 
-            <a href="{{ route('admin.bookings.index') }}" class="group flex flex-col items-center p-6 bg-purple-50 border border-purple-100 rounded-xl hover:bg-purple-100 hover:border-purple-200 transition-all">
-                <div class="bg-white p-4 rounded-full shadow-sm mb-4 group-hover:shadow-md transition-all">
-                    <i class="bi bi-calendar-week text-purple-600 text-2xl"></i>
-                </div>
-                <span class="text-purple-800 font-medium text-center">Kelola Pemesanan</span>
-            </a>
-        </div>
-    </div>
-</div>
+                        if (existingToggle && existingToggle !== this) {
+                            // Trigger existing toggle logic
+                            existingToggle.click();
+                        } else {
+                            // Fallback: try to toggle sidebar classes directly
+                            const sidebar = document.querySelector('.main-sidebar') ||
+                                document.querySelector('.sidebar') ||
+                                document.querySelector('[data-sidebar]') ||
+                                document.querySelector('.sidebar-menu') ||
+                                document.querySelector('#sidebar');
+
+                            const body = document.body;
+
+                            if (sidebar) {
+                                // Common sidebar toggle patterns
+                                sidebar.classList.toggle('active');
+                                sidebar.classList.toggle('show');
+                                sidebar.classList.toggle('open');
+                                sidebar.classList.toggle('sidebar-open');
+                            }
+
+                            if (body) {
+                                body.classList.toggle('sidebar-open');
+                                body.classList.toggle('sidebar-collapse');
+                            }
+                        }
+
+                        // Call any existing toggle functions
+                        if (typeof window.toggleSidebar === 'function') {
+                            window.toggleSidebar();
+                        }
+
+                        if (typeof window.sidebarToggle === 'function') {
+                            window.sidebarToggle();
+                        }
+                    });
+                }
+            }, 200); // Small delay to ensure other scripts load first
+        });
+        </script>
 @endsection

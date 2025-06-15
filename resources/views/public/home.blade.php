@@ -338,7 +338,7 @@
     </div>
 </div>
 
-<!-- Section Jadwal Ketersediaan Lapangan -->
+<!-- Jadwal Ketersediaan Lapangan -->
 <div class="py-16 bg-gradient-to-b from-amber-50/90 to-[#f8e8d4]/80">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12" data-aos="fade-up" data-aos-duration="800">
@@ -348,20 +348,34 @@
             </p>
         </div>
 
-        <!-- Date Selector -->
-        <div class="flex justify-center mb-8" data-aos="fade-up" data-aos-duration="800">
-            <div class="flex gap-4">
-                <button class="date-tab-btn active px-6 py-3 rounded-lg font-medium transition-all duration-300"
-                    data-date="{{ $today->format('Y-m-d') }}"
-                    style="background-color: #A66E38; color: white;">
-                    <span class="block font-medium">{{ $today->format('l') }}</span>
-                    <span class="block text-sm">{{ $today->format('d M Y') }}</span>
-                </button>
-                <button class="date-tab-btn px-6 py-3 rounded-lg font-medium transition-all duration-300 bg-white text-gray-700 border border-gray-300 hover:bg-amber-50"
-                    data-date="{{ $tomorrow->format('Y-m-d') }}">
-                    <span class="block font-medium">{{ $tomorrow->format('l') }}</span>
-                    <span class="block text-sm">{{ $tomorrow->format('d M Y') }}</span>
-                </button>
+        <!-- Date Selection dengan Kalender 1 Bulan -->
+        <div class="bg-gradient-to-br from-amber-50 via-amber-100/30 to-[#fdf5e9] rounded-lg shadow-md p-6 border border-amber-100 mb-8">
+            <div class="flex items-center mb-4">
+                <div class="bg-[#faebd7] p-2 rounded-full mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#A66E38]" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <h3 class="text-xl font-semibold text-[#A66E38]">Pilih Tanggal</h3>
+            </div>
+
+            <p class="text-sm text-gray-600 mb-4">Pilih tanggal untuk melihat ketersediaan lapangan</p>
+
+            <div class="mb-3">
+                <div class="flex items-center text-sm text-[#A66E38] mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Hari ini Tanggal: <span class="font-medium" id="today-date">{{ date('d M, Y') }}</span></span>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 mb-4" id="date-selector-container">
+                <!-- Date buttons will be populated by JavaScript -->
             </div>
         </div>
 
@@ -375,6 +389,10 @@
                 <div class="flex items-center px-3 py-2 bg-red-100 rounded-full text-red-800">
                     <span class="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
                     <span>Terbooking</span>
+                </div>
+                <div class="flex items-center px-3 py-2 bg-yellow-100 rounded-full text-yellow-700">
+                    <span class="w-3 h-3 bg-yellow-400 rounded-full mr-2"></span>
+                    <span>Member Booking</span>
                 </div>
                 <div class="flex items-center px-3 py-2 bg-gray-100 rounded-full text-gray-600">
                     <span class="w-3 h-3 bg-gray-400 rounded-full mr-2"></span>
@@ -433,8 +451,7 @@
                                     <!-- Content will be filled by JavaScript -->
                                 </td>
                                 @endforeach
-                            </tr>
-                            @endforeach
+                                @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -475,107 +492,157 @@
 <!-- JavaScript untuk Schedule Display -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const fieldAvailability = @json($fieldAvailability);
-        const today = '{{ $today->format("Y-m-d") }}';
-        const tomorrow = '{{ $tomorrow->format("Y-m-d") }}';
-        let currentDate = today;
+        // Data dari PHP ke JS
+        const slotsData = @json($slots);
+        const fieldsData = @json($fields);
 
-        // Tab switching
-        document.querySelectorAll('.date-tab-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                // Remove active class from all buttons
-                document.querySelectorAll('.date-tab-btn').forEach(b => {
-                    b.classList.remove('active');
-                    b.style.backgroundColor = '';
-                    b.style.color = '';
-                    b.classList.add('bg-white', 'text-gray-700', 'border', 'border-gray-300', 'hover:bg-amber-50');
+        // Generate tanggal 1 bulan ke depan
+        function generateMonthlyDates() {
+            const monthlyDates = [];
+            const today = new Date();
+            for (let i = 0; i < 30; i++) {
+                const date = new Date(today);
+                date.setDate(today.getDate() + i);
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const dayOfMonth = String(date.getDate()).padStart(2, '0');
+                const dateString = `${year}-${month}-${dayOfMonth}`;
+                const dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+                const day = dayNames[date.getDay()];
+                const formattedDate = date.toLocaleDateString('id-ID', {
+                    month: 'short',
+                    day: 'numeric'
                 });
+                monthlyDates.push({
+                    date: dateString,
+                    day: day,
+                    formatted_date: formattedDate
+                });
+            }
+            return monthlyDates;
+        }
 
-                // Add active class to clicked button
-                this.classList.add('active');
-                this.classList.remove('bg-white', 'text-gray-700', 'border', 'border-gray-300', 'hover:bg-amber-50');
-                this.style.backgroundColor = '#A66E38';
-                this.style.color = 'white';
+        const monthlyDates = generateMonthlyDates();
+        const dateContainer = document.getElementById('date-selector-container');
+        let currentDate = monthlyDates[0].date;
+        let fieldAvailability = {};
 
+        // Populate date buttons
+        monthlyDates.forEach((dateObj, index) => {
+            const dateButton = document.createElement('button');
+            dateButton.type = 'button';
+            dateButton.className = `date-selector px-4 py-2 border rounded-md transition-colors ${
+            index === 0 ? 'bg-[#A66E38] text-white border-[#8B5A2B]' : 'bg-white text-gray-700 border-gray-300 hover:bg-amber-50'
+        }`;
+            dateButton.setAttribute('data-date', dateObj.date);
+            dateButton.innerHTML = `
+            <span class="block font-medium">${dateObj.day}</span>
+            <span class="block text-sm">${dateObj.formatted_date}</span>
+        `;
+            dateContainer.appendChild(dateButton);
+        });
+
+        // Event listener untuk tombol tanggal
+        document.querySelectorAll('.date-selector').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.date-selector').forEach(btn => {
+                    btn.classList.remove('bg-[#A66E38]', 'text-white', 'border-[#8B5A2B]');
+                    btn.classList.add('bg-white', 'text-gray-700', 'border-gray-300', 'hover:bg-amber-50');
+                });
+                this.classList.remove('bg-white', 'text-gray-700', 'border-gray-300', 'hover:bg-amber-50');
+                this.classList.add('bg-[#A66E38]', 'text-white', 'border-[#8B5A2B]');
                 currentDate = this.getAttribute('data-date');
-                updateScheduleDisplay();
+                fetchAvailability(currentDate);
             });
         });
 
+        // Helper function untuk format waktu
+        function formatTime(timeString) {
+            const time = new Date('2000-01-01 ' + timeString);
+            return time.toLocaleTimeString('id-ID', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+        }
+
+        // Fetch availability function
+        function fetchAvailability(date) {
+            fetch(`/api/all-available-slots?date=${date}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        fieldAvailability = data.fieldAvailability;
+                        updateScheduleDisplay();
+                    }
+                });
+        }
+
         function updateScheduleDisplay() {
-            // Update desktop table
+            // Desktop
             document.querySelectorAll('.slot-cell').forEach(cell => {
                 const fieldId = cell.getAttribute('data-field-id');
                 const timeSlot = cell.getAttribute('data-time-slot');
-
-                const slotData = fieldAvailability[fieldId]?.[currentDate]?.[timeSlot];
+                const slotData = fieldAvailability[fieldId]?.[timeSlot];
 
                 const div = document.createElement('div');
                 div.className = 'flex items-center justify-center rounded-md text-sm font-medium h-10 transition duration-200 shadow-sm';
 
-                if (slotData?.booked) {
-                    div.classList.add('bg-red-100', 'text-red-800', 'border', 'border-red-200');
-                    div.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Terbooking
-                `;
-                } else if (slotData?.available) {
+                if (slotData && slotData.available) {
                     div.classList.add('bg-green-100', 'text-green-800', 'border', 'border-green-200');
-                    div.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Tersedia
-                `;
+                    div.innerHTML = `Tersedia`;
+                } else if (slotData && slotData.customer_name) {
+                    const customerName = slotData.customer_name;
+                    const displayName = customerName.length > 10 ? customerName.substring(0, 10) + '...' : customerName;
+                    let bgColor = 'bg-red-100',
+                        textColor = 'text-red-600',
+                        borderColor = 'border-red-200';
+                    if (slotData.type === 'member_manual') {
+                        bgColor = 'bg-yellow-100';
+                        textColor = 'text-yellow-700';
+                        borderColor = 'border-yellow-200';
+                    }
+                    div.classList.add(bgColor, textColor, 'border', borderColor);
+                    div.innerHTML = `<span class="text-center leading-tight font-semibold text-xs">${displayName}</span>`;
                 } else {
                     div.classList.add('bg-gray-100', 'text-gray-600', 'border', 'border-gray-200');
-                    div.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    Tidak Tersedia
-                `;
+                    div.innerHTML = `Tidak Tersedia`;
                 }
-
                 cell.innerHTML = '';
                 cell.appendChild(div);
             });
 
-            // Update mobile cards
+            // Mobile
             document.querySelectorAll('.mobile-slots').forEach(container => {
                 const fieldId = container.getAttribute('data-field-id');
                 container.innerHTML = '';
-
-                const slots = @json($slots);
-                slots.forEach(slot => {
-                    const slotData = fieldAvailability[fieldId]?.[currentDate]?.[slot.time];
-
+                slotsData.forEach(slot => {
+                    const slotData = fieldAvailability[fieldId]?.[slot.time];
                     const slotDiv = document.createElement('div');
-                    slotDiv.className = 'p-2 rounded text-center text-xs font-medium border';
-
-                    const timeFormatted = slot.formatted_time + '-' +
-                        (parseInt(slot.formatted_time.split(':')[0]) + 1).toString().padStart(2, '0') + ':00';
-
-                    if (slotData?.booked) {
-                        slotDiv.classList.add('bg-red-100', 'text-red-800', 'border-red-200');
-                        slotDiv.innerHTML = `${timeFormatted}<br><span class="text-xs">Terbooking</span>`;
-                    } else if (slotData?.available) {
-                        slotDiv.classList.add('bg-green-100', 'text-green-800', 'border-green-200');
-                        slotDiv.innerHTML = `${timeFormatted}<br><span class="text-xs">Tersedia</span>`;
+                    slotDiv.className = 'p-2 rounded-md text-xs font-medium text-center transition duration-200';
+                    if (slotData && slotData.available) {
+                        slotDiv.classList.add('bg-green-100', 'text-green-800', 'border', 'border-green-200');
+                        slotDiv.innerHTML = `<div class="font-semibold">${formatTime(slot.time)}</div><div class="text-xs">Tersedia</div>`;
+                    } else if (slotData && slotData.customer_name) {
+                        const customerName = slotData.customer_name;
+                        const displayName = customerName.length > 8 ? customerName.substring(0, 8) + '...' : customerName;
+                        if (slotData.type === 'member_manual') {
+                            slotDiv.classList.add('bg-yellow-100', 'text-yellow-700', 'border', 'border-yellow-200');
+                        } else {
+                            slotDiv.classList.add('bg-red-100', 'text-red-600', 'border', 'border-red-200');
+                        }
+                        slotDiv.innerHTML = `<div class="font-semibold">${formatTime(slot.time)}</div><div class="text-xs">${displayName}</div>`;
                     } else {
-                        slotDiv.classList.add('bg-gray-100', 'text-gray-600', 'border-gray-200');
-                        slotDiv.innerHTML = `${timeFormatted}<br><span class="text-xs">Tidak Tersedia</span>`;
+                        slotDiv.classList.add('bg-gray-100', 'text-gray-600', 'border', 'border-gray-200');
+                        slotDiv.innerHTML = `<div class="font-semibold">${formatTime(slot.time)}</div><div class="text-xs">Tutup</div>`;
                     }
-
                     container.appendChild(slotDiv);
                 });
             });
         }
 
         // Initial load
-        updateScheduleDisplay();
+        fetchAvailability(currentDate);
     });
 </script>
 
@@ -600,7 +667,6 @@
         }
     }
 </style>
-
 
 <!-- 3. Update Facilities Section -->
 <div class="py-10 bg-[#fdf8f2]">

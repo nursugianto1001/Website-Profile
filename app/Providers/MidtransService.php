@@ -15,12 +15,33 @@ class MidtransService
     {
         $this->serverKey = config('midtrans.server_key');
         $this->clientKey = config('midtrans.client_key');
-        $this->isProduction = config('midtrans.is_production', false);
+        $this->isProduction = config('midtrans.is_production', true);
         $this->is3ds = config('midtrans.is_3ds', true);
+
+        // Validate key format
+        if ($this->isProduction) {
+            if (empty($this->serverKey) || strpos($this->serverKey, 'Mid-server-') !== 0) {
+                Log::error('Midtrans Error: Invalid production server key format. Should start with Mid-server-');
+                throw new \Exception('Invalid Midtrans production server key format');
+            }
+            if (empty($this->clientKey) || strpos($this->clientKey, 'Mid-client-') !== 0) {
+                Log::error('Midtrans Error: Invalid production client key format. Should start with Mid-client-');
+                throw new \Exception('Invalid Midtrans production client key format');
+            }
+        }
 
         \Midtrans\Config::$serverKey = $this->serverKey;
         \Midtrans\Config::$isProduction = $this->isProduction;
         \Midtrans\Config::$is3ds = $this->is3ds;
+
+        // Add logging
+        Log::info('Midtrans Configuration:', [
+            'is_production' => $this->isProduction,
+            'server_key_exists' => !empty($this->serverKey),
+            'client_key_exists' => !empty($this->clientKey),
+            'server_key_prefix' => substr($this->serverKey, 0, 10) . '...',
+            'client_key_prefix' => substr($this->clientKey, 0, 10) . '...'
+        ]);
     }
 
     /**
@@ -41,6 +62,16 @@ class MidtransService
                 Log::error('Midtrans Error: Server key is not configured');
                 return null;
             }
+
+            // Log the Midtrans environment
+            $baseUrl = \Midtrans\Config::$isProduction ? 
+                'https://app.midtrans.com/snap/v1/' : 
+                'https://app.sandbox.midtrans.com/snap/v1/';
+            Log::info('Midtrans Environment:', [
+                'base_url' => $baseUrl,
+                'server_key' => substr($this->serverKey, 0, 8) . '...',
+                'is_production' => \Midtrans\Config::$isProduction
+            ]);
 
             // ✅ PERBAIKAN: Generate order_id yang konsisten
             $orderId = 'ORDER-' . $params['booking_id'] . '-' . time();
@@ -81,15 +112,24 @@ class MidtransService
             ];
 
             Log::info('Midtrans Request: ' . json_encode($transaction_data));
+            
+            // Add more detailed logging
+            Log::info('Midtrans Config Status:', [
+                'is_production' => \Midtrans\Config::$isProduction,
+                'server_key' => substr(\Midtrans\Config::$serverKey, 0, 8) . '...',
+                'is_3ds' => \Midtrans\Config::$is3ds
+            ]);
+            
             $snapToken = \Midtrans\Snap::getSnapToken($transaction_data);
-            Log::info('Midtrans Response: ' . $snapToken);
+            Log::info('Midtrans Response Token: ' . $snapToken);
 
             return [
                 'token' => $snapToken,
-                'order_id' => $orderId  // ✅ Return order_id yang benar
+                'order_id' => $orderId
             ];
         } catch (\Exception $e) {
             Log::error('Midtrans Error: ' . $e->getMessage());
+            Log::error('Midtrans Error Stack Trace: ' . $e->getTraceAsString());
             return null;
         }
     }

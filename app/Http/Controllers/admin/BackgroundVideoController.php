@@ -25,14 +25,14 @@ class BackgroundVideoController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'video' => 'required|file|mimetypes:video/mp4,video/webm,video/ogg|max:20480',
+            'video' => 'required|file|mimetypes:video/mp4,video/webm,video/ogg,video/quicktime|max:51200',
         ]);
 
         DB::beginTransaction();
         try {
             // Upload file
             $path = $request->file('video')->store('background-videos', 'public');
-            
+
             // Create record
             BackgroundVideo::create([
                 'title' => $request->title,
@@ -40,7 +40,7 @@ class BackgroundVideoController extends Controller
                 'mime_type' => $request->file('video')->getMimeType(),
                 'is_active' => false,
             ]);
-            
+
             DB::commit();
             return redirect()->route('admin.background-videos.index')
                 ->with('success', 'Video background berhasil diunggah.');
@@ -59,7 +59,7 @@ class BackgroundVideoController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'video' => 'nullable|file|mimetypes:video/mp4,video/webm,video/ogg|max:20480',
+            'video' => 'required|file|mimetypes:video/mp4,video/webm,video/ogg,video/quicktime|max:51200',
         ]);
 
         DB::beginTransaction();
@@ -70,17 +70,17 @@ class BackgroundVideoController extends Controller
                 if ($backgroundVideo->path && Storage::disk('public')->exists($backgroundVideo->path)) {
                     Storage::disk('public')->delete($backgroundVideo->path);
                 }
-                
+
                 // Upload file baru
                 $path = $request->file('video')->store('background-videos', 'public');
-                
+
                 $backgroundVideo->path = $path;
                 $backgroundVideo->mime_type = $request->file('video')->getMimeType();
             }
-            
+
             $backgroundVideo->title = $request->title;
             $backgroundVideo->save();
-            
+
             DB::commit();
             return redirect()->route('admin.background-videos.index')
                 ->with('success', 'Video background berhasil diperbarui.');
@@ -98,9 +98,9 @@ class BackgroundVideoController extends Controller
             if ($backgroundVideo->path && Storage::disk('public')->exists($backgroundVideo->path)) {
                 Storage::disk('public')->delete($backgroundVideo->path);
             }
-            
+
             $backgroundVideo->delete();
-            
+
             DB::commit();
             return redirect()->route('admin.background-videos.index')
                 ->with('success', 'Video background berhasil dihapus.');
@@ -116,11 +116,11 @@ class BackgroundVideoController extends Controller
         try {
             // Nonaktifkan semua video terlebih dahulu
             BackgroundVideo::where('is_active', true)->update(['is_active' => false]);
-            
+
             // Aktifkan video yang dipilih
             $backgroundVideo->is_active = true;
             $backgroundVideo->save();
-            
+
             DB::commit();
             return back()->with('success', 'Video background berhasil diaktifkan.');
         } catch (\Exception $e) {

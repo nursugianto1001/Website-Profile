@@ -22,252 +22,325 @@
 </style>
 
 <body class="bg-[#fdf8f2]">
-    <div class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold mb-6 text-[#A66E38]">Pesan Lapangan Badminton Karvin</h1>
-        <div id="error-container" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 hidden">
-            <span id="error-message"></span>
+    <div class>
+
+        <!-- Content -->
+        <div class="relative z-10">
+            <!-- Header with elegant styling -->
+            <div class="text-center mb-6 sm:mb-8 pt-16 sm:pt-12">
+                <div
+                    class="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-white/60 backdrop-blur-sm rounded-2xl mb-3 sm:mb-4 shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sm:h-7 sm:w-7 text-[#A66E38]" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                </div>
+                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#A66E38] mb-2 tracking-tight px-4">
+                    Pesan Lapangan Badminton Karvin
+                </h1>
+                <div class="w-8 sm:w-20 h-0.5 bg-gradient-to-r from-[#A66E38] to-[#D4A574] mx-auto"></div>
+            </div>
+
+            <!-- Button Kembali - Pojok Kanan Atas -->
+            <a href="/"
+                class="absolute top-4 right-4 sm:top-6 sm:right-6 inline-flex items-center px-3 py-2 sm:px-4 sm:py-2.5 bg-white/70 backdrop-blur-sm hover:bg-white/90 text-[#A66E38] font-medium rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-[#A66E38]/10 hover:border-[#A66E38]/20 text-sm sm:text-base">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 sm:mr-2" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                <span class="hidden sm:inline">Kembali ke Beranda</span>
+                <span class="sm:hidden">Kembali</span>
+            </a>
+        </div>
+    </div>
+
+    <form id="bookingForm" action="/booking/process" method="POST" class="space-y-6">
+        @csrf
+
+        <!-- Date Selection -->
+        <div
+            class="bg-gradient-to-br from-amber-50 via-amber-100/30 to-[#fdf5e9] rounded-lg shadow-md p-6 border border-amber-100">
+            <div class="flex items-center mb-4">
+                <div class="bg-[#faebd7] p-2 rounded-full mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#A66E38]" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold text-[#A66E38]">Pilih Tanggal</h2>
+            </div>
+
+            <p class="text-sm text-gray-600 mb-4">Pilih tanggal pemesanan yang Anda inginkan dari pilihan yang tersedia
+                di bawah ini.</p>
+
+            <div class="mb-3">
+                <div class="flex items-center text-sm text-[#A66E38] mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>hari ini Tanggal: <span class="font-medium" id="today-date">11 Mei, 2025</span></span>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 mb-4" id="date-selector-container">
+                <!-- Date buttons will be populated by JavaScript -->
+            </div>
+
+            <input type="hidden" name="booking_date" id="booking_date" required>
         </div>
 
-        <form id="bookingForm" action="/booking/process" method="POST" class="space-y-6">
-            @csrf
-
-            <!-- Date Selection -->
-            <div class="bg-gradient-to-br from-amber-50 via-amber-100/30 to-[#fdf5e9] rounded-lg shadow-md p-6 border border-amber-100">
-                <div class="flex items-center mb-4">
-                    <div class="bg-[#faebd7] p-2 rounded-full mr-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#A66E38]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                    </div>
-                    <h2 class="text-xl font-semibold text-[#A66E38]">Pilih Tanggal</h2>
-                </div>
-
-                <p class="text-sm text-gray-600 mb-4">Pilih tanggal pemesanan yang Anda inginkan dari pilihan yang tersedia di bawah ini.</p>
-
-                <div class="mb-3">
-                    <div class="flex items-center text-sm text-[#A66E38] mb-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span>hari ini Tanggal: <span class="font-medium" id="today-date">11 Mei, 2025</span></span>
-                    </div>
-                </div>
-
-                <div class="flex flex-wrap gap-2 mb-4" id="date-selector-container">
-                    <!-- Date buttons will be populated by JavaScript -->
-                </div>
-
-                <input type="hidden" name="booking_date" id="booking_date" required>
-            </div>
-
-            <!-- Field and Time Selection -->
-            <div class="bg-gradient-to-br from-amber-50 via-amber-100/30 to-[#fdf5e9] rounded-lg shadow-md p-6 border border-amber-100">
-                <div class="flex items-center mb-4">
-                    <div class="bg-[#faebd7] p-2 rounded-full mr-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#A66E38]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
-                    </div>
-                    <h2 class="text-xl font-semibold text-[#A66E38]">Pilih Lapangan & Waktu Bermain</h2>
-                </div>
-
-                <div class="flex items-center mb-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#A66E38] mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <!-- Field and Time Selection -->
+        <div
+            class="bg-gradient-to-br from-amber-50 via-amber-100/30 to-[#fdf5e9] rounded-lg shadow-md p-6 border border-amber-100">
+            <div class="flex items-center mb-4">
+                <div class="bg-[#faebd7] p-2 rounded-full mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#A66E38]" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                     </svg>
-                    <p class="text-sm text-blue-700">Klik pada slot waktu yang tersedia untuk memesan. <span class="font-medium">Slot hijau tersedia</span>.</p>
                 </div>
+                <h2 class="text-xl font-semibold text-[#A66E38]">Pilih Lapangan & Waktu Bermain</h2>
+            </div>
 
-                <div class="flex flex-wrap gap-3 mb-4">
-                    <div class="flex items-center px-3 py-1 bg-green-100 rounded-full text-sm text-green-800">
-                        <span class="w-3 h-3 bg-green-100 rounded-full mr-2"></span>
-                        <span>Tersedia</span>
-                    </div>
-                    <div class="flex items-center px-3 py-1 bg-blue-100 rounded-full text-sm text-blue-800">
-                        <span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
-                        <span>Terpilih</span>
-                    </div>
-                    <div class="flex items-center px-3 py-1 bg-red-100 rounded-full text-sm text-red-800">
-                        <span class="w-3 h-3 bg-red-100 rounded-full mr-2"></span>
-                        <span>Tidak Tersedia</span>
-                    </div>
+            <div class="flex items-center mb-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#A66E38] mr-2" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-sm text-blue-700">Klik pada slot waktu yang tersedia untuk memesan. <span
+                        class="font-medium">Slot hijau tersedia</span>.</p>
+            </div>
+
+            <div class="flex flex-wrap gap-3 mb-4">
+                <div class="flex items-center px-3 py-1 bg-green-100 rounded-full text-sm text-green-800">
+                    <span class="w-3 h-3 bg-green-100 rounded-full mr-2"></span>
+                    <span>Tersedia</span>
                 </div>
-
-                <div class="overflow-x-auto rounded-lg border border-gray-200">
-                    <table class="w-full border-collapse booking-table">
-                        <thead>
-                            <tr>
-                                <th class="border px-4 py-3 bg-gray-50 text-gray-700">
-                                    <div class="flex items-center justify-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        <span>Waktu / Lapangan</span>
-                                    </div>
-                                </th>
-                                <!-- Field headers will be populated by JavaScript -->
-                            </tr>
-                        </thead>
-                        <tbody id="booking-table-body">
-                            <!-- Time slots will be populated by JavaScript -->
-                        </tbody>
-                    </table>
+                <div class="flex items-center px-3 py-1 bg-blue-100 rounded-full text-sm text-blue-800">
+                    <span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
+                    <span>Terpilih</span>
                 </div>
-
-                <div id="selected-slots-container" class="mt-5 hidden">
-                    <div class="flex items-center mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#A66E38] mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <h3 class="font-medium text-gray-800">Kamu Pilih Slot:</h3>
-                    </div>
-                    <div id="selected-slots-summary" class="p-4 bg-blue-50 rounded-lg border border-blue-100 text-sm"></div>
+                <div class="flex items-center px-3 py-1 bg-red-100 rounded-full text-sm text-red-800">
+                    <span class="w-3 h-3 bg-red-100 rounded-full mr-2"></span>
+                    <span>Tidak Tersedia</span>
                 </div>
             </div>
 
-            <!-- Customer Information -->
-            <div class="bg-gradient-to-br from-amber-50 via-amber-100/30 to-[#fdf5e9] rounded-lg shadow-md p-6 border border-amber-100">
-                <div class="flex items-center mb-4">
-                    <div class="bg-[#faebd7] p-2 rounded-full mr-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#A66E38]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                    </div>
-                    <h2 class="text-xl font-semibold text-[#8B5A2B]">Informasi Pelanggan</h2>
-                </div>
-
-                <p class="text-sm text-gray-600 mb-4">Silakan berikan detail kontak Anda untuk konfirmasi pemesanan.</p>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div class="space-y-1">
-                        <label for="customer_name" class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
-                            </div>
-                            <input type="text" name="customer_name" id="customer_name" placeholder="John Doe"
-                                class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#A66E38] focus:border-[#A66E38]"
-                                required>
-                        </div>
-                        <span class="text-red-500 text-sm customer_name-error"></span>
-                    </div>
-
-                    <div class="space-y-1">
-                        <label for="customer_email" class="block text-sm font-medium text-gray-700">Email</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                </svg>
-                            </div>
-                            <input type="email" name="customer_email" id="customer_email" placeholder="johndoe@example.com"
-                                class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#A66E38] focus:border-[#A66E38]"
-                                required>
-                        </div>
-                        <p class="text-xs text-gray-500">Kami akan mengirimkan konfirmasi pemesanan ke email ini</p>
-                        <span class="text-red-500 text-sm customer_email-error"></span>
-                    </div>
-
-                    <div class="space-y-1">
-                        <label for="customer_phone" class="block text-sm font-medium text-gray-700">Nomor Handphone</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                </svg>
-                            </div>
-                            <input type="text" name="customer_phone" id="customer_phone" placeholder="+62 812-3456-7890"
-                                class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#A66E38] focus:border-[#A66E38]"
-                                required>
-                        </div>
-                        <p class="text-xs text-gray-500">Untuk pemberitahuan mendesak tentang pemesanan Anda</p>
-                        <span class="text-red-500 text-sm customer_phone-error"></span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Payment Method -->
-            <div class="bg-gradient-to-br from-amber-50 via-amber-100/30 to-[#fdf5e9] rounded-lg shadow-md p-6 border border-amber-100">
-                <div class="flex items-center mb-4">
-                    <div class="bg-[#faebd7] p-2 rounded-full mr-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#A66E38]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                        </svg>
-                    </div>
-                    <h2 class="text-xl font-semibold text-[#A66E38]">Metode Pembayaran</h2>
-                </div>
-
-                <div class="space-y-3">
-                    <label class="block p-4 border rounded-lg transition-all hover:border-blue-300 hover:bg-blue-50 cursor-pointer">
-                        <div class="flex items-center">
-                            <input type="radio" name="payment_method" value="online" checked class="h-5 w-5 text-[#A66E38] focus:ring-[#A66E38]">
-                            <div class="ml-3 flex-1">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-gray-800 font-medium">Pembayaran Online</span>
-                                </div>
-                                <p class="text-gray-500 text-sm mt-1">Bayar dengan aman secara online dengan kartu kredit, transfer bank, atau dompet elektronik</p>
-                                <div class="mt-2 flex flex-wrap gap-2">
-                                    <span class="inline-block px-2 py-1 bg-gray-100 text-xs rounded">Credit Card</span>
-                                    <span class="inline-block px-2 py-1 bg-gray-100 text-xs rounded">Bank Transfer</span>
-                                    <span class="inline-block px-2 py-1 bg-gray-100 text-xs rounded">GoPay</span>
-                                    <span class="inline-block px-2 py-1 bg-gray-100 text-xs rounded">OVO</span>
-                                </div>
-                            </div>
-                        </div>
-                    </label>
-
-                    <label class="block p-4 border rounded-lg transition-all hover:border-blue-300 hover:bg-blue-50 cursor-pointer">
-                        <div class="flex items-center">
-                            <input type="radio" name="payment_method" value="cash" class="h-5 w-5 text-[#A66E38] focus:ring-[#A66E38]">
-                            <div class="ml-3 flex-1">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-gray-800 font-medium">Pembayaran Tunai</span>
-                                    <div class="flex items-center text-xs text-white bg-[#A66E38] px-2 py-1 rounded-full">
-                                        Hanya Hari Ini
-                                    </div>
-                                </div>
-                                <p class="text-gray-500 text-sm mt-1">Bayar tunai saat Anda tiba di tempat (Pembayaran tunai hanya tersedia untuk pemesanan hari ini)</p>
-                                <div class="mt-2 text-sm text-[#A66E38]">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <div class="overflow-x-auto rounded-lg border border-gray-200">
+                <table class="w-full border-collapse booking-table">
+                    <thead>
+                        <tr>
+                            <th class="border px-4 py-3 bg-gray-50 text-gray-700">
+                                <div class="flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-gray-500"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    Catatan: Pembayaran tunai mengharuskan Anda tiba 15 menit sebelum waktu pemesanan Anda
+                                    <span>Waktu / Lapangan</span>
                                 </div>
+                            </th>
+                            <!-- Field headers will be populated by JavaScript -->
+                        </tr>
+                    </thead>
+                    <tbody id="booking-table-body">
+                        <!-- Time slots will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="selected-slots-container" class="mt-5 hidden">
+                <div class="flex items-center mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#A66E38] mr-2" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h3 class="font-medium text-gray-800">Kamu Pilih Slot:</h3>
+                </div>
+                <div id="selected-slots-summary" class="p-4 bg-blue-50 rounded-lg border border-blue-100 text-sm">
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Information -->
+        <div
+            class="bg-gradient-to-br from-amber-50 via-amber-100/30 to-[#fdf5e9] rounded-lg shadow-md p-6 border border-amber-100">
+            <div class="flex items-center mb-4">
+                <div class="bg-[#faebd7] p-2 rounded-full mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#A66E38]" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold text-[#8B5A2B]">Informasi Pelanggan</h2>
+            </div>
+
+            <p class="text-sm text-gray-600 mb-4">Silakan berikan detail kontak Anda untuk konfirmasi pemesanan.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="space-y-1">
+                    <label for="customer_name" class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                        </div>
+                        <input type="text" name="customer_name" id="customer_name" placeholder="John Doe"
+                            class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#A66E38] focus:border-[#A66E38]"
+                            required>
+                    </div>
+                    <span class="text-red-500 text-sm customer_name-error"></span>
+                </div>
+
+                <div class="space-y-1">
+                    <label for="customer_email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <input type="email" name="customer_email" id="customer_email"
+                            placeholder="johndoe@example.com"
+                            class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#A66E38] focus:border-[#A66E38]"
+                            required>
+                    </div>
+                    <p class="text-xs text-gray-500">Kami akan mengirimkan konfirmasi pemesanan ke email ini</p>
+                    <span class="text-red-500 text-sm customer_email-error"></span>
+                </div>
+
+                <div class="space-y-1">
+                    <label for="customer_phone" class="block text-sm font-medium text-gray-700">Nomor
+                        Handphone</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                        </div>
+                        <input type="text" name="customer_phone" id="customer_phone"
+                            placeholder="+62 812-3456-7890"
+                            class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#A66E38] focus:border-[#A66E38]"
+                            required>
+                    </div>
+                    <p class="text-xs text-gray-500">Untuk pemberitahuan mendesak tentang pemesanan Anda</p>
+                    <span class="text-red-500 text-sm customer_phone-error"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Method -->
+        <div
+            class="bg-gradient-to-br from-amber-50 via-amber-100/30 to-[#fdf5e9] rounded-lg shadow-md p-6 border border-amber-100">
+            <div class="flex items-center mb-4">
+                <div class="bg-[#faebd7] p-2 rounded-full mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#A66E38]" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold text-[#A66E38]">Metode Pembayaran</h2>
+            </div>
+
+            <div class="space-y-3">
+                <label
+                    class="block p-4 border rounded-lg transition-all hover:border-blue-300 hover:bg-blue-50 cursor-pointer">
+                    <div class="flex items-center">
+                        <input type="radio" name="payment_method" value="online" checked
+                            class="h-5 w-5 text-[#A66E38] focus:ring-[#A66E38]">
+                        <div class="ml-3 flex-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-800 font-medium">Pembayaran Online</span>
+                            </div>
+                            <p class="text-gray-500 text-sm mt-1">Bayar dengan aman secara online dengan kartu kredit,
+                                transfer bank, atau dompet elektronik</p>
+                            <div class="mt-2 flex flex-wrap gap-2">
+                                <span class="inline-block px-2 py-1 bg-gray-100 text-xs rounded">Credit Card</span>
+                                <span class="inline-block px-2 py-1 bg-gray-100 text-xs rounded">Bank Transfer</span>
+                                <span class="inline-block px-2 py-1 bg-gray-100 text-xs rounded">GoPay</span>
+                                <span class="inline-block px-2 py-1 bg-gray-100 text-xs rounded">OVO</span>
                             </div>
                         </div>
-                    </label>
-                </div>
+                    </div>
+                </label>
+
+                <label
+                    class="block p-4 border rounded-lg transition-all hover:border-blue-300 hover:bg-blue-50 cursor-pointer">
+                    <div class="flex items-center">
+                        <input type="radio" name="payment_method" value="cash"
+                            class="h-5 w-5 text-[#A66E38] focus:ring-[#A66E38]">
+                        <div class="ml-3 flex-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-800 font-medium">Pembayaran Tunai</span>
+                                <div class="flex items-center text-xs text-white bg-[#A66E38] px-2 py-1 rounded-full">
+                                    Hanya Hari Ini
+                                </div>
+                            </div>
+                            <p class="text-gray-500 text-sm mt-1">Bayar tunai saat Anda tiba di tempat (Pembayaran
+                                tunai hanya tersedia untuk pemesanan hari ini)</p>
+                            <div class="mt-2 text-sm text-[#A66E38]">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Catatan: Pembayaran tunai mengharuskan Anda tiba 15 menit sebelum waktu pemesanan Anda
+                            </div>
+                        </div>
+                    </div>
+                </label>
             </div>
+        </div>
 
-            <!-- Booking Summary and Total -->
-            <div class="bg-gradient-to-br from-amber-50 via-amber-100/30 to-[#fdf5e9] rounded-lg shadow-md p-6 border border-amber-100">
-                <h2 class="text-xl font-semibold mb-4 text-[#A66E38]">Ringkasan Pemesanan</h2>
-                <div id="booking-summary" class="mb-4">
-                    <p class="text-gray-500 italic">Please select field(s) and time slot(s) to see the summary</p>
-                </div>
-                <div class="flex justify-between items-center border-t pt-4 mt-4">
-                    <span class="text-xl font-bold text-[#A66E38]">Total Biaya:</span>
-                    <span id="total-price" class="text-xl font-bold text-[#A66E38]">Rp -</span>
-                </div>
+        <!-- Booking Summary and Total -->
+        <div
+            class="bg-gradient-to-br from-amber-50 via-amber-100/30 to-[#fdf5e9] rounded-lg shadow-md p-6 border border-amber-100">
+            <h2 class="text-xl font-semibold mb-4 text-[#A66E38]">Ringkasan Pemesanan</h2>
+            <div id="booking-summary" class="mb-4">
+                <p class="text-gray-500 italic">Please select field(s) and time slot(s) to see the summary</p>
             </div>
+            <div class="flex justify-between items-center border-t pt-4 mt-4">
+                <span class="text-xl font-bold text-[#A66E38]">Total Biaya:</span>
+                <span id="total-price" class="text-xl font-bold text-[#A66E38]">Rp -</span>
+            </div>
+        </div>
 
-            <!-- Submit Button -->
-            <button type="submit" class="w-full py-4 px-6 bg-[#A66E38] hover:bg-[#8B5A2B] text-white font-bold rounded-lg shadow-lg transition-colors flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-                Lanjutkan ke Pembayaran
-            </button>
+        <!-- Submit Button -->
+        <button type="submit"
+            class="w-full py-4 px-6 bg-[#A66E38] hover:bg-[#8B5A2B] text-white font-bold rounded-lg shadow-lg transition-colors flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+            Lanjutkan ke Pembayaran
+        </button>
 
-            <p class="text-center text-sm text-gray-500 mt-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                Secure payment powered by Midtrans
-            </p>
-        </form>
+        <p class="text-center text-sm text-gray-500 mt-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            Secure payment powered by Midtrans
+        </p>
+    </form>
     </div>
 
     <!-- Data untuk JavaScript -->
@@ -336,12 +409,15 @@
                 button.addEventListener('click', function() {
                     // Reset semua tombol ke warna default
                     document.querySelectorAll('.date-selector').forEach(btn => {
-                        btn.classList.remove('bg-[#A66E38]', 'bg-blue-500', 'text-white', 'border-[#8B5A2B]', 'border-blue-600');
-                        btn.classList.add('bg-white', 'text-gray-700', 'border-gray-300', 'hover:bg-amber-50');
+                        btn.classList.remove('bg-[#A66E38]', 'bg-blue-500', 'text-white',
+                            'border-[#8B5A2B]', 'border-blue-600');
+                        btn.classList.add('bg-white', 'text-gray-700', 'border-gray-300',
+                            'hover:bg-amber-50');
                     });
 
                     // Ubah warna tombol yang diklik ke coklat keemasan
-                    this.classList.remove('bg-white', 'text-gray-700', 'border-gray-300', 'hover:bg-amber-50');
+                    this.classList.remove('bg-white', 'text-gray-700', 'border-gray-300',
+                        'hover:bg-amber-50');
                     this.classList.add('bg-[#A66E38]', 'text-white', 'border-[#8B5A2B]');
 
                     // Update tanggal yang dipilih
@@ -416,8 +492,8 @@
 
                     // Kolom untuk setiap lapangan
                     fields.forEach(field => {
-                        const slotData = fieldAvailability && fieldAvailability[field.id] && 
-                                       fieldAvailability[field.id][slot.time];
+                        const slotData = fieldAvailability && fieldAvailability[field.id] &&
+                            fieldAvailability[field.id][slot.time];
                         const isSelected = selectedSlots[field.id]?.includes(slot.time);
 
                         const td = document.createElement('td');
@@ -426,10 +502,12 @@
                         td.setAttribute('data-time-slot', slot.time);
 
                         const div = document.createElement('div');
-                        div.className = 'flex flex-col items-center justify-center rounded-md text-xs font-medium h-12 transition duration-200 shadow-sm';
+                        div.className =
+                            'flex flex-col items-center justify-center rounded-md text-xs font-medium h-12 transition duration-200 shadow-sm';
 
                         if (isSelected) {
-                            div.classList.add('bg-blue-500', 'text-white', 'border', 'border-blue-600');
+                            div.classList.add('bg-blue-500', 'text-white', 'border',
+                                'border-blue-600');
                             div.innerHTML = `
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -439,7 +517,9 @@
                             td.setAttribute('data-available', 'true');
                             td.classList.add('time-slot');
                         } else if (slotData && slotData.available) {
-                            div.classList.add('bg-green-100', 'hover:bg-green-200', 'text-green-800', 'cursor-pointer', 'border', 'border-green-200', 'hover:border-green-300');
+                            div.classList.add('bg-green-100', 'hover:bg-green-200',
+                                'text-green-800', 'cursor-pointer', 'border',
+                                'border-green-200', 'hover:border-green-300');
                             div.innerHTML = `
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -451,10 +531,11 @@
                         } else {
                             // Tampilkan nama customer atau status lainnya
                             const customerName = slotData?.customer_name || 'Tidak Tersedia';
-                            const displayName = customerName.length > 12 ? 
-                                              customerName.substring(0, 12) + '...' : customerName;
-                            
-                            div.classList.add('bg-red-100', 'text-red-600', 'cursor-not-allowed', 'border', 'border-red-200');
+                            const displayName = customerName.length > 12 ?
+                                customerName.substring(0, 12) + '...' : customerName;
+
+                            div.classList.add('bg-red-100', 'text-red-600', 'cursor-not-allowed',
+                                'border', 'border-red-200');
                             div.innerHTML = `
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -462,7 +543,7 @@
                                 <span class="text-center leading-tight">${displayName}</span>
                             `;
                             td.setAttribute('data-available', 'false');
-                            
+
                             // Tambahkan tooltip untuk nama lengkap jika dipotong
                             if (customerName.length > 12) {
                                 td.setAttribute('title', customerName);
@@ -583,7 +664,8 @@
                 if (hasSelections) {
                     let summaryHTML = "";
                     for (const fieldId in selectedSlots) {
-                        const fieldName = document.querySelector(`th input[data-field-id="${fieldId}"]`).getAttribute("data-field-name");
+                        const fieldName = document.querySelector(`th input[data-field-id="${fieldId}"]`)
+                            .getAttribute("data-field-name");
                         const slots = selectedSlots[fieldId].sort();
                         const formattedTimes = slots.map(slot => formatTimeRange(slot)).join(", ");
                         summaryHTML += `<div class="mb-2"><strong>${fieldName}:</strong> ${formattedTimes}</div>`;
@@ -683,7 +765,8 @@
 
                         if (isToday) {
                             btn.classList.add('bg-[#A66E38]', 'text-white', 'border-[#8B5A2B]');
-                            btn.classList.remove('bg-white', 'text-gray-700', 'border-gray-300', 'hover:bg-amber-50');
+                            btn.classList.remove('bg-white', 'text-gray-700', 'border-gray-300',
+                                'hover:bg-amber-50');
                             currentDate = today;
                             document.getElementById('booking_date').value = today;
                             fetchAvailability(today);
@@ -693,7 +776,8 @@
                     if (!cashNote) {
                         const noteDiv = document.createElement('div');
                         noteDiv.id = 'cash-payment-note';
-                        noteDiv.className = 'mt-3 p-3 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 text-sm';
+                        noteDiv.className =
+                            'mt-3 p-3 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 text-sm';
                         noteDiv.innerHTML = `
                             <div class="flex">
                                 <div class="flex-shrink-0">

@@ -52,14 +52,14 @@
                             <div class="flex text-sm text-gray-600">
                                 <label for="video"
                                     class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none">
-                                    <span>Upload a video</span>
+                                    <span>Unggah Video</span>
                                     <input id="video" name="video" type="file" class="sr-only"
-                                        accept="video/mp4,video/webm,video/ogg" required>
+                                        accept="video/mp4,video/webm,video/ogg,video/quicktime" required>
                                 </label>
                                 <p class="pl-1">atau seret dan lepas</p>
                             </div>
                             <p class="text-xs text-gray-500">
-                                MP4, WebM, Ogg up to 20MB
+                                MP4, WebM, Ogg, MOV up to 20MB
                             </p>
                         </div>
                     </div>

@@ -9,6 +9,7 @@
     <title>{{ config('app.name', 'Sport') }} - @yield('title')</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
+    <link rel="stylesheet" href="https://unpkg.com/swiper@10/swiper-bundle.min.css" />
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
         integrity="..." crossorigin="anonymous" />
@@ -23,8 +24,7 @@
                 <div class="flex-shrink-0 flex items-center relative">
                     <img src="{{ Vite::asset(asset: 'resources/images/Karvin.png') }}" alt="Karvin Logo"
                         class="h-12 w-auto">
-                    <span
-                        class="italic font-black text-white">Karvin Badminton</span>
+                    <span class="italic font-black text-white">Karvin Badminton</span>
                 </div>
 
                 <div id="desktopMenu" class="hidden md:flex flex-grow justify-center space-x-6">
@@ -71,6 +71,14 @@
                 </div>
             </div>
         </nav>
+        @if (app()->environment('local'))
+            @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @else
+            <link rel="stylesheet" href="{{ asset('build/assets/app.css') }}">
+            <script src="{{ asset('build/assets/app.js') }}" defer></script>
+        @endif
+
+        @stack('styles')
     </header>
 
     <main class="mt-[70px] md:mt-[80px] flex-grow w-full">
@@ -143,7 +151,8 @@
             });
         });
     </script>
-
+    <script src="https://unpkg.com/swiper@10/swiper-bundle.min.js"></script>
+    @stack('scripts')
 </body>
 
 </html>

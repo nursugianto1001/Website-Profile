@@ -25,6 +25,7 @@ class Booking extends Model
         'booking_code',
         'status',
         'payment_instruction',
+        'order_id', // Tambahkan jika belum ada
     ];
 
     protected $casts = [
@@ -32,7 +33,7 @@ class Booking extends Model
         'start_time' => 'datetime',
         'end_time' => 'datetime',
         'duration_hours' => 'integer',
-        'total_price' => 'float',
+        'total_price' => 'decimal:2', // Ubah dari float ke decimal untuk konsistensi
     ];
 
     /**
@@ -60,6 +61,51 @@ class Booking extends Model
     }
 
     /**
+     * Calculate total price from booking slots (untuk verifikasi)
+     */
+    public function getTotalPriceFromSlotsAttribute()
+    {
+        return $this->slots()->sum('price_per_slot');
+    }
+
+    /**
+     * Get price breakdown by time category
+     */
+    public function getPriceBreakdownAttribute()
+    {
+        return [
+            'morning' => $this->slots()->where('price_per_slot', 40000)->sum('price_per_slot'),
+            'afternoon' => $this->slots()->where('price_per_slot', 25000)->sum('price_per_slot'),
+            'evening' => $this->slots()->where('price_per_slot', 60000)->sum('price_per_slot'),
+            'total' => $this->slots()->sum('price_per_slot'),
+        ];
+    }
+
+    /**
+     * Check if booking has dynamic pricing data
+     */
+    public function hasDynamicPricing()
+    {
+        return $this->slots()->where('price_per_slot', '>', 0)->exists();
+    }
+
+    /**
+     * Get formatted total price
+     */
+    public function getFormattedTotalPriceAttribute()
+    {
+        return 'Rp ' . number_format($this->total_price, 0, ',', '.');
+    }
+
+    /**
+     * Get booking time range as string
+     */
+    public function getTimeRangeAttribute()
+    {
+        return $this->start_time->format('H:i') . ' - ' . $this->end_time->format('H:i');
+    }
+
+    /**
      * Scope a query to only include pending bookings
      */
     public function scopePending($query)
@@ -72,7 +118,7 @@ class Booking extends Model
      */
     public function scopePaid($query)
     {
-        return $query->where('payment_status', 'paid');
+        return $query->whereIn('payment_status', ['paid', 'settlement']);
     }
 
     /**
@@ -88,6 +134,22 @@ class Booking extends Model
      */
     public function scopeActive($query)
     {
-        return $query->whereIn('payment_status', ['pending', 'paid']);
+        return $query->whereIn('payment_status', ['pending', 'paid', 'settlement']);
+    }
+
+    /**
+     * Scope untuk booking hari ini
+     */
+    public function scopeToday($query)
+    {
+        return $query->whereDate('booking_date', today());
+    }
+
+    /**
+     * Scope untuk booking yang akan datang
+     */
+    public function scopeUpcoming($query)
+    {
+        return $query->where('booking_date', '>=', today());
     }
 }

@@ -204,6 +204,8 @@ class BookingService
         return !$conflictSlot->exists();
     }
 
+
+
     /**
      * Mendapatkan slot tersedia dengan validasi real-time
      */
@@ -304,9 +306,6 @@ class BookingService
         ];
     }
 
-    /**
-     * Proses pembuatan booking dengan validasi lengkap
-     */
     public function createBooking(array $data, bool $isConfirmed = false): ?Booking
     {
         try {
@@ -316,6 +315,14 @@ class BookingService
             $startTime = Carbon::parse($data['start_time']);
             $endTime = Carbon::parse($data['end_time']);
             $field = Field::findOrFail($data['field_id']);
+
+            Log::info('Creating booking:', [
+                'field_id' => $data['field_id'],
+                'booking_date' => $bookingDate,
+                'start_time' => $startTime->format('H:i:s'),
+                'end_time' => $endTime->format('H:i:s'),
+                'is_confirmed' => $isConfirmed
+            ]);
 
             // Validasi waktu
             if ($startTime->gte($endTime)) {
@@ -327,13 +334,52 @@ class BookingService
                 throw new \Exception("Slot waktu tidak tersedia");
             }
 
-            $duration = $startTime->diffInHours($endTime);
-            $totalPrice = $field->price_per_hour * $duration;
+            // PERBAIKAN: Gunakan time_slots dari data jika tersedia, atau generate dari start/end time
+            $timeSlots = $data['time_slots'] ?? [];
+            
+            if (empty($timeSlots)) {
+                Log::info('Generating time slots from start/end time');
+                $currentTime = $startTime->copy();
+                while ($currentTime < $endTime) {
+                    $timeSlots[] = $currentTime->format('H:i:s');
+                    $currentTime->addHour();
+                }
+            }
 
-            // Generate booking code hanya untuk yang sudah dikonfirmasi
+            Log::info('Time slots for booking:', ['time_slots' => $timeSlots]);
+
+            // PERBAIKAN: Hitung total harga berdasarkan slot waktu dinamis
+            $totalPrice = 0;
+            $slotsData = [];
+            
+            foreach ($timeSlots as $slot) {
+                $hour = (int) Carbon::parse($slot)->format('H');
+                $slotPrice = $field->getPriceByTimeSlot($hour); // Gunakan harga dinamis
+                $totalPrice += $slotPrice;
+
+                $slotStartTime = Carbon::parse($bookingDate . ' ' . $slot);
+                $slotEndTime = $slotStartTime->copy()->addHour();
+
+                $slotsData[] = [
+                    'slot_time' => $slot,
+                    'start_time' => $slotStartTime,
+                    'end_time' => $slotEndTime,
+                    'price_per_slot' => $slotPrice
+                ];
+            }
+
+            $duration = count($timeSlots);
+
+            Log::info('Calculated booking totals:', [
+                'total_price' => $totalPrice,
+                'duration' => $duration,
+                'slots_count' => count($slotsData)
+            ]);
+
+            // Generate booking code
             $bookingCode = $isConfirmed
-                ? 'CASH-' . Carbon::now()->format('YmdHis') . '-' . strtoupper(uniqid())
-                : 'BK-' . strtoupper(Str::random(8));
+                ? 'BK-' . Carbon::now()->format('YmdHis') . '-' . strtoupper(uniqid())
+                : 'TEMP-' . strtoupper(Str::random(8));
 
             $bookingData = [
                 'field_id' => $field->id,
@@ -345,10 +391,10 @@ class BookingService
                 'start_time' => $startTime,
                 'end_time' => $endTime,
                 'duration_hours' => $duration,
-                'total_price' => $totalPrice,
+                'total_price' => $totalPrice, // PERBAIKAN: Gunakan harga dinamis
                 'payment_method' => $data['payment_method'],
                 'payment_status' => $isConfirmed ? 'settlement' : 'pending',
-                'status' => $isConfirmed ? 'booked' : 'pending',
+                'status' => $isConfirmed ? 'confirmed' : 'pending',
             ];
 
             $booking = Booking::create($bookingData);
@@ -357,35 +403,40 @@ class BookingService
                 throw new \Exception('Failed to create booking');
             }
 
-            Log::info('Booking created:', ['booking_id' => $booking->id]);
+            Log::info('Booking created successfully:', [
+                'booking_id' => $booking->id,
+                'booking_code' => $booking->booking_code,
+                'total_price' => $totalPrice
+            ]);
 
             // Selalu buat transaction record
             $this->createTransactionRecord($booking);
 
-            // Hanya buat slot jika booking dikonfirmasi
+            // PENTING: Buat slot dengan harga jika booking dikonfirmasi
             if ($isConfirmed) {
-                $this->createBookingSlots($booking);
+                $this->createBookingSlotsWithPrice($booking, $slotsData);
+                Log::info('Booking slots created with dynamic pricing');
             }
 
             // For online payment, create Midtrans transaction
-            if ($data['payment_method'] === 'online') {
+            if ($data['payment_method'] === 'online' && !$isConfirmed) {
                 $this->createMidtransTransaction($booking);
             }
 
             DB::commit();
-            Log::info('Booking process completed:', ['booking_id' => $booking->id]);
+            Log::info('Booking process completed successfully:', ['booking_id' => $booking->id]);
 
             return $booking;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Booking failed: ' . $e->getMessage());
+            Log::error('Booking creation failed: ' . $e->getMessage(), [
+                'data' => $data,
+                'stack_trace' => $e->getTraceAsString()
+            ]);
             return null;
         }
     }
 
-    /**
-     * Create transaction record for any booking
-     */
     /**
      * Create transaction record for any booking
      */
@@ -454,6 +505,9 @@ class BookingService
     /**
      * Create Midtrans transaction
      */
+    /**
+     * Create Midtrans transaction - LENGKAPI METHOD INI
+     */
     private function createMidtransTransaction($booking)
     {
         try {
@@ -465,8 +519,8 @@ class BookingService
                 'total_price' => (int)$booking->total_price,
                 'items' => [
                     [
-                        'id' => $booking->field->id,
-                        'name' => $booking->field->name,
+                        'id' => $booking->id,
+                        'name' => "Booking {$booking->field->name}",
                         'price' => (int)$booking->total_price,
                         'quantity' => 1
                     ]
@@ -475,17 +529,19 @@ class BookingService
 
             $midtransResponse = $this->midtransService->createTransaction($midtransData);
 
-            $booking->update([
-                'snap_token' => $midtransResponse['token'],
-                'booking_code' => $midtransResponse['order_id']
-            ]);
+            if ($midtransResponse) {
+                $booking->update([
+                    'snap_token' => $midtransResponse['token'],
+                    'order_id' => $midtransResponse['order_id']
+                ]);
+            }
 
-            Log::info('Midtrans transaction created:', [
-                'booking_id' => $booking->id,
-                'order_id' => $midtransResponse['order_id']
-            ]);
+            Log::info('Midtrans transaction created for booking:', ['booking_id' => $booking->id]);
         } catch (\Exception $e) {
-            Log::error('Midtrans transaction failed: ' . $e->getMessage());
+            Log::error('Failed to create Midtrans transaction:', [
+                'booking_id' => $booking->id,
+                'error' => $e->getMessage()
+            ]);
             throw $e;
         }
     }
@@ -521,5 +577,33 @@ class BookingService
             Log::error('Booking cancellation failed: ' . $e->getMessage());
             return false;
         }
+    }
+    private function createBookingSlotsWithPrice($booking, array $slotsData)
+    {
+        Log::info('Creating booking slots with price:', [
+            'booking_id' => $booking->id,
+            'slots_count' => count($slotsData)
+        ]);
+
+        foreach ($slotsData as $slotData) {
+            $bookingSlot = BookingSlot::create([
+                'booking_id' => $booking->id,
+                'field_id' => $booking->field_id,
+                'booking_date' => $booking->booking_date,
+                'slot_time' => $slotData['slot_time'],
+                'start_time' => $slotData['start_time'],
+                'end_time' => $slotData['end_time'],
+                'price_per_slot' => $slotData['price_per_slot'], // PENTING: Simpan harga per slot
+                'status' => 'booked'
+            ]);
+
+            Log::info('Booking slot created:', [
+                'slot_id' => $bookingSlot->id,
+                'slot_time' => $slotData['slot_time'],
+                'price_per_slot' => $slotData['price_per_slot']
+            ]);
+        }
+
+        Log::info('All booking slots created successfully for booking:', ['booking_id' => $booking->id]);
     }
 }

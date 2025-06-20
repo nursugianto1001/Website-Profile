@@ -97,7 +97,7 @@ class AdminBookingController extends Controller
     }
 
     /**
-     * Store a newly created booking in storage.
+     * Store a newly created booking in storage - DIPERBAIKI
      */
     public function store(Request $request)
     {
@@ -118,6 +118,9 @@ class AdminBookingController extends Controller
                     ->withErrors($validator)
                     ->withInput();
             }
+
+            // Get field for price calculation
+            $field = Field::findOrFail($request->field_id);
 
             // VALIDASI TAMBAHAN: Cek apakah waktu yang dipilih adalah slot member (17-19)
             $startHour = (int) Carbon::parse($request->start_time)->format('H');
@@ -146,44 +149,59 @@ class AdminBookingController extends Controller
                     ->withInput();
             }
 
+            // PERBAIKAN: Generate time slots untuk harga dinamis
+            $startTime = Carbon::parse($request->start_time);
+            $endTime = Carbon::parse($request->end_time);
+            $timeSlots = [];
+            
+            $current = $startTime->copy();
+            while ($current < $endTime) {
+                $timeSlots[] = $current->format('H:i:s');
+                $current->addHour();
+            }
+
+            Log::info('Admin creating booking with time slots:', [
+                'field_id' => $request->field_id,
+                'time_slots' => $timeSlots,
+                'start_time' => $request->start_time,
+                'end_time' => $request->end_time
+            ]);
+
             DB::beginTransaction();
 
             try {
                 // Determine if this is a direct confirmation (for cash payments)
                 $directConfirm = $request->payment_method === 'cash';
 
-                // Create booking
-                $booking = $this->bookingService->createBooking($request->all(), $directConfirm);
+                // PERBAIKAN: Create booking dengan time slots
+                $bookingData = $request->all();
+                $bookingData['time_slots'] = $timeSlots; // Tambahkan time slots untuk dynamic pricing
+                
+                $booking = $this->bookingService->createBooking($bookingData, $directConfirm);
 
                 if (!$booking) {
                     throw new \Exception('Gagal membuat booking');
                 }
 
-                // PERBAIKAN: Hanya buat transaction jika belum ada dan untuk cash payment
-                if ($directConfirm && $request->payment_method === 'cash') {
-                    // Cek dulu apakah sudah ada transaction
-                    if (!Transaction::existsForBooking($booking->id)) {
-                        Transaction::createForBooking($booking->id, [
-                            'order_id' => 'ADMIN-' . $booking->booking_code,
-                            'payment_type' => 'cash',
-                            'transaction_status' => 'settlement',
-                            'gross_amount' => $booking->total_price,
-                            'payment_channel' => 'cash_payment',
-                            'transaction_time' => now(),
-                        ]);
-                    }
-                }
+                Log::info('Admin booking created successfully:', [
+                    'booking_id' => $booking->id,
+                    'total_price' => $booking->total_price,
+                    'slots_count' => $booking->slots ? $booking->slots->count() : 0
+                ]);
 
                 DB::commit();
 
                 return redirect()->route('admin.bookings.index')
-                    ->with('success', 'Booking berhasil dibuat');
+                    ->with('success', 'Booking berhasil dibuat dengan total harga Rp ' . number_format($booking->total_price, 0, ',', '.'));
             } catch (\Exception $e) {
                 DB::rollBack();
                 throw $e;
             }
         } catch (\Exception $e) {
-            Log::error('AdminBookingController store error: ' . $e->getMessage());
+            Log::error('AdminBookingController store error: ' . $e->getMessage(), [
+                'request_data' => $request->all(),
+                'stack_trace' => $e->getTraceAsString()
+            ]);
             return redirect()->back()
                 ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
                 ->withInput();
@@ -276,40 +294,94 @@ class AdminBookingController extends Controller
     }
 
     /**
-     * Update booking payment status.
+     * Update booking payment status - DIPERBAIKI
      */
     public function updateStatus(Request $request, Booking $booking)
     {
         try {
-            $validated = $request->validate([
+            $validator = Validator::make($request->all(), [
                 'status' => 'required|in:pending,settlement,expired,cancel',
             ]);
 
-            $booking->update(['payment_status' => $validated['status']]);
-
-            // Update booking slots status accordingly
-            if ($validated['status'] === 'settlement') {
-                $booking->slots()->update(['status' => 'booked']);
-
-                // Update transaction if exists
-                if ($booking->transaction) {
-                    $booking->transaction->update(['transaction_status' => 'settlement']);
-                }
-            } elseif (in_array($validated['status'], ['expired', 'cancel'])) {
-                $booking->slots()->update(['status' => 'cancelled']);
-
-                // Update transaction if exists
-                if ($booking->transaction) {
-                    $booking->transaction->update(['transaction_status' => $validated['status']]);
-                }
+            if ($validator->fails()) {
+                return redirect()->back()
+                    ->withErrors($validator)
+                    ->withInput();
             }
 
-            return redirect()->route('admin.bookings.index')
-                ->with('success', 'Status booking berhasil diperbarui');
+            $oldStatus = $booking->payment_status;
+            $newStatus = $request->input('status');
+
+            Log::info('Admin updating booking status:', [
+                'booking_id' => $booking->id,
+                'old_status' => $oldStatus,
+                'new_status' => $newStatus,
+                'admin_action' => true
+            ]);
+
+            DB::beginTransaction();
+
+            try {
+                // Update booking status
+                $booking->update(['payment_status' => $newStatus]);
+
+                // Update booking slots status accordingly
+                if ($newStatus === 'settlement') {
+                    $booking->slots()->update(['status' => 'booked']);
+
+                    // Update or create transaction if not exists
+                    if ($booking->transaction) {
+                        $booking->transaction->update(['transaction_status' => 'settlement']);
+                    } else {
+                        // Create transaction for admin confirmation
+                        Transaction::createForBooking($booking->id, [
+                            'order_id' => 'ADMIN-CONFIRM-' . $booking->booking_code,
+                            'payment_type' => 'admin_confirmation',
+                            'transaction_status' => 'settlement',
+                            'gross_amount' => $booking->total_price,
+                            'payment_channel' => 'admin_confirm',
+                            'transaction_time' => now(),
+                        ]);
+                    }
+                } elseif (in_array($newStatus, ['expired', 'cancel'])) {
+                    $booking->slots()->update(['status' => 'cancelled']);
+
+                    // Update transaction if exists
+                    if ($booking->transaction) {
+                        $booking->transaction->update(['transaction_status' => $newStatus]);
+                    }
+                }
+
+                DB::commit();
+
+                $statusText = [
+                    'settlement' => 'dikonfirmasi',
+                    'expired' => 'kadaluarsa',
+                    'cancel' => 'dibatalkan',
+                    'pending' => 'pending'
+                ];
+
+                Log::info('Admin booking status updated successfully:', [
+                    'booking_id' => $booking->id,
+                    'new_status' => $newStatus,
+                    'slots_updated' => $booking->slots->count()
+                ]);
+
+                return redirect()->route('admin.bookings.show', $booking->id)
+                    ->with('success', 'Status booking berhasil ' . ($statusText[$newStatus] ?? 'diperbarui'));
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+
         } catch (\Exception $e) {
-            Log::error('AdminBookingController updateStatus error: ' . $e->getMessage());
-            return redirect()->back()
-                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            Log::error('AdminBookingController updateStatus error: ' . $e->getMessage(), [
+                'booking_id' => $booking->id,
+                'request_data' => $request->all(),
+                'stack_trace' => $e->getTraceAsString()
+            ]);
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 

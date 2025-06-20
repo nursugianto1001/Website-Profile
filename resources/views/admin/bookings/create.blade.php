@@ -309,24 +309,142 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // JavaScript untuk form booking reguler (tetap sama)
+        // JavaScript untuk form booking reguler dengan dynamic pricing
         const startTimeSelect = document.getElementById('start_time');
         const endTimeSelect = document.getElementById('end_time');
+        const fieldSelect = document.getElementById('field_id');
+
+        // PERBAIKAN: Dynamic pricing calculation
+        function getPriceByHour(hour) {
+            const hourInt = parseInt(hour);
+            if (hourInt >= 6 && hourInt < 12) {
+                return 40000; // Pagi: 06:00-12:00
+            } else if (hourInt >= 12 && hourInt < 17) {
+                return 25000; // Siang: 12:00-17:00
+            } else if (hourInt >= 17 && hourInt < 23) {
+                return 60000; // Malam: 17:00-23:00
+            }
+            return 40000; // Default
+        }
+
+        function calculateTotalPrice() {
+            const startTime = startTimeSelect.value;
+            const endTime = endTimeSelect.value;
+            
+            if (startTime && endTime) {
+                const startHour = parseInt(startTime.split(':')[0]);
+                const endHour = parseInt(endTime.split(':')[0]);
+                
+                let totalPrice = 0;
+                let priceBreakdown = '';
+                
+                for (let hour = startHour; hour < endHour; hour++) {
+                    const slotPrice = getPriceByHour(hour);
+                    totalPrice += slotPrice;
+                    const nextHour = hour + 1;
+                    priceBreakdown += `${hour.toString().padStart(2, '0')}:00-${nextHour.toString().padStart(2, '0')}:00: Rp ${slotPrice.toLocaleString('id-ID')}\n`;
+                }
+                
+                // Update price display
+                updatePriceDisplay(totalPrice, priceBreakdown);
+            } else {
+                updatePriceDisplay(0, '');
+            }
+        }
+
+        function updatePriceDisplay(totalPrice, breakdown) {
+            // Create or update price display
+            let priceContainer = document.getElementById('price-display');
+            if (!priceContainer) {
+                priceContainer = document.createElement('div');
+                priceContainer.id = 'price-display';
+                priceContainer.className = 'mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg';
+                
+                // Insert after payment method section
+                const paymentSection = document.querySelector('input[name="payment_method"]').closest('.space-y-4');
+                paymentSection.parentNode.insertBefore(priceContainer, paymentSection.nextSibling);
+            }
+            
+            if (totalPrice > 0) {
+                priceContainer.innerHTML = `
+                    <h4 class="text-sm font-medium text-blue-800 mb-2">Estimasi Harga</h4>
+                    <div class="text-xs text-blue-600 space-y-1 mb-2">
+                        ${breakdown.split('\n').filter(line => line.trim()).map(line => `<div>${line}</div>`).join('')}
+                    </div>
+                    <div class="border-t border-blue-200 pt-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium text-blue-800">Total:</span>
+                            <span class="text-lg font-bold text-blue-900">Rp ${totalPrice.toLocaleString('id-ID')}</span>
+                        </div>
+                    </div>
+                `;
+                priceContainer.style.display = 'block';
+            } else {
+                priceContainer.style.display = 'none';
+            }
+        }
 
         startTimeSelect.addEventListener('change', function() {
             const selectedStartHour = parseInt(this.value.split(':')[0]);
             endTimeSelect.innerHTML = '<option value="">Pilih Waktu</option>';
 
+            // PERBAIKAN: Block member slots (17-19) untuk admin booking
             for (let hour = selectedStartHour + 1; hour <= 24; hour++) {
+                // Skip member slots
+                if (selectedStartHour < 17 && hour > 17) {
+                    // If start is before 17, end should not go beyond 17
+                    break;
+                }
+                
                 const option = document.createElement('option');
                 option.value = `${hour.toString().padStart(2, '0')}:00:00`;
                 option.textContent = `${hour.toString().padStart(2, '0')}:00`;
+                
+                // Add warning for member slots
+                if (hour >= 17 && hour <= 20) {
+                    option.textContent += ' (Member Only)';
+                    option.disabled = true;
+                    option.style.color = '#dc2626';
+                }
+                
                 endTimeSelect.appendChild(option);
             }
             endTimeSelect.value = '';
+            calculateTotalPrice();
         });
 
-        // JavaScript untuk form member booking
+        endTimeSelect.addEventListener('change', calculateTotalPrice);
+
+        // PERBAIKAN: Validate member slots
+        function validateTimeSlots() {
+            const startTime = startTimeSelect.value;
+            const endTime = endTimeSelect.value;
+            
+            if (startTime && endTime) {
+                const startHour = parseInt(startTime.split(':')[0]);
+                const endHour = parseInt(endTime.split(':')[0]);
+                
+                // Check if any hour in range is member slot
+                for (let hour = startHour; hour < endHour; hour++) {
+                    if (hour >= 17 && hour < 20) {
+                        alert('Slot jam 17:00-20:00 khusus untuk member. Gunakan form Member Booking di bawah untuk slot ini.');
+                        endTimeSelect.value = '';
+                        calculateTotalPrice();
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        // Add validation to form submit
+        document.querySelector('form').addEventListener('submit', function(e) {
+            if (!validateTimeSlots()) {
+                e.preventDefault();
+            }
+        });
+
+        // JavaScript untuk form member booking dengan dynamic pricing
         const memberStartTimeSelect = document.getElementById('member_start_time');
         const memberEndTimeSelect = document.getElementById('member_end_time');
         const memberFieldSelect = document.getElementById('member_field_id');
@@ -335,12 +453,15 @@
         const memberTotalPriceDisplay = document.getElementById('member_total_price_display');
         const memberTotalPrice = document.getElementById('member_total_price');
 
+        // PERBAIKAN: Member pricing (fixed rate for member slots)
+        const MEMBER_PRICE_PER_HOUR = 50000; // Fixed price for member slots
+
         // Update end time options based on start time for member booking
         memberStartTimeSelect.addEventListener('change', function() {
             const selectedStartHour = parseInt(this.value.split(':')[0]);
             memberEndTimeSelect.innerHTML = '<option value="">Pilih Waktu Selesai</option>';
 
-            // Batasi end time hingga maksimal jam 20:00 (karena slot member 17-19)
+            // Batasi end time hingga maksimal jam 20:00 (karena slot member 17-20)
             const maxEndHour = Math.min(20, 24);
 
             for (let hour = selectedStartHour + 1; hour <= maxEndHour; hour++) {
@@ -367,8 +488,9 @@
                 const startHour = parseInt(startTime.split(':')[0]);
                 const endHour = parseInt(endTime.split(':')[0]);
                 const duration = endHour - startHour;
-                const pricePerHour = parseFloat(fieldOption.dataset.price) || 0;
-                const totalPrice = duration * pricePerHour;
+                
+                // PERBAIKAN: Use member pricing
+                const totalPrice = duration * MEMBER_PRICE_PER_HOUR;
 
                 // Update display
                 memberDurationDisplay.textContent = `${duration} jam`;

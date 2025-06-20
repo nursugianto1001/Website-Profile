@@ -251,13 +251,58 @@
                 </div>
             </div>
 
-            <!-- Slot Booking Information -->
+            <!-- Booking Slots Information -->
             <div class="mt-8">
                 <h3 class="text-lg font-semibold text-indigo-800 mb-4 flex items-center">
                     <i class="bi bi-clock mr-2 text-indigo-600"></i>
-                    Booking Slots
+                    Booking Slots & Price Breakdown
                 </h3>
 
+                @if($booking->slots && $booking->slots->count() > 0)
+                <!-- Price Breakdown from Slots -->
+                <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                    <h4 class="text-sm font-medium text-gray-700 mb-3">Rincian Harga Berdasarkan Booking Slots:</h4>
+                    <div class="space-y-2">
+                        @foreach($booking->slots as $slot)
+                        <div class="flex justify-between items-center py-2 border-b border-gray-200 last:border-b-0">
+                            <div>
+                                <span class="text-sm text-gray-900">
+                                    {{ \Carbon\Carbon::parse($slot->slot_time)->format('H:i') }}-{{ \Carbon\Carbon::parse($slot->slot_time)->addHour()->format('H:i') }}
+                                </span>
+                                @php
+                                    $hour = \Carbon\Carbon::parse($slot->slot_time)->format('H');
+                                    if($hour >= 6 && $hour < 12) {
+                                        $period = 'Pagi';
+                                        $periodClass = 'bg-yellow-100 text-yellow-800';
+                                    } elseif($hour >= 12 && $hour < 17) {
+                                        $period = 'Siang';
+                                        $periodClass = 'bg-green-100 text-green-800';
+                                    } else {
+                                        $period = 'Malam';
+                                        $periodClass = 'bg-purple-100 text-purple-800';
+                                    }
+                                @endphp
+                                <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ $periodClass }}">
+                                    {{ $period }}
+                                </span>
+                            </div>
+                            <span class="text-sm font-medium text-gray-900">
+                                Rp {{ number_format($slot->price_per_slot ?? 0, 0, ',', '.') }}
+                            </span>
+                        </div>
+                        @endforeach
+                    </div>
+                    <div class="border-t border-gray-300 pt-3 mt-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-semibold text-gray-900">Total dari Slots:</span>
+                            <span class="text-sm font-bold text-indigo-600">
+                                Rp {{ number_format($booking->slots->sum('price_per_slot'), 0, ',', '.') }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slots Table -->
                 <div class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-100">
@@ -269,19 +314,25 @@
                                     Waktu
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Harga per Slot
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Status
                                 </th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            @forelse($booking->slots as $slot)
+                            @foreach($booking->slots as $slot)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                     #{{ $slot->id }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ \Carbon\Carbon::parse($slot->start_time)->format('H:i') }} -
-                                    {{ \Carbon\Carbon::parse($slot->end_time)->format('H:i') }}
+                                    {{ \Carbon\Carbon::parse($slot->slot_time)->format('H:i') }} - 
+                                    {{ \Carbon\Carbon::parse($slot->slot_time)->addHour()->format('H:i') }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    Rp {{ number_format($slot->price_per_slot ?? 0, 0, ',', '.') }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     @if($slot->status == 'booked')
@@ -303,16 +354,72 @@
                                     @endif
                                 </td>
                             </tr>
-                            @empty
-                            <tr>
-                                <td colspan="3" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
-                                    Tidak ada data slot booking
-                                </td>
-                            </tr>
-                            @endforelse
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
+                @else
+                <!-- Fallback: Estimated Breakdown -->
+                <div class="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                    <h4 class="text-sm font-medium text-yellow-800 mb-3">Estimasi Breakdown Harga (Tidak ada data slots):</h4>
+                    <div class="space-y-2">
+                        @php
+                            $startHour = \Carbon\Carbon::parse($booking->start_time)->format('H');
+                            $endHour = \Carbon\Carbon::parse($booking->end_time)->format('H');
+                            $totalEstimated = 0;
+                        @endphp
+                        @for($hour = $startHour; $hour < $endHour; $hour++)
+                            @php
+                                $nextHour = $hour + 1;
+                                // Calculate price based on time slot
+                                if($hour >= 6 && $hour < 12) {
+                                    $slotPrice = 40000;
+                                    $period = 'Pagi';
+                                    $periodClass = 'bg-yellow-100 text-yellow-800';
+                                } elseif($hour >= 12 && $hour < 17) {
+                                    $slotPrice = 25000;
+                                    $period = 'Siang';
+                                    $periodClass = 'bg-green-100 text-green-800';
+                                } else {
+                                    $slotPrice = 60000;
+                                    $period = 'Malam';
+                                    $periodClass = 'bg-purple-100 text-purple-800';
+                                }
+                                $totalEstimated += $slotPrice;
+                            @endphp
+                            <div class="flex justify-between items-center py-2 border-b border-yellow-200 last:border-b-0">
+                                <div>
+                                    <span class="text-sm text-yellow-900">
+                                        {{ sprintf('%02d:00-%02d:00', $hour, $nextHour) }}
+                                    </span>
+                                    <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ $periodClass }}">
+                                        {{ $period }}
+                                    </span>
+                                </div>
+                                <span class="text-sm font-medium text-yellow-900">
+                                    Rp {{ number_format($slotPrice, 0, ',', '.') }}
+                                </span>
+                            </div>
+                        @endfor
+                    </div>
+                    <div class="border-t border-yellow-300 pt-3 mt-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-semibold text-yellow-900">Total Estimasi:</span>
+                            <span class="text-sm font-bold text-yellow-800">
+                                Rp {{ number_format($totalEstimated, 0, ',', '.') }}
+                            </span>
+                        </div>
+                        @if($totalEstimated != $booking->total_price)
+                        <p class="text-xs text-yellow-700 mt-2">
+                            <i class="bi bi-info-circle mr-1"></i>
+                            Harga estimasi berbeda dengan total booking (Rp {{ number_format($booking->total_price, 0, ',', '.') }}). 
+                            Ini mungkin karena booking dibuat sebelum sistem dynamic pricing.
+                        </p>
+                        @endif
+                    </div>
+                </div>
+                @endif
+
                 <p class="text-xs text-gray-500 mt-2">
                     <i class="bi bi-info-circle"></i>
                     Status slot akan otomatis diperbarui saat mengubah status pembayaran booking.

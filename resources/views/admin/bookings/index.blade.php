@@ -133,7 +133,7 @@
                                 <th scope="col" class="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-indigo-800 uppercase tracking-wider">Pelanggan</th>
                                 <th scope="col" class="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-indigo-800 uppercase tracking-wider hidden md:table-cell">Lapangan</th>
                                 <th scope="col" class="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-indigo-800 uppercase tracking-wider">Tanggal & Waktu</th>
-                                <th scope="col" class="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-indigo-800 uppercase tracking-wider hidden lg:table-cell">Total</th>
+                                <th scope="col" class="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-indigo-800 uppercase tracking-wider hidden lg:table-cell">Total & Breakdown</th>
                                 <th scope="col" class="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-indigo-800 uppercase tracking-wider">Status</th>
                                 <th scope="col" class="px-3 sm:px-6 py-3 sm:py-4 text-right text-xs font-bold text-indigo-800 uppercase tracking-wider">Aksi</th>
                             </tr>
@@ -176,6 +176,40 @@
                                 <td class="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap hidden lg:table-cell">
                                     <div class="text-xs sm:text-sm text-gray-900 font-medium">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</div>
                                     <div class="text-xs text-gray-500">{{ $booking->duration_hours }} jam</div>
+                                    
+                                    @if($booking->slots && $booking->slots->count() > 0)
+                                    <!-- Show dynamic pricing breakdown -->
+                                    <div class="mt-1">
+                                        <button class="text-xs text-indigo-600 hover:text-indigo-800" 
+                                                onclick="toggleBreakdown('breakdown-{{ $booking->id }}')"
+                                                type="button">
+                                            <i class="bi bi-eye text-xs mr-1"></i>Lihat Breakdown
+                                        </button>
+                                        <div id="breakdown-{{ $booking->id }}" class="hidden mt-2 p-2 bg-gray-50 rounded text-xs">
+                                            @foreach($booking->slots->take(3) as $slot)
+                                            <div class="flex justify-between">
+                                                <span>{{ \Carbon\Carbon::parse($slot->slot_time)->format('H:i') }}:</span>
+                                                <span>Rp {{ number_format($slot->price_per_slot ?? 0, 0, ',', '.') }}</span>
+                                            </div>
+                                            @endforeach
+                                            @if($booking->slots->count() > 3)
+                                            <div class="text-center text-gray-500 mt-1">
+                                                +{{ $booking->slots->count() - 3 }} slot lainnya
+                                            </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    @else
+                                    <!-- Fallback for old bookings without slots -->
+                                    <div class="text-xs text-gray-500">
+                                        @php
+                                            $startHour = \Carbon\Carbon::parse($booking->start_time)->format('H');
+                                            $endHour = \Carbon\Carbon::parse($booking->end_time)->format('H');
+                                            $avgPrice = $booking->total_price / ($endHour - $startHour);
+                                        @endphp
+                                        ~Rp {{ number_format($avgPrice, 0, ',', '.') }}/jam
+                                    </div>
+                                    @endif
                                 </td>
                                 <td class="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                                     @if($booking->payment_status == 'settlement')
@@ -240,3 +274,14 @@
         </div>
     </div>
 @endsection
+
+<script>
+function toggleBreakdown(elementId) {
+    const element = document.getElementById(elementId);
+    if (element.classList.contains('hidden')) {
+        element.classList.remove('hidden');
+    } else {
+        element.classList.add('hidden');
+    }
+}
+</script>

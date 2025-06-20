@@ -28,12 +28,10 @@ Route::post('/booking/process-multiple', [BookingPageController::class, 'process
 
 // Rute yang diamankan dengan signed URL
 Route::get('/booking/{booking}/success', [BookingPageController::class, 'bookingSuccess'])
-    ->name('booking.success')
-    ->middleware('signed');
+    ->name('booking.success');
 
 Route::get('/booking/{booking}/payment', [BookingPageController::class, 'payment'])
-    ->name('booking.payment')
-    ->middleware('signed');
+    ->name('booking.payment');
 
 // Rute payment yang memerlukan validasi session
 Route::get('/payment/finish', [BookingPageController::class, 'finishPayment'])->name('payment.finish');
@@ -42,6 +40,12 @@ Route::get('/payment/error', [BookingPageController::class, 'errorPayment'])->na
 
 // Webhook Midtrans - tidak perlu signed karena diakses oleh Midtrans
 Route::post('/payment/notification', [BookingPageController::class, 'handlePaymentNotification']);
+
+Route::get('/booking/payment/pending', [BookingPageController::class, 'paymentPending'])->name('booking.payment.pending');
+Route::get('/payment/success-handler', [BookingPageController::class, 'handlePaymentSuccess'])->name('payment.success.handler');
+Route::get('/payment/pending-handler', [BookingPageController::class, 'handlePaymentPending'])->name('payment.pending.handler');
+
+
 
 // Auth Routes
 require __DIR__ . '/auth.php';
@@ -66,6 +70,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     // New Booking System Admin Routes
     Route::resource('fields', AdminFieldController::class);
     Route::resource('bookings', AdminBookingController::class);
+    Route::put('bookings/{booking}/update-status', [AdminBookingController::class, 'updateStatus'])->name('bookings.update-status');
     Route::put('bookings/{booking}/cancel', [AdminBookingController::class, 'cancel'])->name('bookings.cancel');
     Route::get('/admin/transactions/export', [AdminTransactionController::class, 'export'])
         ->name('transactions.export');

@@ -50,6 +50,40 @@
         z-index: 1000;
         pointer-events: none;
     }
+
+    /* Loading state untuk slot */
+    .slot-loading {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+    }
+
+    @keyframes loading {
+        0% {
+            background-position: 200% 0;
+        }
+
+        100% {
+            background-position: -200% 0;
+        }
+    }
+
+    /* Success message styling */
+    .success-message {
+        animation: slideDown 0.5s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 </style>
 
 <body class="bg-[#fdf8f2]">
@@ -333,32 +367,6 @@
                         </div>
                     </div>
                 </label>
-
-                <!-- <label
-                    class="block p-4 border rounded-lg transition-all hover:border-blue-300 hover:bg-blue-50 cursor-pointer">
-                    <div class="flex items-center">
-                        <input type="radio" name="payment_method" value="cash"
-                            class="h-5 w-5 text-[#A66E38] focus:ring-[#A66E38]">
-                        <div class="ml-3 flex-1">
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-800 font-medium">Pembayaran Tunai</span>
-                                <div class="flex items-center text-xs text-white bg-[#A66E38] px-2 py-1 rounded-full">
-                                    Hanya Hari Ini
-                                </div>
-                            </div>
-                            <p class="text-gray-500 text-sm mt-1">Bayar tunai saat Anda tiba di tempat (Pembayaran
-                                tunai hanya tersedia untuk pemesanan hari ini)</p>
-                            <div class="mt-2 text-sm text-[#A66E38]">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                Catatan: Pembayaran tunai mengharuskan Anda tiba 15 menit sebelum waktu pemesanan Anda
-                            </div>
-                        </div>
-                    </div>
-                </label> -->
             </div>
         </div>
 
@@ -416,6 +424,181 @@
                 fieldPrices[field.id] = field.price_per_hour;
             });
 
+            // ===== CACHE MANAGEMENT FUNCTIONS =====
+            function clearAllCaches() {
+                // Clear browser caches
+                if ('caches' in window) {
+                    caches.keys().then(function(names) {
+                        names.forEach(function(name) {
+                            caches.delete(name);
+                        });
+                    });
+                }
+
+                // Clear localStorage and sessionStorage
+                if (typeof(Storage) !== "undefined") {
+                    localStorage.removeItem('fieldAvailability');
+                    localStorage.removeItem('lastFetchTime');
+                    sessionStorage.clear();
+                }
+
+                // Clear any cached availability data
+                fieldAvailability = {};
+            }
+
+            function forceRefreshAvailability(date = null) {
+                const targetDate = date || currentDate;
+
+                // Clear caches first
+                clearAllCaches();
+
+                // Clear error container
+                document.getElementById("error-container")?.classList.add("hidden");
+
+                // Add cache-busting parameter
+                const timestamp = new Date().getTime();
+                const url = `/api/all-available-slots?date=${targetDate}&_t=${timestamp}&_refresh=true`;
+
+                console.log('Force refreshing availability for date:', targetDate);
+
+                fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Cache-Control': 'no-cache, no-store, must-revalidate',
+                            'Pragma': 'no-cache',
+                            'Expires': '0'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            fieldAvailability = data.fieldAvailability;
+                            renderTimeSlots();
+                            updateSelectedSlotsDisplay();
+                            updateBookingSummary();
+                            updateTotalPrice();
+                            console.log('Availability refreshed successfully');
+                        } else {
+                            throw new Error("API returned success: false");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error force refreshing availability:", error);
+                        const errorContainer = document.getElementById("error-container");
+                        if (errorContainer) {
+                            document.getElementById("error-message").textContent =
+                                "Gagal memuat data terbaru. Silakan refresh halaman.";
+                            errorContainer.classList.remove("hidden");
+                        }
+                    });
+            }
+
+            // Update fetchAvailability function dengan cache busting
+            function fetchAvailability(date) {
+                document.getElementById("error-container")?.classList.add("hidden");
+
+                // Add cache-busting parameter
+                const timestamp = new Date().getTime();
+                const url = `/api/all-available-slots?date=${date}&_t=${timestamp}`;
+
+                fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Cache-Control': 'no-cache, no-store, must-revalidate',
+                            'Pragma': 'no-cache',
+                            'Expires': '0'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            fieldAvailability = data.fieldAvailability;
+                            renderTimeSlots();
+                            updateSelectedSlotsDisplay();
+                            updateBookingSummary();
+                            updateTotalPrice();
+                        } else {
+                            throw new Error("API returned success: false");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error fetching availability:", error);
+                        const errorContainer = document.getElementById("error-container");
+                        if (errorContainer) {
+                            document.getElementById("error-message").textContent =
+                                "Gagal mengambil data slot. Silakan refresh halaman.";
+                            errorContainer.classList.remove("hidden");
+                        }
+                    });
+            }
+
+            // Auto-refresh function untuk real-time updates
+            function setupAutoRefresh() {
+                const today = new Date().toISOString().split('T')[0];
+
+                // Refresh setiap 30 detik jika tanggal hari ini
+                if (currentDate === today) {
+                    setInterval(function() {
+                        console.log('Auto-refreshing availability...');
+                        forceRefreshAvailability(currentDate);
+                    }, 30000); // 30 seconds
+                }
+            }
+
+            // Handle browser back/forward navigation
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    console.log('Page loaded from cache, force refreshing...');
+                    forceRefreshAvailability(currentDate);
+                }
+            });
+
+            // Handle visibility change (when user switches tabs)
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden) {
+                    console.log('Page became visible, refreshing availability...');
+                    forceRefreshAvailability(currentDate);
+                }
+            });
+
+            // Handle focus event (when user returns to page)
+            window.addEventListener('focus', function() {
+                console.log('Window focused, refreshing availability...');
+                setTimeout(() => {
+                    forceRefreshAvailability(currentDate);
+                }, 500);
+            });
+
+            // Handle mobile touch events
+            let touchStartTime = 0;
+            document.addEventListener('touchstart', function() {
+                touchStartTime = Date.now();
+            });
+
+            document.addEventListener('touchend', function() {
+                const touchDuration = Date.now() - touchStartTime;
+                // If quick tap (less than 200ms), refresh availability
+                if (touchDuration < 200) {
+                    setTimeout(() => {
+                        forceRefreshAvailability(currentDate);
+                    }, 100);
+                }
+            });
+
+            // Handle orientation change
+            window.addEventListener('orientationchange', function() {
+                setTimeout(() => {
+                    console.log('Orientation changed, refreshing...');
+                    forceRefreshAvailability(currentDate);
+                }, 500);
+            });
+
             function generateMonthlyDates() {
                 const monthlyDates = [];
                 const today = new Date();
@@ -457,7 +640,7 @@
                 dateContainer.appendChild(dateButton);
             });
 
-            // Event listener untuk tombol tanggal
+            // Event listener untuk tombol tanggal - UPDATED
             document.querySelectorAll('.date-selector').forEach(button => {
                 button.addEventListener('click', function() {
                     // Reset semua tombol ke warna default
@@ -480,8 +663,9 @@
                     // Clear selections saat ganti tanggal
                     clearAllSelections();
 
-                    // Muat ulang ketersediaan lapangan untuk tanggal yang dipilih
-                    fetchAvailability(currentDate);
+                    // UPDATED: Force refresh dengan cache clearing
+                    console.log('Date changed, force refreshing availability...');
+                    forceRefreshAvailability(currentDate);
                 });
             });
 
@@ -494,28 +678,25 @@
                 const th = document.createElement('th');
                 th.className = 'border px-4 py-3 bg-gray-50';
                 th.innerHTML = `
-                    <div class="flex flex-col items-center">
-                        <div class="flex items-center mb-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                            </svg>
-                            <span class="font-medium text-gray-800">${field.name}</span>
-                        </div>
-                        <div class="text-sm text-blue-600 font-medium mb-1">
-                            Rp ${field.price_per_hour.toLocaleString('id-ID')}/jam
-                        </div>
-                        <label class="flex items-center bg-gray-100 px-2 py-1 rounded-full text-xs hover:bg-gray-200 cursor-pointer transition-colors">
-                            <input type="checkbox" class="mr-1 field-checkbox"
-                                id="field_${field.id}"
-                                data-field-id="${field.id}"
-                                data-field-name="${field.name}"
-                                data-field-price="${field.price_per_hour}"
-                                name="selected_fields[]"
-                                value="${field.id}">
-                            <span class="text-gray-600">Pilih</span>
-                        </label>
-                    </div>
-                `;
+        <div class="flex flex-col items-center">
+            <div class="flex items-center mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                </svg>
+                <span class="font-medium text-gray-800">${field.name}</span>
+            </div>
+            <label class="flex items-center bg-gray-100 px-2 py-1 rounded-full text-xs hover:bg-gray-200 cursor-pointer transition-colors">
+                <input type="checkbox" class="mr-1 field-checkbox"
+                    id="field_${field.id}"
+                    data-field-id="${field.id}"
+                    data-field-name="${field.name}"
+                    data-field-price="${field.price_per_hour}"
+                    name="selected_fields[]"
+                    value="${field.id}">
+                <span class="text-gray-600">Pilih</span>
+            </label>
+        </div>
+    `;
                 tableHeader.appendChild(th);
             });
 
@@ -527,24 +708,57 @@
                 return `${hours}:${startMin}-${String(endHour).padStart(2, '0')}:${startMin}`;
             }
 
+            function getPriceByHour(hour) {
+                // Pastikan hour adalah integer
+                const hourInt = parseInt(hour);
+
+                if (isNaN(hourInt)) {
+                    console.error('Invalid hour:', hour);
+                    return 40000; // Default fallback
+                }
+
+                if (hourInt >= 6 && hourInt < 12) {
+                    return 40000; // Pagi: 06:00-12:00
+                } else if (hourInt >= 12 && hourInt < 17) {
+                    return 25000; // Siang: 12:00-17:00
+                } else if (hourInt >= 17 && hourInt < 23) {
+                    return 60000; // Malam: 17:00-23:00
+                }
+
+                console.warn('Hour outside range:', hourInt);
+                return 40000; // Default fallback
+            }
+
+
             function renderTimeSlots() {
                 const tableBody = document.getElementById('booking-table-body');
                 tableBody.innerHTML = '';
 
                 slots.forEach(slot => {
                     const tr = document.createElement('tr');
+                    const slotHour = parseInt(slot.time.split(':')[0]);
+                    const slotPrice = getPriceByHour(slotHour); // Pastikan fungsi ini return angka yang valid
 
-                    // Kolom waktu
+                    // Kolom waktu dengan harga
                     const tdTime = document.createElement('td');
                     tdTime.className = 'border px-4 py-3 text-sm font-medium text-gray-700 bg-gray-50';
                     tdTime.innerHTML = `
-                        <div class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            ${formatTimeRange(slot.time)}
-                        </div>
-                    `;
+            <div class="flex flex-col items-center">
+                <div class="flex items-center mb-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span class="font-semibold">${formatTimeRange(slot.time)}</span>
+                </div>
+                <div class="text-xs font-medium px-2 py-1 rounded-full ${
+                    slotHour >= 6 && slotHour < 12 ? 'bg-yellow-100 text-yellow-800' :
+                    slotHour >= 12 && slotHour < 17 ? 'bg-green-100 text-green-800' :
+                    'bg-purple-100 text-purple-800'
+                }">
+                    Rp ${slotPrice.toLocaleString('id-ID')}
+                </div>
+            </div>
+        `;
                     tr.appendChild(tdTime);
 
                     // Kolom untuk setiap lapangan
@@ -557,67 +771,44 @@
                         td.className = 'p-2 border';
                         td.setAttribute('data-field-id', field.id);
                         td.setAttribute('data-time-slot', slot.time);
+                        td.setAttribute('data-slot-price', slotPrice);
 
                         const div = document.createElement('div');
                         div.className = 'flex flex-col items-center justify-center rounded-md text-xs font-medium h-12 transition duration-200 shadow-sm';
 
                         if (isSelected) {
-                            // Slot terpilih
                             div.classList.add('bg-blue-500', 'text-white', 'border', 'border-blue-600');
                             div.innerHTML = `
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                </svg>
-                                <span>Terpilih</span>
-                            `;
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Terpilih</span>
+                `;
                             td.setAttribute('data-available', 'true');
                             td.classList.add('time-slot');
                         } else if (slotData && slotData.available) {
-                            // Slot tersedia
                             div.classList.add('bg-green-100', 'hover:bg-green-200', 'text-green-800', 'cursor-pointer', 'border', 'border-green-200', 'hover:border-green-300');
                             div.innerHTML = `
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                </svg>
-                                <span>Tersedia</span>
-                            `;
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    <span>Tersedia</span>
+                `;
                             td.setAttribute('data-available', 'true');
                             td.classList.add('time-slot');
                         } else {
-                            // Slot tidak tersedia - tampilkan nama customer/member
                             const customerName = slotData?.customer_name || 'Tidak Tersedia';
-                            const displayName = customerName.length > 12 ? 
-                                              customerName.substring(0, 12) + '...' : customerName;
+                            const displayName = customerName.length > 12 ?
+                                customerName.substring(0, 12) + '...' : customerName;
 
-                            // Tentukan warna berdasarkan tipe booking
-                            let bgColor = 'bg-red-100';
-                            let textColor = 'text-red-600';
-                            let borderColor = 'border-red-200';
-                            let icon = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />`;
-
-                            // Jika ini adalah slot member (jam 17-19)
-                            if (slotData?.type === 'member_manual') {
-                                bgColor = 'bg-yellow-100';
-                                textColor = 'text-yellow-700';
-                                borderColor = 'border-yellow-200';
-                                icon = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />`;
-                            }
-
-                            div.classList.add(bgColor, textColor, 'cursor-not-allowed', 'border', borderColor);
+                            div.classList.add('bg-red-100', 'text-red-600', 'cursor-not-allowed', 'border', 'border-red-200');
                             div.innerHTML = `
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    ${icon}
-                                </svg>
-                                <span class="text-center leading-tight font-semibold">${displayName}</span>
-                            `;
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    <span class="text-center leading-tight font-semibold">${displayName}</span>
+                `;
                             td.setAttribute('data-available', 'false');
-
-                            // Tambahkan tooltip untuk nama lengkap jika dipotong
-                            if (customerName.length > 12) {
-                                td.setAttribute('title', `${customerName} - ${slotData?.type === 'member_manual' ? 'Member Booking' : 'Regular Booking'}`);
-                            } else {
-                                td.setAttribute('title', `${customerName} - ${slotData?.type === 'member_manual' ? 'Member Booking' : 'Regular Booking'}`);
-                            }
                         }
 
                         td.appendChild(div);
@@ -655,6 +846,17 @@
 
             function handleSlotClick(fieldId, timeSlot) {
                 const fieldCheckbox = document.getElementById(`field_${fieldId}`);
+                const slotElement = document.querySelector(`[data-field-id="${fieldId}"][data-time-slot="${timeSlot}"]`);
+                const slotPriceAttr = slotElement.getAttribute('data-slot-price');
+                const slotPrice = parseInt(slotPriceAttr) || 0; // Validasi untuk mencegah NaN
+
+                // Debug log untuk memastikan harga valid
+                console.log('Slot Price:', slotPrice, 'Type:', typeof slotPrice);
+
+                if (isNaN(slotPrice) || slotPrice <= 0) {
+                    console.error('Invalid slot price:', slotPriceAttr);
+                    return; // Jangan lanjutkan jika harga tidak valid
+                }
 
                 if (!selectedSlots[fieldId]) {
                     selectedSlots[fieldId] = [];
@@ -664,11 +866,11 @@
 
                 if (slotIndex === -1) {
                     selectedSlots[fieldId].push(timeSlot);
-                    totalAmount += fieldPrices[fieldId];
+                    totalAmount += slotPrice;
                     fieldCheckbox.checked = true;
                 } else {
                     selectedSlots[fieldId].splice(slotIndex, 1);
-                    totalAmount -= fieldPrices[fieldId];
+                    totalAmount -= slotPrice;
 
                     if (selectedSlots[fieldId].length === 0) {
                         delete selectedSlots[fieldId];
@@ -676,41 +878,14 @@
                     }
                 }
 
+                // Debug log untuk memastikan totalAmount valid
+                console.log('Total Amount:', totalAmount, 'Type:', typeof totalAmount);
+
                 renderTimeSlots();
                 updateSelectedSlotsDisplay();
                 updateBookingSummary();
                 updateTotalPrice();
                 updateFormInputs();
-            }
-
-            // Fungsi fetchAvailability yang sudah diperbarui untuk menggunakan endpoint yang benar
-            function fetchAvailability(date) {
-                document.getElementById("error-container")?.classList.add("hidden");
-                fetch(`/api/all-available-slots?date=${date}`)
-                    .then(response => {
-                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            fieldAvailability = data.fieldAvailability;
-                            renderTimeSlots();
-                            updateSelectedSlotsDisplay();
-                            updateBookingSummary();
-                            updateTotalPrice();
-                        } else {
-                            throw new Error("API returned success: false");
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error fetching availability:", error);
-                        // Tampilkan error message jika ada
-                        const errorContainer = document.getElementById("error-container");
-                        if (errorContainer) {
-                            document.getElementById("error-message").textContent = "Gagal mengambil data slot. Silakan refresh halaman.";
-                            errorContainer.classList.remove("hidden");
-                        }
-                    });
             }
 
             document.querySelectorAll(".field-checkbox").forEach(checkbox => {
@@ -776,48 +951,62 @@
                 for (const fieldId in selectedSlots) {
                     const fieldCheckbox = document.getElementById(`field_${fieldId}`);
                     const fieldName = fieldCheckbox.getAttribute("data-field-name");
-                    const fieldPrice = parseFloat(fieldCheckbox.getAttribute("data-field-price"));
                     const slots = selectedSlots[fieldId].sort();
-                    const subtotal = slots.length * fieldPrice;
+
+                    // PERBAIKAN: Hitung subtotal berdasarkan harga dinamis per slot
+                    let subtotal = 0;
+                    slots.forEach(slot => {
+                        const hour = parseInt(slot.split(':')[0]);
+                        const slotPrice = getPriceByHour(hour);
+                        subtotal += slotPrice;
+                    });
+
                     const formattedTimes = slots.map(slot => formatTimeRange(slot)).join(", ");
 
                     summaryHTML += `
-                        <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                            <div class="flex items-center justify-between mb-2">
-                                <div class="font-medium text-gray-800">${fieldName}</div>
-                                <div class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded">
-                                    ${slots.length} hour${slots.length > 1 ? 's' : ''}
-                                </div>
-                            </div>
-                            <div class="text-sm text-gray-600 mb-3">
-                                <div class="flex items-center mb-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    ${formattedTimes}
-                                </div>
-                                <div class="flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                    ${currentDate}
-                                </div>
-                            </div>
-                            <div class="flex justify-between text-sm text-gray-600 py-2 border-t border-gray-200">
-                                <span>Price per hour:</span>
-                                <span>Rp ${fieldPrice.toLocaleString("id-ID")}</span>
-                            </div>
-                            <div class="flex justify-between font-medium text-gray-800 pt-1">
-                                <span>Subtotal:</span>
-                                <span>Rp ${subtotal.toLocaleString("id-ID")}</span>
-                            </div>
-                        </div>
-                    `;
+            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="font-medium text-gray-800">${fieldName}</div>
+                    <div class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded">
+                        ${slots.length} hour${slots.length > 1 ? 's' : ''}
+                    </div>
+                </div>
+                <div class="text-sm text-gray-600 mb-3">
+                    <div class="flex items-center mb-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        ${formattedTimes}
+                    </div>
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        ${currentDate}
+                    </div>
+                </div>
+                <div class="space-y-1 text-sm text-gray-600 py-2 border-t border-gray-200">
+                    ${slots.map(slot => {
+                        const hour = parseInt(slot.split(':')[0]);
+                        const slotPrice = getPriceByHour(hour);
+                        return `<div class="flex justify-between">
+                            <span>${formatTimeRange(slot)}:</span>
+                            <span>Rp ${slotPrice.toLocaleString("id-ID")}</span>
+                        </div>`;
+                    }).join('')}
+                </div>
+                <div class="flex justify-between font-medium text-gray-800 pt-2 border-t border-gray-300">
+                    <span>Subtotal:</span>
+                    <span>Rp ${subtotal.toLocaleString("id-ID")}</span>
+                </div>
+            </div>
+        `;
                 }
 
                 summaryHTML += "</div>";
                 summaryContainer.innerHTML = summaryHTML;
             }
+
 
             function updateTotalPrice() {
                 document.getElementById("total-price").textContent = `Rp ${totalAmount.toLocaleString("id-ID")}`;
@@ -890,19 +1079,75 @@
                 }
             });
 
-            // Init
-            updateFormInputs();
-            updateBookingSummary();
-            updateTotalPrice();
-            fetchAvailability(currentDate);
+            // Check for URL parameters yang menandakan pembatalan atau error
+            const urlParams = new URLSearchParams(window.location.search);
+            const isCancelled = urlParams.get('cancelled') === 'true';
+            const hasError = urlParams.get('error') === 'payment';
+            const forceRefresh = urlParams.get('refresh') === 'true';
 
-            // Refresh slot setiap menit jika tanggal hari ini
-            const today = new Date().toISOString().split('T')[0];
-            if (currentDate === today) {
-                setInterval(function() {
-                    fetchAvailability(currentDate);
-                }, 60000);
+            // Show success message jika ada pembatalan
+            if (isCancelled) {
+                const successDiv = document.createElement('div');
+                successDiv.className = 'mb-4 bg-green-50 border border-green-200 text-green-800 rounded-lg p-4 success-message';
+                successDiv.innerHTML = `
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-green-800">Pembayaran Dibatalkan</h3>
+                            <div class="mt-2 text-sm text-green-700">
+                                <p>Slot waktu telah dibebaskan dan tersedia kembali untuk pemesanan.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.querySelector('form').insertBefore(successDiv, document.querySelector('form').firstChild);
+
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    successDiv.style.transition = 'opacity 0.5s';
+                    successDiv.style.opacity = '0';
+                    setTimeout(() => successDiv.remove(), 500);
+                }, 5000);
             }
+
+            // Force refresh jika ada parameter khusus
+            if (isCancelled || hasError || forceRefresh) {
+                console.log('Special condition detected, force refreshing...');
+                setTimeout(() => {
+                    forceRefreshAvailability(currentDate);
+                }, 1000);
+
+                // Clean URL parameters
+                if (window.history && window.history.replaceState) {
+                    const cleanUrl = window.location.pathname;
+                    window.history.replaceState({}, document.title, cleanUrl);
+                }
+            }
+
+            // Setup auto-refresh
+            setupAutoRefresh();
+
+            // Initial load dengan force refresh jika perlu
+            if (isCancelled || hasError || forceRefresh) {
+                forceRefreshAvailability(currentDate);
+            } else {
+                fetchAvailability(currentDate);
+            }
+
+            // Debug functions - remove in production
+            window.debugBooking = {
+                clearCache: clearAllCaches,
+                forceRefresh: forceRefreshAvailability,
+                showAvailability: () => console.log('Current availability:', fieldAvailability),
+                showSelections: () => console.log('Selected slots:', selectedSlots)
+            };
+
+            // Console log untuk monitoring
+            console.log('Booking form initialized with cache management');
         });
     </script>
 </body>

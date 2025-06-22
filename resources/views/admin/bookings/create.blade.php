@@ -136,6 +136,16 @@
                                 value="{{ old('customer_phone') }}" required
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                         </div>
+
+                        <!-- TAMBAHAN: Field Admin Name untuk Booking Reguler -->
+                        <div>
+                            <label for="admin_name" class="block text-sm font-medium text-gray-700 mb-1">Nama Admin <span class="text-red-600">*</span></label>
+                            <input type="text" name="admin_name" id="admin_name"
+                                value="{{ old('admin_name', auth()->user()->name) }}" required
+                                placeholder="Masukkan nama admin yang menginput"
+                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            <p class="text-xs text-gray-500 mt-1">Default: {{ auth()->user()->name }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -264,6 +274,16 @@
                             <input type="text" name="customer_phone" id="member_customer_phone" required
                                 placeholder="08xxxxxxxxxx"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                        </div>
+
+                        <!-- TAMBAHAN: Field Admin Name untuk Member Booking -->
+                        <div>
+                            <label for="member_admin_name" class="block text-sm font-medium text-gray-700 mb-1">Nama Admin <span class="text-red-600">*</span></label>
+                            <input type="text" name="admin_name" id="member_admin_name" required
+                                value="{{ auth()->user()->name }}"
+                                placeholder="Masukkan nama admin yang menginput"
+                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                            <p class="text-xs text-gray-500 mt-1">Default: {{ auth()->user()->name }}</p>
                         </div>
 
                         <div>
@@ -396,13 +416,11 @@
         const memberTotalPriceDisplay = document.getElementById('member_total_price_display');
         const memberTotalPrice = document.getElementById('member_total_price');
 
-        // HAPUS: const MEMBER_PRICE_PER_HOUR = 50000;
-
         memberStartTimeSelect.addEventListener('change', function() {
             const selectedStartHour = parseInt(this.value.split(':')[0]);
             memberEndTimeSelect.innerHTML = '<option value="">Pilih Waktu Selesai</option>';
 
-            const maxEndHour = 24;
+            const maxEndHour = 23;
 
             for (let hour = selectedStartHour + 1; hour <= maxEndHour; hour++) {
                 const option = document.createElement('option');

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class AdminBookingController extends Controller
@@ -107,6 +108,7 @@ class AdminBookingController extends Controller
                 'customer_name' => 'required|string|max:255',
                 'customer_email' => 'required|email|max:255',
                 'customer_phone' => 'required|string|max:20',
+                'admin_name' => 'required|string|max:255',
                 'booking_date' => 'required|date|date_format:Y-m-d',
                 'start_time' => 'required|date_format:H:i:s',
                 'end_time' => 'required|date_format:H:i:s|after:start_time',
@@ -119,64 +121,178 @@ class AdminBookingController extends Controller
                     ->withInput();
             }
 
-            // Get field for price calculation
-            $field = Field::findOrFail($request->field_id);
+            $startTime = Carbon::parse($request->start_time);
+            $endTime = Carbon::parse($request->end_time);
 
-            // Check slot availability menggunakan BookingService
-            $isAvailable = $this->bookingService->areSlotsAvailable(
-                $request->field_id,
-                $request->booking_date,
-                $request->start_time,
-                $request->end_time
-            );
+            // Validasi konflik booking manual (tanpa pembatasan jam)
+            $conflictBooking = Booking::where('field_id', $request->field_id)
+                ->where('booking_date', $request->booking_date)
+                ->where(function ($query) use ($startTime, $endTime) {
+                    $query->where(function ($q) use ($startTime, $endTime) {
+                        $q->where('start_time', '<=', $startTime->format('H:i:s'))
+                            ->where('end_time', '>', $startTime->format('H:i:s'));
+                    })
+                        ->orWhere(function ($q) use ($startTime, $endTime) {
+                            $q->where('start_time', '<', $endTime->format('H:i:s'))
+                                ->where('end_time', '>=', $endTime->format('H:i:s'));
+                        })
+                        ->orWhere(function ($q) use ($startTime, $endTime) {
+                            $q->where('start_time', '>=', $startTime->format('H:i:s'))
+                                ->where('end_time', '<=', $endTime->format('H:i:s'));
+                        })
+                        ->orWhere(function ($q) use ($startTime, $endTime) {
+                            $q->where('start_time', '<=', $startTime->format('H:i:s'))
+                                ->where('end_time', '>=', $endTime->format('H:i:s'));
+                        });
+                })
+                ->whereNotIn('payment_status', ['expired', 'cancel', 'failed'])
+                ->first();
 
-            if (!$isAvailable) {
+            if ($conflictBooking) {
                 return redirect()->back()
-                    ->with('error', 'Slot yang dipilih sudah tidak tersedia')
+                    ->with('error', 'Terdapat konflik dengan booking yang sudah ada. Slot waktu ' .
+                        $startTime->format('H:i') . ' - ' . $endTime->format('H:i') .
+                        ' sudah dibooking oleh ' . $conflictBooking->customer_name)
                     ->withInput();
             }
 
-            // PERBAIKAN: Generate time slots untuk harga dinamis
-            $startTime = Carbon::parse($request->start_time);
-            $endTime = Carbon::parse($request->end_time);
-            $timeSlots = [];
+            // Cek konflik dengan booking slots
+            $conflictSlot = DB::table('booking_slots')
+                ->join('bookings', 'booking_slots.booking_id', '=', 'bookings.id')
+                ->where('booking_slots.field_id', $request->field_id)
+                ->where('booking_slots.booking_date', $request->booking_date)
+                ->where('booking_slots.status', 'booked')
+                ->where(function ($query) use ($startTime, $endTime) {
+                    $query->where(function ($q) use ($startTime, $endTime) {
+                        $q->where('booking_slots.start_time', '<=', $startTime->format('H:i:s'))
+                            ->where('booking_slots.end_time', '>', $startTime->format('H:i:s'));
+                    })
+                        ->orWhere(function ($q) use ($startTime, $endTime) {
+                            $q->where('booking_slots.start_time', '<', $endTime->format('H:i:s'))
+                                ->where('booking_slots.end_time', '>=', $endTime->format('H:i:s'));
+                        })
+                        ->orWhere(function ($q) use ($startTime, $endTime) {
+                            $q->where('booking_slots.start_time', '>=', $startTime->format('H:i:s'))
+                                ->where('booking_slots.end_time', '<=', $endTime->format('H:i:s'));
+                        })
+                        ->orWhere(function ($q) use ($startTime, $endTime) {
+                            $q->where('booking_slots.start_time', '<=', $startTime->format('H:i:s'))
+                                ->where('booking_slots.end_time', '>=', $endTime->format('H:i:s'));
+                        });
+                })
+                ->whereNotIn('bookings.payment_status', ['expired', 'cancel', 'failed'])
+                ->first();
 
+            if ($conflictSlot) {
+                return redirect()->back()
+                    ->with('error', 'Slot waktu tersebut sudah dibooking melalui sistem booking slots')
+                    ->withInput();
+            }
+
+            // Generate time slots untuk dynamic pricing
+            $timeSlots = [];
             $current = $startTime->copy();
             while ($current < $endTime) {
                 $timeSlots[] = $current->format('H:i:s');
                 $current->addHour();
             }
 
-            Log::info('Admin creating booking with time slots:', [
+            // Hitung total harga dengan dynamic pricing
+            $totalPrice = 0;
+            foreach ($timeSlots as $slot) {
+                $hour = Carbon::parse($slot)->hour;
+                if ($hour >= 6 && $hour < 12) {
+                    $totalPrice += 40000; // Pagi
+                } elseif ($hour >= 12 && $hour < 17) {
+                    $totalPrice += 25000; // Siang
+                } elseif ($hour >= 17 && $hour < 23) {
+                    $totalPrice += 60000; // Malam (termasuk jam 17-19)
+                } else {
+                    $totalPrice += 40000; // Default
+                }
+            }
+
+            Log::info('Admin creating bypass booking:', [
                 'field_id' => $request->field_id,
                 'time_slots' => $timeSlots,
                 'start_time' => $request->start_time,
-                'end_time' => $request->end_time
+                'end_time' => $request->end_time,
+                'total_price' => $totalPrice,
+                'admin_name' => $request->admin_name,
+                'bypass_service' => true
             ]);
 
             DB::beginTransaction();
 
             try {
-                // Determine if this is a direct confirmation (for cash payments)
-                $directConfirm = $request->payment_method === 'cash';
+                $paymentStatus = $request->payment_method === 'cash' ? 'settlement' : 'pending';
 
-                // PERBAIKAN: Create booking dengan time slots
-                $bookingData = $request->all();
-                $bookingData['time_slots'] = $timeSlots; // Tambahkan time slots untuk dynamic pricing
+                // Buat booking langsung tanpa melalui BookingService
+                $booking = Booking::create([
+                    'field_id' => $request->field_id,
+                    'booking_code' => 'ADM-' . time() . '-' . $request->field_id,
+                    'customer_name' => $request->customer_name,
+                    'customer_email' => $request->customer_email,
+                    'customer_phone' => $request->customer_phone,
+                    'admin_name' => $request->admin_name,
+                    'booking_date' => $request->booking_date,
+                    'start_time' => $request->start_time,
+                    'end_time' => $request->end_time,
+                    'duration_hours' => count($timeSlots),
+                    'total_price' => $totalPrice,
+                    'payment_method' => $request->payment_method,
+                    'payment_status' => $paymentStatus,
+                    'status' => 'confirmed'
+                ]);
 
-                $booking = $this->bookingService->createBooking($bookingData, $directConfirm);
+                // Buat booking slots untuk setiap jam
+                foreach ($timeSlots as $slot) {
+                    $slotStartTime = Carbon::parse($slot);
+                    $slotEndTime = $slotStartTime->copy()->addHour();
 
-                if (!$booking) {
-                    throw new \Exception('Gagal membuat booking');
+                    // Hitung harga per slot
+                    $hour = $slotStartTime->hour;
+                    if ($hour >= 6 && $hour < 12) {
+                        $pricePerSlot = 40000;
+                    } elseif ($hour >= 12 && $hour < 17) {
+                        $pricePerSlot = 25000;
+                    } elseif ($hour >= 17 && $hour < 23) {
+                        $pricePerSlot = 60000;
+                    } else {
+                        $pricePerSlot = 40000;
+                    }
+
+                    BookingSlot::create([
+                        'booking_id' => $booking->id,
+                        'field_id' => $request->field_id,
+                        'booking_date' => $request->booking_date,
+                        'start_time' => $slotStartTime->format('H:i:s'),
+                        'end_time' => $slotEndTime->format('H:i:s'),
+                        'slot_time' => $slotStartTime->format('H:i:s'),
+                        'price_per_slot' => $pricePerSlot,
+                        'status' => 'booked'
+                    ]);
                 }
 
-                Log::info('Admin booking created successfully:', [
-                    'booking_id' => $booking->id,
-                    'total_price' => $booking->total_price,
-                    'slots_count' => $booking->slots ? $booking->slots->count() : 0
+                // Buat transaction record
+                Transaction::createForBooking($booking->id, [
+                    'order_id' => 'ADMIN-' . $booking->booking_code,
+                    'payment_type' => $request->payment_method === 'cash' ? 'cash' : 'admin_booking',
+                    'transaction_status' => $paymentStatus,
+                    'gross_amount' => $totalPrice,
+                    'payment_channel' => $request->payment_method === 'cash' ? 'cash_payment' : 'admin_direct',
+                    'transaction_time' => now(),
                 ]);
 
                 DB::commit();
+
+                Log::info('Admin bypass booking created successfully:', [
+                    'booking_id' => $booking->id,
+                    'admin_name' => $booking->admin_name,
+                    'total_price' => $booking->total_price,
+                    'slots_count' => count($timeSlots),
+                    'time_range' => $startTime->format('H:i') . ' - ' . $endTime->format('H:i')
+                ]);
 
                 return redirect()->route('admin.bookings.index')
                     ->with('success', 'Booking berhasil dibuat dengan total harga Rp ' . number_format($booking->total_price, 0, ',', '.'));
@@ -494,10 +610,11 @@ class AdminBookingController extends Controller
                 'customer_name' => 'required|string|max:255',
                 'customer_email' => 'required|email|max:255',
                 'customer_phone' => 'required|string|max:20',
+                'admin_name' => 'required|string|max:255',
                 'booking_date' => 'required|date|date_format:Y-m-d',
                 'start_time' => 'required|date_format:H:i:s',
                 'end_time' => 'required|date_format:H:i:s|after:start_time',
-                'duration_hours' => 'required|integer|min:1|max:12',
+                'duration_hours' => 'required|integer|min:1',
                 'total_price' => 'required|numeric|min:0',
                 'payment_method' => 'required|in:online,cash',
                 'notes' => 'nullable|string|max:500'
@@ -585,13 +702,14 @@ class AdminBookingController extends Controller
                 // Tentukan status pembayaran berdasarkan metode
                 $paymentStatus = $request->payment_method === 'cash' ? 'settlement' : 'pending';
 
-                // Buat booking member
+                // Buat booking member dengan admin_name
                 $booking = Booking::create([
                     'field_id' => $request->field_id,
                     'booking_code' => 'MBR-' . time() . '-' . $request->field_id,
                     'customer_name' => $request->customer_name,
                     'customer_email' => $request->customer_email,
                     'customer_phone' => $request->customer_phone,
+                    'admin_name' => Auth::user()->usertype === 'admin',
                     'booking_date' => $request->booking_date,
                     'start_time' => $request->start_time,
                     'end_time' => $request->end_time,
@@ -603,7 +721,7 @@ class AdminBookingController extends Controller
                     'payment_instruction' => $request->notes
                 ]);
 
-                // PERBAIKAN: Gunakan method baru untuk create transaction
+                // Create transaction
                 Transaction::createForBooking($booking->id, [
                     'order_id' => 'ADMIN-' . $booking->booking_code,
                     'payment_type' => $request->payment_method === 'cash' ? 'cash' : 'admin_booking',

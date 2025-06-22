@@ -16,24 +16,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::factory()->create([
-            'name' => 'Admin Pagi',
-            'email' => 'adminpagi@email.com',
-            'usertype' => 'admin',
-            'password' => bcrypt('password'),
-            'email_verified_at' => now(),
-        ]);
-
-        User::factory()->create([
-            'name' => 'Admin Sore',
-            'email' => 'adminsore@email.com',
-            'usertype' => 'admin',
-            'password' => bcrypt('password'),
-            'email_verified_at' => now(),
-        ]);
-
-        User::factory()->create([
-            'name' => 'Admin Malam',
-            'email' => 'adminmalam@email.com',
+            'name' => 'Admin',
+            'email' => 'admin@gmail.com',
             'usertype' => 'admin',
             'password' => bcrypt('password'),
             'email_verified_at' => now(),
@@ -48,10 +32,9 @@ class DatabaseSeeder extends Seeder
                 'is_active' => true,
                 'opening_hour' => 6,
                 'closing_hour' => 23,
-                // Tambahan untuk sistem harga dinamis
-                'price_morning' => 40000,   // 06:00-12:00
-                'price_afternoon' => 25000, // 12:00-17:00  
-                'price_evening' => 60000,   // 17:00-23:00
+                'price_morning' => 40000,
+                'price_afternoon' => 25000,
+                'price_evening' => 60000,
             ],
             [
                 'name' => 'Lapangan Badminton 2',

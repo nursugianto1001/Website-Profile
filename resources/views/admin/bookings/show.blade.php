@@ -2,6 +2,7 @@
 
 @section('content')
 <div class="bg-gradient-to-b from-gray-50 to-white p-6 rounded-xl shadow-lg">
+    <!-- Header Section -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
             <h2 class="text-2xl font-bold text-indigo-800">Detail Booking #{{ $booking->id }}</h2>
@@ -19,7 +20,7 @@
         </div>
     </div>
 
-    <!-- Status Bar -->
+    <!-- Status Bar Section -->
     <div class="mb-8 bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between">
             <div class="flex items-center mb-4 sm:mb-0">
@@ -77,8 +78,9 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Booking Information -->
+    <!-- Main Information Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <!-- Booking Information Card -->
         <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
             <h3 class="text-lg font-semibold text-indigo-800 mb-6 flex items-center">
                 <i class="bi bi-calendar-event mr-2 text-indigo-600"></i>
@@ -131,7 +133,7 @@
             </div>
         </div>
 
-        <!-- Customer Information -->
+        <!-- Customer Information Card -->
         <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
             <h3 class="text-lg font-semibold text-indigo-800 mb-6 flex items-center">
                 <i class="bi bi-person mr-2 text-indigo-600"></i>
@@ -164,8 +166,49 @@
         </div>
     </div>
 
-    <!-- Price Breakdown -->
-    <div class="mt-8 bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+    <!-- Admin Information Card -->
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mb-8">
+        <h3 class="text-lg font-semibold text-indigo-800 mb-6 flex items-center">
+            <i class="bi bi-person-badge mr-2 text-indigo-600"></i>
+            Informasi Admin
+        </h3>
+
+        <div class="space-y-4">
+            @if($booking->admin_name)
+            <div class="flex items-center space-x-4">
+                <div class="h-12 w-12 rounded-full bg-gradient-to-r from-green-500 to-blue-500 flex items-center justify-center text-white font-bold text-lg">
+                    {{ substr($booking->admin_name, 0, 1) }}
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold text-gray-900">{{ $booking->admin_name }}</h4>
+                    <p class="text-sm text-gray-500">Admin yang membuat booking</p>
+                </div>
+            </div>
+
+            <div class="space-y-3 pt-4 border-t border-gray-100">
+                <div class="flex items-center space-x-3">
+                    <i class="bi bi-calendar-plus text-gray-400"></i>
+                    <span class="text-sm text-gray-900">Booking dibuat oleh admin</span>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    <i class="bi bi-clock text-gray-400"></i>
+                    <span class="text-sm text-gray-900">{{ \Carbon\Carbon::parse($booking->created_at)->format('d/m/Y H:i:s') }}</span>
+                </div>
+            </div>
+            @else
+            <div class="text-center py-4">
+                <div class="text-gray-400 text-2xl mb-2">
+                    <i class="bi bi-person-x"></i>
+                </div>
+                <p class="text-sm text-gray-500">Booking dibuat melalui sistem user</p>
+            </div>
+            @endif
+        </div>
+    </div>
+
+    <!-- Price Breakdown Card -->
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mb-8">
         <h3 class="text-lg font-semibold text-indigo-800 mb-6 flex items-center">
             <i class="bi bi-calculator mr-2 text-indigo-600"></i>
             Rincian Harga (Dynamic Pricing)
@@ -272,8 +315,8 @@
     </div>
 </div>
 
-<!-- Booking Slots Detail -->
-<div class="mt-8 bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+<!-- Booking Slots Detail Card -->
+<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mb-8">
     <h3 class="text-lg font-semibold text-indigo-800 mb-6 flex items-center">
         <i class="bi bi-clock mr-2 text-indigo-600"></i>
         Detail Booking Slots
@@ -350,9 +393,9 @@
     @endif
 </div>
 
-<!-- Transaction Information -->
+<!-- Transaction Information Card -->
 @if($booking->transaction)
-<div class="mt-8 bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mb-8">
     <h3 class="text-lg font-semibold text-indigo-800 mb-6 flex items-center">
         <i class="bi bi-credit-card mr-2 text-indigo-600"></i>
         Informasi Transaksi
@@ -421,8 +464,8 @@
 </div>
 @endif
 
-<!-- Activity Timeline -->
-<div class="mt-8 bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+<!-- Activity Timeline Card -->
+<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
     <h3 class="text-lg font-semibold text-indigo-800 mb-6 flex items-center">
         <i class="bi bi-activity mr-2 text-indigo-600"></i>
         Timeline Aktivitas

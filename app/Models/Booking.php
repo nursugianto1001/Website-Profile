@@ -14,6 +14,7 @@ class Booking extends Model
         'customer_name',
         'customer_email',
         'customer_phone',
+        'admin_name',
         'booking_date',
         'start_time',
         'end_time',
@@ -25,7 +26,7 @@ class Booking extends Model
         'booking_code',
         'status',
         'payment_instruction',
-        'order_id', // Tambahkan jika belum ada
+        'order_id',
     ];
 
     protected $casts = [
@@ -33,7 +34,7 @@ class Booking extends Model
         'start_time' => 'datetime',
         'end_time' => 'datetime',
         'duration_hours' => 'integer',
-        'total_price' => 'decimal:2', // Ubah dari float ke decimal untuk konsistensi
+        'total_price' => 'decimal:2',
     ];
 
     /**

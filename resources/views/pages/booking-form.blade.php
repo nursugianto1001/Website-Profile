@@ -20,16 +20,6 @@
         cursor: pointer;
     }
 
-    /* Styling khusus untuk member slots */
-    .member-slot {
-        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-        border: 2px solid #f59e0b;
-    }
-
-    .member-slot:hover {
-        background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%);
-    }
-
     /* Tooltip styling */
     [title] {
         position: relative;

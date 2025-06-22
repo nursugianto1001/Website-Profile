@@ -104,17 +104,6 @@ class BookingService
             return false;
         }
 
-        // VALIDASI SLOT MEMBER (17-19) UNTUK PUBLIC
-        $startHour = (int) Carbon::parse($startTime)->format('H');
-        $endHour = (int) Carbon::parse($endTime)->format('H');
-
-        for ($hour = $startHour; $hour < $endHour; $hour++) {
-            if (in_array($hour, [17, 18, 19])) {
-                // Slot member hanya bisa dibooking oleh admin
-                return false;
-            }
-        }
-
         // VALIDASI WAKTU YANG SUDAH LEWAT
         if ($isToday) {
             $currentTime = now('Asia/Jakarta');
@@ -237,7 +226,6 @@ class BookingService
                 $slotEnd = $slotStart->copy()->addHour();
 
                 $isPast = $isToday && $slotEnd->lte($currentTime);
-                $isMemberSlot = in_array($hour, [17, 18, 19]);
 
                 // Cek konflik dengan booking yang ada
                 $isBooked = false;
@@ -253,7 +241,7 @@ class BookingService
 
                 $slots[$slotTime] = [
                     'formatted_time' => $slotStart->format('H:i') . '-' . $slotEnd->format('H:i'),
-                    'is_available' => !$isBooked && !$isPast && !$isMemberSlot
+                    'is_available' => !$isBooked && !$isPast
                 ];
             }
 
@@ -336,7 +324,7 @@ class BookingService
 
             // PERBAIKAN: Gunakan time_slots dari data jika tersedia, atau generate dari start/end time
             $timeSlots = $data['time_slots'] ?? [];
-            
+
             if (empty($timeSlots)) {
                 Log::info('Generating time slots from start/end time');
                 $currentTime = $startTime->copy();
@@ -351,7 +339,7 @@ class BookingService
             // PERBAIKAN: Hitung total harga berdasarkan slot waktu dinamis
             $totalPrice = 0;
             $slotsData = [];
-            
+
             foreach ($timeSlots as $slot) {
                 $hour = (int) Carbon::parse($slot)->format('H');
                 $slotPrice = $field->getPriceByTimeSlot($hour); // Gunakan harga dinamis

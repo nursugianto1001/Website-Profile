@@ -79,7 +79,7 @@
     </div>
 </div>
 
-<!-- 2. Update Featured Posters Section -->
+<!-- Featured Posters Section -->
 @if ($featuredPosters->count() > 0)
 <div class="py-16 bg-gradient-to-b from-amber-50/90 to-[#f8e8d4]/80">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -242,6 +242,24 @@
             </div>
         </div>
 
+        <!-- Tambahkan legend harga -->
+        <div class="flex justify-center mb-8" data-aos="fade-up" data-aos-duration="800">
+            <div class="bg-white rounded-lg shadow-md p-4 border border-amber-100">
+                <h3 class="text-center font-semibold text-[#A66E38] mb-3">Harga per Jam</h3>
+                <div class="flex flex-wrap justify-center gap-4 text-sm">
+                    <div class="flex items-center px-3 py-2 bg-yellow-100 rounded-full text-yellow-800">
+                        <span class="font-medium">06:00-12:00: Rp 40.000</span>
+                    </div>
+                    <div class="flex items-center px-3 py-2 bg-green-100 rounded-full text-green-800">
+                        <span class="font-medium">12:00-17:00: Rp 25.000</span>
+                    </div>
+                    <div class="flex items-center px-3 py-2 bg-purple-100 rounded-full text-purple-800">
+                        <span class="font-medium">17:00-23:00: Rp 60.000</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Desktop Table View -->
         <div class="hidden md:block" data-aos="fade-up" data-aos-duration="800">
             <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-amber-100">
@@ -267,7 +285,7 @@
                                             <span class="font-medium text-gray-800">{{ $field->name }}</span>
                                         </div>
                                         <div class="text-sm text-[#A66E38] font-medium">
-                                            Rp {{ number_format($field->price_per_hour, 0, ',', '.') }}/jam
+                                            Harga Dinamis
                                         </div>
                                     </div>
                                 </th>
@@ -278,21 +296,28 @@
                             @foreach($slots as $slot)
                             <tr>
                                 <td class="border px-4 py-3 text-sm font-medium text-gray-700 bg-gray-50">
-                                    <div class="flex items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        {{ Carbon\Carbon::parse($slot['time'])->format('H:i') }} - {{ Carbon\Carbon::parse($slot['time'])->addHour()->format('H:i') }}
+                                    <div class="flex flex-col items-center">
+                                        <div class="flex items-center mb-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <span class="font-semibold">{{ Carbon\Carbon::parse($slot['time'])->format('H:i') }} - {{ Carbon\Carbon::parse($slot['time'])->addHour()->format('H:i') }}</span>
+                                        </div>
+                                        <div class="text-xs font-medium px-2 py-1 rounded-full slot-price-badge" data-hour="{{ Carbon\Carbon::parse($slot['time'])->format('H') }}">
+                                            <!-- Harga akan diisi oleh JavaScript -->
+                                        </div>
                                     </div>
                                 </td>
                                 @foreach($fields as $field)
                                 <td class="p-2 border slot-cell"
                                     data-field-id="{{ $field->id }}"
-                                    data-time-slot="{{ $slot['time'] }}">
-                                    <!-- Content will be filled by JavaScript -->
+                                    data-time-slot="{{ $slot['time'] }}"
+                                    data-slot-hour="{{ Carbon\Carbon::parse($slot['time'])->format('H') }}">
+                                    <!-- Content akan diisi oleh JavaScript -->
                                 </td>
                                 @endforeach
-                                @endforeach
+                            </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -305,7 +330,7 @@
             <div class="bg-white rounded-lg shadow-lg border border-amber-100 overflow-hidden">
                 <div class="bg-gradient-to-r from-[#A66E38] to-[#8B5A2B] text-white p-4">
                     <h3 class="text-lg font-semibold">{{ $field->name }}</h3>
-                    <p class="text-sm opacity-90">Rp {{ number_format($field->price_per_hour, 0, ',', '.') }}/jam</p>
+                    <p class="text-sm opacity-90">Harga Dinamis</p>
                 </div>
                 <div class="p-4">
                     <div class="grid grid-cols-3 gap-2 mobile-slots" data-field-id="{{ $field->id }}">
@@ -336,6 +361,35 @@
         // Data dari PHP ke JS
         const slotsData = @json($slots);
         const fieldsData = @json($fields);
+
+        // Fungsi untuk mendapatkan harga berdasarkan jam
+        function getPriceByHour(hour) {
+            const hourInt = parseInt(hour);
+
+            if (isNaN(hourInt)) {
+                console.error('Invalid hour:', hour);
+                return 40000; // Default fallback
+            }
+
+            if (hourInt >= 6 && hourInt < 12) {
+                return 40000; // Pagi: 06:00-12:00
+            } else if (hourInt >= 12 && hourInt < 17) {
+                return 25000; // Siang: 12:00-17:00
+            } else if (hourInt >= 17 && hourInt < 23) {
+                return 60000; // Malam: 17:00-23:00
+            }
+
+            console.warn('Hour outside range:', hourInt);
+            return 40000; // Default fallback
+        }
+
+        function formatTimeRange(startTime) {
+            const [hours, minutes] = startTime.split(':');
+            const startHour = parseInt(hours);
+            const startMin = minutes;
+            const endHour = (startHour + 1) % 24;
+            return `${hours}:${startMin}-${String(endHour).padStart(2, '0')}:${startMin}`;
+        }
 
         // Generate tanggal 1 bulan ke depan
         function generateMonthlyDates() {
@@ -420,7 +474,26 @@
         }
 
         function updateScheduleDisplay() {
-            // Desktop
+            // Update price badges first
+            document.querySelectorAll('.slot-price-badge').forEach(badge => {
+                const hour = parseInt(badge.getAttribute('data-hour'));
+                const price = getPriceByHour(hour);
+
+                badge.textContent = `Rp ${price.toLocaleString('id-ID')}`;
+
+                // Add color coding based on time
+                badge.classList.remove('bg-yellow-100', 'text-yellow-800', 'bg-green-100', 'text-green-800', 'bg-purple-100', 'text-purple-800');
+
+                if (hour >= 6 && hour < 12) {
+                    badge.classList.add('bg-yellow-100', 'text-yellow-800');
+                } else if (hour >= 12 && hour < 17) {
+                    badge.classList.add('bg-green-100', 'text-green-800');
+                } else {
+                    badge.classList.add('bg-purple-100', 'text-purple-800');
+                }
+            });
+
+            // Desktop view
             document.querySelectorAll('.slot-cell').forEach(cell => {
                 const fieldId = cell.getAttribute('data-field-id');
                 const timeSlot = cell.getAttribute('data-time-slot');
@@ -453,17 +526,25 @@
                 cell.appendChild(div);
             });
 
-            // Mobile
+            // Mobile view
             document.querySelectorAll('.mobile-slots').forEach(container => {
                 const fieldId = container.getAttribute('data-field-id');
                 container.innerHTML = '';
                 slotsData.forEach(slot => {
                     const slotData = fieldAvailability[fieldId]?.[slot.time];
+                    const slotHour = parseInt(slot.time.split(':')[0]);
+                    const slotPrice = getPriceByHour(slotHour);
+
                     const slotDiv = document.createElement('div');
                     slotDiv.className = 'p-2 rounded-md text-xs font-medium text-center transition duration-200';
+
                     if (slotData && slotData.available) {
                         slotDiv.classList.add('bg-green-100', 'text-green-800', 'border', 'border-green-200');
-                        slotDiv.innerHTML = `<div class="font-semibold">${formatTime(slot.time)}</div><div class="text-xs">Tersedia</div>`;
+                        slotDiv.innerHTML = `
+                            <div class="font-semibold">${formatTime(slot.time)}</div>
+                            <div class="text-xs">Tersedia</div>
+                            <div class="text-xs font-bold mt-1">Rp ${slotPrice.toLocaleString('id-ID')}</div>
+                        `;
                     } else if (slotData && slotData.customer_name) {
                         const customerName = slotData.customer_name;
                         const displayName = customerName.length > 8 ? customerName.substring(0, 8) + '...' : customerName;
@@ -472,10 +553,18 @@
                         } else {
                             slotDiv.classList.add('bg-red-100', 'text-red-600', 'border', 'border-red-200');
                         }
-                        slotDiv.innerHTML = `<div class="font-semibold">${formatTime(slot.time)}</div><div class="text-xs">${displayName}</div>`;
+                        slotDiv.innerHTML = `
+                            <div class="font-semibold">${formatTime(slot.time)}</div>
+                            <div class="text-xs">${displayName}</div>
+                            <div class="text-xs font-bold mt-1">Rp ${slotPrice.toLocaleString('id-ID')}</div>
+                        `;
                     } else {
                         slotDiv.classList.add('bg-gray-100', 'text-gray-600', 'border', 'border-gray-200');
-                        slotDiv.innerHTML = `<div class="font-semibold">${formatTime(slot.time)}</div><div class="text-xs">Tutup</div>`;
+                        slotDiv.innerHTML = `
+                            <div class="font-semibold">${formatTime(slot.time)}</div>
+                            <div class="text-xs">Tutup</div>
+                            <div class="text-xs font-bold mt-1">Rp ${slotPrice.toLocaleString('id-ID')}</div>
+                        `;
                     }
                     container.appendChild(slotDiv);
                 });
@@ -509,7 +598,7 @@
     }
 </style>
 
-<!-- 3. Update Facilities Section -->
+<!-- Facilities Section -->
 <div class="py-10 bg-[#fdf8f2]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12" data-aos="fade-up" data-aos-duration="800">
@@ -591,7 +680,7 @@
     </div>
 </div>
 
-<!-- 4. Update Documentation Photos Gallery -->
+<!-- Documentation Photos Gallery -->
 @if ($featuredDocumentations->count() > 0)
 <div class="py-16 bg-gradient-to-b from-[#faebd7]/80 to-amber-50/70">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -650,7 +739,7 @@
 </div>
 @endif
 
-<!-- 5. Update Image Preview Modal with warmer colors -->
+<!-- Image Preview Modal with warmer colors -->
 <div id="previewModal"
     class="hidden fixed inset-0 z-[9999] bg-black bg-opacity-90 flex items-center justify-center p-4">
     <button id="prevButton" onclick="previewPrev()"
@@ -1005,49 +1094,27 @@
 
         modal.classList.remove('hidden');
         setTimeout(() => {
-            modal.classList.add('opacity-100');
+            modal.classList.remove('opacity-0');
             modal.querySelector('.transform').classList.remove('scale-90');
         }, 10);
-
-        document.body.style.overflow = 'hidden';
     }
 
     function closePosterPreview() {
         const modal = document.getElementById('posterModal');
-        modal.classList.remove('opacity-100');
+        modal.classList.add('opacity-0');
         modal.querySelector('.transform').classList.add('scale-90');
-
         setTimeout(() => {
             modal.classList.add('hidden');
-            document.body.style.overflow = '';
         }, 300);
     }
 
-    // Handle window resize for responsive preview
-    window.addEventListener('resize', function() {
-        if (!previewModal.classList.contains('hidden')) {
-            setOptimalImageSize();
-        }
-    });
-
-    let originalHeaderZIndex;
-
+    // Initialize Swiper for facilities on mobile
     document.addEventListener('DOMContentLoaded', function() {
-        const header = document.querySelector('header');
-        if (header) {
-            // Store original z-index value
-            originalHeaderZIndex = window.getComputedStyle(header).zIndex;
-        }
-    });
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize Swiper for facilities on mobile
         const facilitiesSwiper = new Swiper('.facilities-swiper', {
-            slidesPerView: 1.1,
-            spaceBetween: 12,
-            centeredSlides: false,
+            slidesPerView: 1,
+            spaceBetween: 20,
+            centeredSlides: true,
             loop: true,
-            speed: 800, // Increased speed for smoother animation
-            effect: "slide", // Default effect but with better performance
             autoplay: {
                 delay: 4000,
                 disableOnInteraction: false,
@@ -1061,170 +1128,94 @@
                 nextEl: '.swiper-button-next',
                 prevEl: '.swiper-button-prev',
             },
-            breakpoints: {
-                // when window width is >= 400px
-                400: {
-                    slidesPerView: 1,
-                    spaceBetween: 15,
-                    centeredSlides: true
-                },
-                // when window width is >= 540px
-                540: {
-                    slidesPerView: 2,
-                    spaceBetween: 20,
-                    centeredSlides: false
-                },
-                // when window width is >= 640px but smaller than md breakpoint
-                640: {
-                    slidesPerView: 3,
-                    spaceBetween: 20,
-                    centeredSlides: false
-                }
-            }
+            effect: 'slide',
+            speed: 600,
         });
     });
 </script>
 
-<!-- Add custom styles for smoother transitions -->
 <style>
-    /* Hide scrollbar for carousel */
-    .scrollbar-hide::-webkit-scrollbar {
-        display: none;
-    }
-
     .scrollbar-hide {
         -ms-overflow-style: none;
         scrollbar-width: none;
     }
 
-    /* Smooth transition for preview image */
-    #previewFullImg {
-        transition: opacity 0.2s ease-in-out, transform 0.3s ease;
-        max-width: 95vw;
-        max-height: 85vh;
-        object-fit: contain;
-        margin: 0 auto;
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
     }
 
-    /* Add responsive padding to modal */
-    #previewModal {
-        padding: 1rem;
+    .carousel-img {
+        transition: transform 0.3s ease-in-out, z-index 0.3s ease-in-out;
     }
 
-    @media (min-width: 768px) {
-        #previewModal {
-            padding: 2rem;
-        }
-    }
-
-    /* Improve modal animation */
-    #previewModal.hidden {
-        opacity: 0;
-        pointer-events: none;
-    }
-
-    #previewModal {
-        opacity: 1;
-        transition: opacity 0.3s ease;
-    }
-
-    /* Ensure modal is above everything else */
-    #previewModal {
-        z-index: 9999 !important;
-    }
-
-    /* Make posters look clickable */
-    .poster-item {
-        cursor: pointer;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .poster-item:hover {
-        transform: scale(1.02);
-        box-shadow: 0 10px 25px rgba(166, 110, 56, 0.2);
-    }
-
-    /* Styling for poster info in preview */
-    #posterInfo {
-        transition: opacity 0.3s ease;
-        max-width: 80vw;
-    }
-
-    /* Improved carousel item hover effects */
     .carousel-img:hover .title-overlay {
-        opacity: 1 !important;
+        opacity: 1;
     }
 
-    /* Change text color for better readability */
-    .text-gray-500 {
-        color: #6B5E50;
+    .carousel-img:hover {
+        transform: scale(1.05) !important;
     }
 
-    /* Custom styles for Swiper */
-    .swiper-container {
-        padding: 10px 0 40px 0;
-        /* Space for pagination and better alignment */
-        overflow: visible;
-    }
-
-    .swiper-slide {
-        height: auto;
-        /* Equal height slides */
-        transition: transform 0.3s ease;
-    }
-
-    .swiper-slide-active {
-        transform: translateY(-5px);
-        /* Subtle lift effect for active slide */
-    }
-
-    .swiper-pagination {
-        bottom: 0px;
-    }
-
+    /* Swiper custom styles */
     .swiper-pagination-bullet {
-        width: 8px;
-        height: 8px;
-        opacity: 0.6;
+        background: #A66E38;
+        opacity: 0.5;
     }
 
     .swiper-pagination-bullet-active {
-        background-color: #A66E38;
         opacity: 1;
-        width: 10px;
-        height: 10px;
+        background: #8B5A2B;
     }
 
     .swiper-button-next,
     .swiper-button-prev {
-        display: none !important;
+        color: #A66E38 !important;
+        font-weight: bold;
     }
 
-    @keyframes pulse {
-        0% {
-            opacity: 0.6;
-        }
-
-        50% {
-            opacity: 1;
-        }
-
-        100% {
-            opacity: 0.6;
-        }
-    }
-
-    .animate-pulse {
-        animation: pulse 2s infinite;
+    .swiper-button-next:after,
+    .swiper-button-prev:after {
+        font-size: 18px;
     }
 
     /* Modal animations */
-    .transition-opacity {
-        transition-property: opacity;
+    #posterModal {
+        transition: opacity 0.3s ease-in-out;
     }
 
-    .transition-transform {
-        transition-property: transform;
+    #posterModal .transform {
+        transition: transform 0.5s ease-out;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+
+        .swiper-button-next,
+        .swiper-button-prev {
+            display: none;
+        }
+    }
+
+    /* Image preview modal improvements */
+    #previewModal {
+        backdrop-filter: blur(5px);
+    }
+
+    #previewFullImg {
+        transition: opacity 0.2s ease-in-out;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Hover effects for navigation buttons */
+    button:hover {
+        transform: scale(1.05);
+    }
+
+    /* Smooth transitions for all interactive elements */
+    .transition {
+        transition-property: all;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 300ms;
     }
 </style>
 @endsection

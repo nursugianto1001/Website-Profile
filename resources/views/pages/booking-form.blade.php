@@ -197,13 +197,13 @@
                         d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <p class="text-sm text-blue-700">Klik pada slot waktu yang tersedia untuk memesan. <span
-                        class="font-medium">Slot hijau tersedia</span>, <span class="font-medium">slot kuning untuk member</span>.</p>
+                        class="font-medium">Slot hijau tersedia</span>, <span class="font-medium">slot merah tidak tersedia</span>.</p>
             </div>
 
             <!-- Legend dengan keterangan member -->
             <div class="flex flex-wrap gap-3 mb-4">
                 <div class="flex items-center px-3 py-1 bg-green-100 rounded-full text-sm text-green-800">
-                    <span class="w-3 h-3 bg-green-100 rounded-full mr-2"></span>
+                    <span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
                     <span>Tersedia</span>
                 </div>
                 <div class="flex items-center px-3 py-1 bg-blue-100 rounded-full text-sm text-blue-800">
@@ -211,50 +211,47 @@
                     <span>Terpilih</span>
                 </div>
                 <div class="flex items-center px-3 py-1 bg-red-100 rounded-full text-sm text-red-800">
-                    <span class="w-3 h-3 bg-red-100 rounded-full mr-2"></span>
+                    <span class="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
                     <span>Tidak Tersedia</span>
                 </div>
-                <div class="flex items-center px-3 py-1 bg-yellow-100 rounded-full text-sm text-yellow-700">
-                    <span class="w-3 h-3 bg-yellow-400 rounded-full mr-2"></span>
-                    <span>Member Booking</span>
-                </div>
             </div>
+        </div>
 
-            <div class="overflow-x-auto rounded-lg border border-gray-200">
-                <table class="w-full border-collapse booking-table">
-                    <thead>
-                        <tr>
-                            <th class="border px-4 py-3 bg-gray-50 text-gray-700">
-                                <div class="flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-gray-500"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <span>Waktu / Lapangan</span>
-                                </div>
-                            </th>
-                            <!-- Field headers will be populated by JavaScript -->
-                        </tr>
-                    </thead>
-                    <tbody id="booking-table-body">
-                        <!-- Time slots will be populated by JavaScript -->
-                    </tbody>
-                </table>
-            </div>
+        <div class="overflow-x-auto rounded-lg border border-gray-200">
+            <table class="w-full border-collapse booking-table">
+                <thead>
+                    <tr>
+                        <th class="border px-4 py-3 bg-gray-50 text-gray-700">
+                            <div class="flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-gray-500"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span>Waktu / Lapangan</span>
+                            </div>
+                        </th>
+                        <!-- Field headers will be populated by JavaScript -->
+                    </tr>
+                </thead>
+                <tbody id="booking-table-body">
+                    <!-- Time slots will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
 
-            <div id="selected-slots-container" class="mt-5 hidden">
-                <div class="flex items-center mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#A66E38] mr-2" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <h3 class="font-medium text-gray-800">Kamu Pilih Slot:</h3>
-                </div>
-                <div id="selected-slots-summary" class="p-4 bg-blue-50 rounded-lg border border-blue-100 text-sm">
-                </div>
+        <div id="selected-slots-container" class="mt-5 hidden">
+            <div class="flex items-center mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#A66E38] mr-2" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h3 class="font-medium text-gray-800">Kamu Pilih Slot:</h3>
             </div>
+            <div id="selected-slots-summary" class="p-4 bg-blue-50 rounded-lg border border-blue-100 text-sm">
+            </div>
+        </div>
         </div>
 
         <!-- Customer Information -->

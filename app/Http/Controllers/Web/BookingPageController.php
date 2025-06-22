@@ -121,17 +121,6 @@ class BookingPageController extends Controller
             for ($hour = $openingHour; $hour < $closingHour; $hour++) {
                 $slotTime = sprintf('%02d:00:00', $hour);
 
-                if (in_array($hour, [17, 18, 19])) {
-                    Log::info("Blocking slot {$slotTime} for field {$fieldId}");
-                    $fieldAvailability[$fieldId][$slotTime] = false;
-                    continue;
-                }
-
-                if (in_array($hour, [17, 18, 19])) {
-                    $fieldAvailability[$fieldId][$slotTime] = false;
-                    continue;
-                }
-
                 $isBooked = in_array($slotTime, $bookedSlots, true);
                 $isPast = $isToday && ($hour <= $currentHour);
 

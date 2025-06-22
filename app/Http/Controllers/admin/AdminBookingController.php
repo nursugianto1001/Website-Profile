@@ -122,19 +122,6 @@ class AdminBookingController extends Controller
             // Get field for price calculation
             $field = Field::findOrFail($request->field_id);
 
-            // VALIDASI TAMBAHAN: Cek apakah waktu yang dipilih adalah slot member (17-19)
-            $startHour = (int) Carbon::parse($request->start_time)->format('H');
-            $endHour = (int) Carbon::parse($request->end_time)->format('H');
-
-            // Blokir booking admin pada slot member jika bukan member booking
-            for ($hour = $startHour; $hour < $endHour; $hour++) {
-                if (in_array($hour, [17, 18, 19])) {
-                    return redirect()->back()
-                        ->with('error', 'Slot jam 17:00-20:00 khusus untuk member. Gunakan form Member Booking untuk slot ini.')
-                        ->withInput();
-                }
-            }
-
             // Check slot availability menggunakan BookingService
             $isAvailable = $this->bookingService->areSlotsAvailable(
                 $request->field_id,
@@ -153,7 +140,7 @@ class AdminBookingController extends Controller
             $startTime = Carbon::parse($request->start_time);
             $endTime = Carbon::parse($request->end_time);
             $timeSlots = [];
-            
+
             $current = $startTime->copy();
             while ($current < $endTime) {
                 $timeSlots[] = $current->format('H:i:s');
@@ -176,7 +163,7 @@ class AdminBookingController extends Controller
                 // PERBAIKAN: Create booking dengan time slots
                 $bookingData = $request->all();
                 $bookingData['time_slots'] = $timeSlots; // Tambahkan time slots untuk dynamic pricing
-                
+
                 $booking = $this->bookingService->createBooking($bookingData, $directConfirm);
 
                 if (!$booking) {
@@ -369,12 +356,10 @@ class AdminBookingController extends Controller
 
                 return redirect()->route('admin.bookings.show', $booking->id)
                     ->with('success', 'Status booking berhasil ' . ($statusText[$newStatus] ?? 'diperbarui'));
-
             } catch (\Exception $e) {
                 DB::rollBack();
                 throw $e;
             }
-
         } catch (\Exception $e) {
             Log::error('AdminBookingController updateStatus error: ' . $e->getMessage(), [
                 'booking_id' => $booking->id,
@@ -510,9 +495,9 @@ class AdminBookingController extends Controller
                 'customer_email' => 'required|email|max:255',
                 'customer_phone' => 'required|string|max:20',
                 'booking_date' => 'required|date|date_format:Y-m-d',
-                'start_time' => 'required|date_format:H:i:s|in:17:00:00,18:00:00,19:00:00',
+                'start_time' => 'required|date_format:H:i:s',
                 'end_time' => 'required|date_format:H:i:s|after:start_time',
-                'duration_hours' => 'required|integer|min:1|max:3',
+                'duration_hours' => 'required|integer|min:1|max:12',
                 'total_price' => 'required|numeric|min:0',
                 'payment_method' => 'required|in:online,cash',
                 'notes' => 'nullable|string|max:500'
@@ -521,14 +506,6 @@ class AdminBookingController extends Controller
             if ($validator->fails()) {
                 return redirect()->back()
                     ->withErrors($validator)
-                    ->withInput();
-            }
-
-            // Validasi bahwa end_time tidak melebihi jam 20:00
-            $endHour = (int) Carbon::parse($request->end_time)->format('H');
-            if ($endHour > 20) {
-                return redirect()->back()
-                    ->with('error', 'Waktu selesai tidak boleh melebihi jam 20:00')
                     ->withInput();
             }
 

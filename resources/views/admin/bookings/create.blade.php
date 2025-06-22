@@ -14,7 +14,7 @@
         </a>
     </div>
 
-    <!-- Form Booking Reguler (kode yang sudah ada tetap sama) -->
+    <!-- Form Booking Reguler -->
     <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mb-6">
         <form action="{{ route('admin.bookings.store') }}" method="POST">
             @csrf
@@ -54,7 +54,7 @@
                                 <option value="">Pilih Lapangan</option>
                                 @foreach($fields as $field)
                                 <option value="{{ $field->id }}" {{ old('field_id') == $field->id ? 'selected' : '' }}>
-                                    {{ $field->name }} - Rp {{ number_format($field->price_per_hour, 0, ',', '.') }}/jam
+                                    {{ $field->name }}
                                 </option>
                                 @endforeach
                             </select>
@@ -98,12 +98,6 @@
                         <div>
                             <label for="payment_method" class="block text-sm font-medium text-gray-700 mb-1">Metode Pembayaran <span class="text-red-600">*</span></label>
                             <div class="flex space-x-4 mt-1">
-                                <div class="flex items-center">
-                                    <input type="radio" name="payment_method" id="payment_online" value="online"
-                                        {{ old('payment_method') == 'online' ? 'checked' : '' }}
-                                        class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
-                                    <label for="payment_online" class="ml-2 block text-sm text-gray-700">Online</label>
-                                </div>
                                 <div class="flex items-center">
                                     <input type="radio" name="payment_method" id="payment_cash" value="cash"
                                         {{ old('payment_method', 'cash') == 'cash' ? 'checked' : '' }}
@@ -155,13 +149,13 @@
         </form>
     </div>
 
-    <!-- Form Member Booking Khusus Slot 17-19 dengan Jam Fleksibel -->
+    <!-- Form Member Booking - UPDATED: Bebas Jam -->
     <div class="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl border border-yellow-200 p-6 shadow-sm">
         <div class="flex items-center mb-4">
             <i class="bi bi-star-fill text-yellow-500 mr-2"></i>
-            <h3 class="text-lg font-semibold text-yellow-800">Booking Member Khusus (17:00 - 20:00)</h3>
+            <h3 class="text-lg font-semibold text-yellow-800">Booking Member (Bebas Jam)</h3>
         </div>
-        <p class="text-yellow-700 text-sm mb-6">Form khusus untuk membuat booking member pada slot waktu 17:00-20:00 dengan durasi fleksibel</p>
+        <p class="text-yellow-700 text-sm mb-6">Form khusus untuk membuat booking member pada jam berapapun dengan durasi fleksibel</p>
 
         <form action="{{ route('admin.bookings.store-member') }}" method="POST" id="memberBookingForm">
             @csrf
@@ -181,7 +175,7 @@
                                 <option value="">Pilih Lapangan</option>
                                 @foreach($fields as $field)
                                 <option value="{{ $field->id }}" data-price="{{ $field->price_per_hour }}">
-                                    {{ $field->name }} - Rp {{ number_format($field->price_per_hour, 0, ',', '.') }}/jam
+                                    {{ $field->name }}
                                 </option>
                                 @endforeach
                             </select>
@@ -195,15 +189,16 @@
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
                         </div>
 
+                        <!-- UPDATED: Bebas Jam 06:00-24:00 -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label for="member_start_time" class="block text-sm font-medium text-gray-700 mb-1">Waktu Mulai <span class="text-red-600">*</span></label>
                                 <select name="start_time" id="member_start_time" required
                                     class="w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
                                     <option value="">Pilih Waktu Mulai</option>
-                                    <option value="17:00:00">17:00</option>
-                                    <option value="18:00:00">18:00</option>
-                                    <option value="19:00:00">19:00</option>
+                                    @for($hour = 6; $hour < 24; $hour++)
+                                        <option value="{{ sprintf('%02d', $hour) }}:00:00">{{ sprintf('%02d', $hour) }}:00</option>
+                                        @endfor
                                 </select>
                             </div>
                             <div>
@@ -275,11 +270,6 @@
                             <label for="member_payment_method" class="block text-sm font-medium text-gray-700 mb-1">Metode Pembayaran <span class="text-red-600">*</span></label>
                             <div class="flex space-x-4 mt-1">
                                 <div class="flex items-center">
-                                    <input type="radio" name="payment_method" id="member_payment_online" value="online"
-                                        class="h-4 w-4 text-yellow-600 border-gray-300 focus:ring-yellow-500">
-                                    <label for="member_payment_online" class="ml-2 block text-sm text-gray-700">Online</label>
-                                </div>
-                                <div class="flex items-center">
                                     <input type="radio" name="payment_method" id="member_payment_cash" value="cash" checked
                                         class="h-4 w-4 text-yellow-600 border-gray-300 focus:ring-yellow-500">
                                     <label for="member_payment_cash" class="ml-2 block text-sm text-gray-700">Cash</label>
@@ -314,7 +304,7 @@
         const endTimeSelect = document.getElementById('end_time');
         const fieldSelect = document.getElementById('field_id');
 
-        // PERBAIKAN: Dynamic pricing calculation
+        // Dynamic pricing calculation
         function getPriceByHour(hour) {
             const hourInt = parseInt(hour);
             if (hourInt >= 6 && hourInt < 12) {
@@ -330,22 +320,21 @@
         function calculateTotalPrice() {
             const startTime = startTimeSelect.value;
             const endTime = endTimeSelect.value;
-            
+
             if (startTime && endTime) {
                 const startHour = parseInt(startTime.split(':')[0]);
                 const endHour = parseInt(endTime.split(':')[0]);
-                
+
                 let totalPrice = 0;
                 let priceBreakdown = '';
-                
+
                 for (let hour = startHour; hour < endHour; hour++) {
                     const slotPrice = getPriceByHour(hour);
                     totalPrice += slotPrice;
                     const nextHour = hour + 1;
                     priceBreakdown += `${hour.toString().padStart(2, '0')}:00-${nextHour.toString().padStart(2, '0')}:00: Rp ${slotPrice.toLocaleString('id-ID')}\n`;
                 }
-                
-                // Update price display
+
                 updatePriceDisplay(totalPrice, priceBreakdown);
             } else {
                 updatePriceDisplay(0, '');
@@ -353,18 +342,16 @@
         }
 
         function updatePriceDisplay(totalPrice, breakdown) {
-            // Create or update price display
             let priceContainer = document.getElementById('price-display');
             if (!priceContainer) {
                 priceContainer = document.createElement('div');
                 priceContainer.id = 'price-display';
                 priceContainer.className = 'mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg';
-                
-                // Insert after payment method section
+
                 const paymentSection = document.querySelector('input[name="payment_method"]').closest('.space-y-4');
                 paymentSection.parentNode.insertBefore(priceContainer, paymentSection.nextSibling);
             }
-            
+
             if (totalPrice > 0) {
                 priceContainer.innerHTML = `
                     <h4 class="text-sm font-medium text-blue-800 mb-2">Estimasi Harga</h4>
@@ -388,25 +375,10 @@
             const selectedStartHour = parseInt(this.value.split(':')[0]);
             endTimeSelect.innerHTML = '<option value="">Pilih Waktu</option>';
 
-            // PERBAIKAN: Block member slots (17-19) untuk admin booking
             for (let hour = selectedStartHour + 1; hour <= 24; hour++) {
-                // Skip member slots
-                if (selectedStartHour < 17 && hour > 17) {
-                    // If start is before 17, end should not go beyond 17
-                    break;
-                }
-                
                 const option = document.createElement('option');
                 option.value = `${hour.toString().padStart(2, '0')}:00:00`;
                 option.textContent = `${hour.toString().padStart(2, '0')}:00`;
-                
-                // Add warning for member slots
-                if (hour >= 17 && hour <= 20) {
-                    option.textContent += ' (Member Only)';
-                    option.disabled = true;
-                    option.style.color = '#dc2626';
-                }
-                
                 endTimeSelect.appendChild(option);
             }
             endTimeSelect.value = '';
@@ -415,36 +387,7 @@
 
         endTimeSelect.addEventListener('change', calculateTotalPrice);
 
-        // PERBAIKAN: Validate member slots
-        function validateTimeSlots() {
-            const startTime = startTimeSelect.value;
-            const endTime = endTimeSelect.value;
-            
-            if (startTime && endTime) {
-                const startHour = parseInt(startTime.split(':')[0]);
-                const endHour = parseInt(endTime.split(':')[0]);
-                
-                // Check if any hour in range is member slot
-                for (let hour = startHour; hour < endHour; hour++) {
-                    if (hour >= 17 && hour < 20) {
-                        alert('Slot jam 17:00-20:00 khusus untuk member. Gunakan form Member Booking di bawah untuk slot ini.');
-                        endTimeSelect.value = '';
-                        calculateTotalPrice();
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-
-        // Add validation to form submit
-        document.querySelector('form').addEventListener('submit', function(e) {
-            if (!validateTimeSlots()) {
-                e.preventDefault();
-            }
-        });
-
-        // JavaScript untuk form member booking dengan dynamic pricing
+        // JavaScript untuk form member booking - DIPERBAIKI: Gunakan dynamic pricing
         const memberStartTimeSelect = document.getElementById('member_start_time');
         const memberEndTimeSelect = document.getElementById('member_end_time');
         const memberFieldSelect = document.getElementById('member_field_id');
@@ -453,16 +396,13 @@
         const memberTotalPriceDisplay = document.getElementById('member_total_price_display');
         const memberTotalPrice = document.getElementById('member_total_price');
 
-        // PERBAIKAN: Member pricing (fixed rate for member slots)
-        const MEMBER_PRICE_PER_HOUR = 50000; // Fixed price for member slots
+        // HAPUS: const MEMBER_PRICE_PER_HOUR = 50000;
 
-        // Update end time options based on start time for member booking
         memberStartTimeSelect.addEventListener('change', function() {
             const selectedStartHour = parseInt(this.value.split(':')[0]);
             memberEndTimeSelect.innerHTML = '<option value="">Pilih Waktu Selesai</option>';
 
-            // Batasi end time hingga maksimal jam 20:00 (karena slot member 17-20)
-            const maxEndHour = Math.min(20, 24);
+            const maxEndHour = 24;
 
             for (let hour = selectedStartHour + 1; hour <= maxEndHour; hour++) {
                 const option = document.createElement('option');
@@ -475,10 +415,10 @@
             updateMemberCalculation();
         });
 
-        // Update calculation when end time changes
         memberEndTimeSelect.addEventListener('change', updateMemberCalculation);
         memberFieldSelect.addEventListener('change', updateMemberCalculation);
 
+        // DIPERBAIKI: Gunakan dynamic pricing yang sama
         function updateMemberCalculation() {
             const startTime = memberStartTimeSelect.value;
             const endTime = memberEndTimeSelect.value;
@@ -488,9 +428,13 @@
                 const startHour = parseInt(startTime.split(':')[0]);
                 const endHour = parseInt(endTime.split(':')[0]);
                 const duration = endHour - startHour;
-                
-                // PERBAIKAN: Use member pricing
-                const totalPrice = duration * MEMBER_PRICE_PER_HOUR;
+
+                // PERBAIKAN: Gunakan dynamic pricing yang sama dengan booking reguler
+                let totalPrice = 0;
+                for (let hour = startHour; hour < endHour; hour++) {
+                    const slotPrice = getPriceByHour(hour); // Gunakan function yang sama
+                    totalPrice += slotPrice;
+                }
 
                 // Update display
                 memberDurationDisplay.textContent = `${duration} jam`;

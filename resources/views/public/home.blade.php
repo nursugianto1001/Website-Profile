@@ -73,7 +73,7 @@
             </div>
             <div class="flex justify-center md:order-1" data-aos="fade-left" data-aos-duration="1000">
                 <img src="{{ Vite::asset('resources/images/servis.jpg') }}" alt="About Us"
-                    class="w-[500px] h-[500px] rounded-lg max-w-md">
+                    class="w-full h-auto rounded-lg max-w-md mx-auto">
             </div>
         </div>
     </div>

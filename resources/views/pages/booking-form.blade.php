@@ -389,7 +389,6 @@
             Secure payment powered by Midtrans
         </p>
     </form>
-    </div>
 
     <!-- Data untuk JavaScript -->
     <script>

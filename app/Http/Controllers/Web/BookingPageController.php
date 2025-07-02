@@ -301,7 +301,6 @@ class BookingPageController extends Controller
                     'end_time' => $endTime
                 ]);
 
-                // Cek availability
                 $isAvailable = $this->bookingService->areSlotsAvailable(
                     $fieldId,
                     $bookingDate,
@@ -318,7 +317,6 @@ class BookingPageController extends Controller
 
                 $field = Field::findOrFail($fieldId);
 
-                // PERBAIKAN: Hitung harga dinamis berdasarkan time slots
                 $subtotal = $field->calculateTotalPrice($timeSlots);
                 $totalPrice += $subtotal;
 
@@ -327,7 +325,6 @@ class BookingPageController extends Controller
                     'subtotal' => $subtotal
                 ]);
 
-                // PENTING: Simpan data lengkap untuk session termasuk time_slots
                 $pendingBookings[] = [
                     'field_id' => $fieldId,
                     'field_name' => $field->name,
@@ -340,7 +337,7 @@ class BookingPageController extends Controller
                     'duration_hours' => count($timeSlots),
                     'total_price' => $subtotal,
                     'payment_method' => $paymentMethod,
-                    'time_slots' => $timeSlots // PENTING: Simpan time slots untuk harga dinamis
+                    'time_slots' => $timeSlots
                 ];
             }
 
@@ -351,12 +348,13 @@ class BookingPageController extends Controller
                     ->withInput();
             }
 
-            // Generate order ID
+            $tax = 2000;
+            $totalPrice += $tax;
+
             $tempOrderId = 'ORDER-' . time() . '-' . uniqid();
 
             Log::info('Generated temp order ID:', ['temp_order_id' => $tempOrderId]);
 
-            // Buat transaksi Midtrans
             $midtransResponse = app('App\Providers\MidtransService')->createTransaction([
                 'booking_id' => $tempOrderId,
                 'customer_name' => $request->customer_name,
@@ -385,10 +383,10 @@ class BookingPageController extends Controller
                 'token' => substr($midtransResponse['token'], 0, 20) . '...'
             ]);
 
-            // PENTING: Simpan ke session dengan format yang benar dan validasi
             $sessionData = [
                 'bookings' => $pendingBookings,
                 'total_price' => $totalPrice,
+                'tax' => $tax,
                 'snap_token' => $midtransResponse['token'],
                 'order_id' => $midtransResponse['order_id'],
                 'temp_order_id' => $tempOrderId,
@@ -400,10 +398,10 @@ class BookingPageController extends Controller
             Log::info('Session data saved:', [
                 'bookings_count' => count($pendingBookings),
                 'total_price' => $totalPrice,
+                'tax' => $tax,
                 'session_keys' => array_keys($sessionData)
             ]);
 
-            // Verifikasi session data tersimpan
             $verifySession = Session::get('pending_booking_data');
             if (!$verifySession) {
                 Log::error('Failed to save session data');
@@ -413,7 +411,6 @@ class BookingPageController extends Controller
             }
 
             return redirect()->route('booking.payment.pending');
-
         } catch (\Exception $e) {
             Log::error('Booking process error: ' . $e->getMessage(), [
                 'stack_trace' => $e->getTraceAsString(),
@@ -578,7 +575,7 @@ class BookingPageController extends Controller
                     $startTime = Carbon::parse($bookingData['start_time']);
                     $endTime = Carbon::parse($bookingData['end_time']);
                     $timeSlots = [];
-                    
+
                     $current = $startTime->copy();
                     while ($current < $endTime) {
                         $timeSlots[] = $current->format('H:i:s');
@@ -626,14 +623,13 @@ class BookingPageController extends Controller
 
             // Redirect ke halaman success dengan parameter yang benar
             $bookingParam = implode(',', $bookingIds);
-            
+
             Log::info('Redirecting to booking success with param:', ['booking' => $bookingParam]);
 
             return redirect()->route('booking.success', ['booking' => $bookingParam])
                 ->with('success', 'Pembayaran berhasil! Booking Anda telah dikonfirmasi.')
                 ->with('multipleBookings', count($bookingIds) > 1)
                 ->with('totalBookings', count($bookingIds));
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Payment success handler error: ' . $e->getMessage(), [

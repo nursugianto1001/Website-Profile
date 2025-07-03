@@ -348,7 +348,7 @@ class BookingPageController extends Controller
                     ->withInput();
             }
 
-            $tax = 2000;
+            $tax = 2500;
             $totalPrice += $tax;
 
             $tempOrderId = 'ORDER-' . time() . '-' . uniqid();

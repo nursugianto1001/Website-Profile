@@ -20,7 +20,7 @@
                 <div class="mb-6 pb-4 border-b border-gray-100">
                     <div class="flex items-center text-amber-600">
                         <i class="bi bi-pencil-square mr-2"></i>
-                        <span class="font-medium">Edit {{ $gallery->type == 'documentation' ? 'Dokementasi' : 'Poster' }}
+                        <span class="font-medium">Edit {{ $gallery->type == 'documentation' ? 'Dokumentasi' : 'Poster' }}
                             Detail</span>
                     </div>
                 </div>
@@ -39,13 +39,13 @@
                                 <div class="flex space-x-4">
                                     <label class="inline-flex items-center">
                                         <input type="radio" name="type" value="poster"
-                                            {{ $gallery->type == 'poster' ? 'checked' : '' }}
+                                            {{ old('type', $gallery->type) == 'poster' ? 'checked' : '' }}
                                             class="rounded-full border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                         <span class="ml-2 text-gray-700">Poster</span>
                                     </label>
                                     <label class="inline-flex items-center">
                                         <input type="radio" name="type" value="documentation"
-                                            {{ $gallery->type == 'documentation' ? 'checked' : '' }}
+                                            {{ old('type', $gallery->type) == 'documentation' ? 'checked' : '' }}
                                             class="rounded-full border-gray-300 text-purple-600 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
                                         <span class="ml-2 text-gray-700">Foto Dokumentasi</span>
                                     </label>
@@ -84,7 +84,7 @@
                                     <label for="is_featured" class="flex items-center space-x-3">
                                         <div class="relative inline-block w-10 mr-2 align-middle select-none">
                                             <input type="checkbox" name="is_featured" id="is_featured" value="1"
-                                                {{ $gallery->is_featured ? 'checked' : '' }}
+                                                {{ old('is_featured', $gallery->is_featured) ? 'checked' : '' }}
                                                 class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" />
                                             <label for="is_featured"
                                                 class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
@@ -112,12 +112,14 @@
                         <div class="md:col-span-1">
                             <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 h-full">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Gambar Saat ini</label>
-                                <div class="mb-4 bg-white p-2 rounded-lg border border-gray-200 shadow-sm">
-                                    <img src="{{ asset('storage/' . $gallery->image_path) }}" alt="{{ $gallery->title }}"
-                                        class="w-full h-auto rounded-md">
-                                    <p class="text-xs text-gray-500 mt-2 text-center truncate">{{ $gallery->image_path }}
-                                    </p>
-                                </div>
+                                @if($gallery->image_path)
+                                    <div class="mb-4 bg-white p-2 rounded-lg border border-gray-200 shadow-sm">
+                                        <img src="{{ asset('storage/' . $gallery->image_path) }}" alt="{{ $gallery->title }}"
+                                            class="w-full h-auto rounded-md">
+                                        <p class="text-xs text-gray-500 mt-2 text-center truncate">{{ basename($gallery->image_path) }}
+                                        </p>
+                                    </div>
+                                @endif
 
                                 <label for="image" class="block text-sm font-medium text-gray-700 mb-2">Unggah Gambar Baru
                                     (Opsional)</label>
@@ -149,27 +151,36 @@
                         </div>
                     </div>
 
+                    <!-- Action Buttons -->
                     <div class="flex flex-wrap items-center justify-between gap-3 mt-8 pt-5 border-t border-gray-100">
-                        <form action="{{ route('admin.gallery.destroy', $gallery) }}" method="POST"
-                            onsubmit="return confirm('Are you sure you want to delete this {{ $gallery->type == 'documentation' ? 'photo' : 'poster' }}? This action cannot be undone.');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit"
+                        <!-- Delete Button (Separate Form) -->
+                        <div>
+                            <button type="button" onclick="confirmDelete()"
                                 class="px-4 py-2 bg-red-50 text-red-600 font-medium rounded-lg hover:bg-red-100 transition border border-red-200 flex items-center">
-                                <i class=""></i>Hapus {{ $gallery->type == 'documentation' ? 'Photo' : 'Poster' }}
+                                <i class="bi bi-trash mr-2"></i>Hapus {{ $gallery->type == 'documentation' ? 'Photo' : 'Poster' }}
                             </button>
-                        </form>
+                        </div>
 
-                        <a href="{{ route('admin.gallery.index') }}"
-                            class="px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition border border-gray-200 flex items-center">
-                            <i class=""></i>Batal
-                        </a>
+                        <div class="flex gap-3">
+                            <!-- Cancel Button -->
+                            <a href="{{ route('admin.gallery.index') }}"
+                                class="px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition border border-gray-200 flex items-center">
+                                <i class="bi bi-arrow-left mr-2"></i>Batal
+                            </a>
 
-                        <button type="submit"
-                            class="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-lg hover:from-blue-600 hover:to-blue-700 transition shadow-sm flex items-center">
-                            <i class=""></i>Perbarui {{ $gallery->type == 'documentation' ? 'Dokumentasi' : 'Poster' }}
-                        </button>
+                            <!-- Update Button -->
+                            <button type="submit"
+                                class="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-lg hover:from-blue-600 hover:to-blue-700 transition shadow-sm flex items-center">
+                                <i class="bi bi-check-lg mr-2"></i>Perbarui {{ $gallery->type == 'documentation' ? 'Dokumentasi' : 'Poster' }}
+                            </button>
+                        </div>
                     </div>
+                </form>
+
+                <!-- Separate Delete Form (Hidden) -->
+                <form id="deleteForm" action="{{ route('admin.gallery.destroy', $gallery) }}" method="POST" class="hidden">
+                    @csrf
+                    @method('DELETE')
                 </form>
             </div>
         </div>
@@ -200,6 +211,13 @@
                 reader.readAsDataURL(file);
             }
         });
+
+        // Delete confirmation function
+        function confirmDelete() {
+            if (confirm('Apakah Anda yakin ingin menghapus {{ $gallery->type == "documentation" ? "foto dokumentasi" : "poster" }} ini? Tindakan ini tidak dapat dibatalkan.')) {
+                document.getElementById('deleteForm').submit();
+            }
+        }
 
         // Drag and drop functionality
         const dropArea = document.querySelector('label[for="image"]').closest('div.border-dashed');

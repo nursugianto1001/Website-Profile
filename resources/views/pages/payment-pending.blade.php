@@ -38,7 +38,7 @@
                         <span class="font-medium">Tanggal:</span>
                         <span>{{ \Carbon\Carbon::parse($bookings[0]['booking_date'])->format('d M Y') }}</span>
                     </div>
-                    
+
                     <div class="border-t border-amber-100 pt-4 mb-2">
                         <h3 class="font-semibold mb-2 text-[#8B5A2B]">Lapangan yang Dipesan:</h3>
                         <div class="space-y-1">
@@ -51,20 +51,21 @@
                             @endforeach
                         </div>
                     </div>
-                    
+
                     <div class="flex justify-between text-lg font-bold mt-4">
                         <span>Total Biaya:</span>
                         <span class="text-[#A66E38]">Rp {{ number_format($totalPrice, 0, ',', '.') }}</span>
                     </div>
-                    
+
                     <div class="mt-4 p-3 bg-amber-100 border-l-4 border-[#A66E38] text-[#8B5A2B] rounded">
                         <b>Informasi Pembayaran:</b><br>
+                        Setiap transaksi yang dilakukan akan dikenakan pajak Admin sebesar Rp2.500.<br>
                         Data booking Anda belum tersimpan di sistem. Booking akan otomatis tersimpan setelah pembayaran berhasil.<br>
                         Jika membatalkan pembayaran, slot waktu akan tetap tersedia untuk customer lain.
                     </div>
                 </div>
             </div>
-            
+
             <div class="text-center mt-6">
                 <a href="/fields/book" class="inline-flex items-center px-5 py-3 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg shadow transition-colors mr-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -72,7 +73,7 @@
                     </svg>
                     Kembali ke Form Booking
                 </a>
-                
+
                 <button id="pay-button" class="inline-flex items-center px-5 py-3 bg-[#A66E38] hover:bg-[#8B5A2B] text-white font-medium rounded-lg shadow transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-3a2 2 0 00-2-2H9a2 2 0 00-2 2v3a2 2 0 002 2z" />
@@ -105,28 +106,28 @@
                 if (snapToken) {
                     console.log('Starting payment process...');
                     loadingIndicator.classList.remove('hidden');
-                    
+
                     snap.pay(snapToken, {
                         onSuccess: function(result) {
                             console.log('Payment success:', result);
                             loadingIndicator.classList.add('hidden');
-                            
+
                             // Debug log
                             console.log('Redirecting to success handler with order_id:', result.order_id);
-                            
+
                             // Redirect ke success handler yang akan menyimpan data ke database
                             const successUrl = '/payment/success-handler?order_id=' + result.order_id;
                             console.log('Success URL:', successUrl);
-                            
+
                             window.location.href = successUrl;
                         },
                         onPending: function(result) {
                             console.log('Payment pending:', result);
                             loadingIndicator.classList.add('hidden');
-                            
+
                             const pendingUrl = '/payment/pending-handler?order_id=' + result.order_id;
                             console.log('Pending URL:', pendingUrl);
-                            
+
                             window.location.href = pendingUrl;
                         },
                         onError: function(result) {

@@ -93,7 +93,7 @@
                                     <p class="text-xs text-gray-500 mt-2 pl-12">Item unggulan akan ditampilkan secara menonjol di beranda situs web</p>
                                 </div>
                                 <div>
-                                    <label for="display_order" class="block text-sm font-medium text-gray-700 mb-2">Urutab</label>
+                                    <label for="display_order" class="block text-sm font-medium text-gray-700 mb-2">Urutan</label>
                                     <div class="relative">
                                         <input type="number" name="display_order" id="display_order"
                                             value="{{ old('display_order', 0) }}"

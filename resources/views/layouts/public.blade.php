@@ -40,25 +40,25 @@
 
                 <div id="desktopMenu" class="hidden md:flex flex-grow justify-center space-x-6">
                     <a href="{{ route('home') }}"
-                        class="text-white px-3 py-2 rounded-md text-sm font-bold hover:text-[#A66E38]">Beranda</a>
+                        class="text-white px-3 py-2 rounded-md text-sm font-bold hover:text-green-300">Beranda</a>
                     <a href="{{ route('about') }}"
-                        class="text-white px-3 py-2 rounded-md text-sm font-bold hover:text-[#A66E38]">Tentang</a>
+                        class="text-white px-3 py-2 rounded-md text-sm font-bold hover:text-green-300">Tentang</a>
                     <a href="{{ route('facilities') }}"
-                        class="text-white px-3 py-2 rounded-md text-sm font-bold hover:text-[#A66E38]">Fasilitas</a>
+                        class="text-white px-3 py-2 rounded-md text-sm font-bold hover:text-green-300">Fasilitas</a>
                     <a href="{{ route('contact') }}"
-                        class="text-white px-3 py-2 rounded-md text-sm font-bold hover:text-[#A66E38]">Kontak</a>
+                        class="text-white px-3 py-2 rounded-md text-sm font-bold hover:text-green-300">Kontak</a>
                 </div>
 
                 <div class="hidden md:block flex-shrink-0">
                     <a href="{{ route('booking.form') }}"
-                        class="bg-[#A66E38] text-white px-5 py-2 rounded-md text-sm font-bold border-2 border-[#A66E38] transition duration-300 hover:bg-transparent hover:text-[#ffff] hover:border-white text-center">
+                        class="bg-green-600/90 text-white px-5 py-2 rounded-md text-sm font-bold border-2 border-green-600/90 transition duration-300 hover:bg-transparent hover:text-[#ffff] hover:border-white text-center">
                         Pesan Sekarang
                     </a>
                 </div>
 
                 <div id="mobileMenuButton" class="flex md:hidden">
                     <button type="button"
-                        class="inline-flex items-center justify-center p-2 rounded-md text-white hover:text-[#A66E38]"
+                        class="inline-flex items-center justify-center p-2 rounded-md text-white hover:text-green-300"
                         onclick="toggleMobileMenu()">
                         <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                             stroke-width="2" stroke="currentColor">
@@ -72,13 +72,13 @@
                 class="hidden absolute top-full left-0 right-0 w-full z-50 bg-black/90 rounded-b-md p-2 shadow-lg">
                 <div class="px-2 pt-2 pb-3 space-y-1">
                     <a href="{{ route('home') }}"
-                        class="text-white block w-full px-3 py-3 rounded-md text-base font-bold hover:text-[#A66E38] hover:bg-gray-700/70">Beranda</a>
+                        class="text-white block w-full px-3 py-3 rounded-md text-base font-bold hover:text-green-300 hover:bg-gray-700/70">Beranda</a>
                     <a href="{{ route('about') }}"
-                        class="text-white block w-full px-3 py-3 rounded-md text-base font-bold hover:text-[#A66E38] hover:bg-gray-700/70">Tentang</a>
+                        class="text-white block w-full px-3 py-3 rounded-md text-base font-bold hover:text-green-300 hover:bg-gray-700/70">Tentang</a>
                     <a href="{{ route('facilities') }}"
-                        class="text-white block w-full px-3 py-3 rounded-md text-base font-bold hover:text-[#A66E38] hover:bg-gray-700/70">Fasilitas</a>
+                        class="text-white block w-full px-3 py-3 rounded-md text-base font-bold hover:text-green-300 hover:bg-gray-700/70">Fasilitas</a>
                     <a href="{{ route('contact') }}"
-                        class="text-white block w-full px-3 py-3 rounded-md text-base font-bold hover:text-[#A66E38] hover:bg-gray-700/70">Kontak</a>
+                        class="text-white block w-full px-3 py-3 rounded-md text-base font-bold hover:text-green-300 hover:bg-gray-700/70">Kontak</a>
                 </div>
             </div>
         </nav>
@@ -89,7 +89,7 @@
     </main>
 
     <footer class="w-full mt-auto">
-        <div class="bg-[#1A1A19] backdrop-blur p-8">
+        <div class="bg-blue-900 backdrop-blur p-8">
             <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 gap-8">
                     <div>
@@ -101,12 +101,16 @@
                         </ul>
                         <div class="mt-4 flex gap-4">
                             <a href="https://www.instagram.com/karvin_badminton/"
-                                class="text-gray-300 hover:text-[#A66E38] w-10 h-10 flex items-center justify-center">
+                                class="text-gray-300 hover:text-blue-300 w-10 h-10 flex items-center justify-center">
                                 <i class="fab fa-instagram text-xl"></i>
                             </a>
                             <a href="https://maps.app.goo.gl/XryjjSfbFV3FjJJAA" target="_blank"
-                                class="text-gray-300 hover:text-[#A66E38] w-10 h-10 flex items-center justify-center">
+                                class="text-gray-300 hover:text-blue-300 w-10 h-10 flex items-center justify-center">
                                 <i class="fas fa-map-marker-alt text-xl"></i>
+                            </a>
+                            <a href="https://www.tiktok.com/@karvinbadminton?_t=ZS-8xlSGLPLg4V&_r=1"
+                                class="text-gray-300 hover:text-blue-300 w-10 h-10 flex items-center justify-center">
+                                <i class="fab fa-tiktok text-xl"></i>
                             </a>
                         </div>
                     </div>
@@ -124,9 +128,9 @@
             const header = document.getElementById('main-header');
             if (window.scrollY > 50) {
                 header.classList.remove('bg-transparent');
-                header.classList.add('bg-[#1A1A19]');
+                header.classList.add('bg-blue-900');
             } else {
-                header.classList.remove('bg-[#1A1A19]');
+                header.classList.remove('bg-blue-900');
                 header.classList.add('bg-transparent');
             }
         }

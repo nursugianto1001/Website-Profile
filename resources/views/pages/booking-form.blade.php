@@ -76,7 +76,7 @@
     }
 </style>
 
-<body class="bg-[#fdf8f2]">
+<body class="bg-green-500/90">
     <div class>
 
         <!-- Content -->
@@ -85,21 +85,21 @@
             <div class="text-center mb-6 sm:mb-8 pt-16 sm:pt-12">
                 <div
                     class="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-white/60 backdrop-blur-sm rounded-2xl mb-3 sm:mb-4 shadow-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sm:h-7 sm:w-7 text-[#A66E38]" fill="none"
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sm:h-7 sm:w-7 text-green-600" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                             d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                 </div>
-                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#A66E38] mb-2 tracking-tight px-4">
+                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-green-300 mb-2 tracking-tight px-4">
                     Pesan Lapangan Badminton Karvin
                 </h1>
-                <div class="w-8 sm:w-20 h-0.5 bg-gradient-to-r from-[#A66E38] to-[#D4A574] mx-auto"></div>
+                <div class="w-8 sm:w-20 h-0.5 bg-gradient-to-r from-green-600 to-green-300 mx-auto"></div>
             </div>
 
             <!-- Button Kembali - Pojok Kanan Atas -->
             <a href="/"
-                class="absolute top-4 right-4 sm:top-6 sm:right-6 inline-flex items-center px-3 py-2 sm:px-4 sm:py-2.5 bg-white/70 backdrop-blur-sm hover:bg-white/90 text-[#A66E38] font-medium rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-[#A66E38]/10 hover:border-[#A66E38]/20 text-sm sm:text-base">
+                class="absolute top-4 right-4 sm:top-6 sm:right-6 inline-flex items-center px-3 py-2 sm:px-4 sm:py-2.5 bg-white/70 backdrop-blur-sm hover:bg-white/90 text-green-600 font-medium rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-green-600/10 hover:border-green-600/20 text-sm sm:text-base">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 sm:mr-2" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -115,8 +115,11 @@
     <div id="error-container" class="hidden mb-4 bg-red-50 border border-red-200 text-red-800 rounded-lg p-4">
         <div class="flex">
             <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                    fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                        clip-rule="evenodd" />
                 </svg>
             </div>
             <div class="ml-3">
@@ -132,24 +135,23 @@
         @csrf
 
         <!-- Date Selection -->
-        <div
-            class="bg-gradient-to-br from-amber-50 via-amber-100/30 to-[#fdf5e9] rounded-lg shadow-md p-6 border border-amber-100">
+        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
             <div class="flex items-center mb-4">
-                <div class="bg-[#faebd7] p-2 rounded-full mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#A66E38]" fill="none"
+                <div class="bg-green-100 p-2 rounded-full mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                 </div>
-                <h2 class="text-xl font-semibold text-[#A66E38]">Pilih Tanggal</h2>
+                <h2 class="text-xl font-semibold text-green-600">Pilih Tanggal</h2>
             </div>
 
             <p class="text-sm text-gray-600 mb-4">Pilih tanggal pemesanan yang Anda inginkan dari pilihan yang tersedia
                 di bawah ini.</p>
 
             <div class="mb-3">
-                <div class="flex items-center text-sm text-[#A66E38] mb-3">
+                <div class="flex items-center text-sm text-gray-600 mb-3">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -167,27 +169,27 @@
         </div>
 
         <!-- Field and Time Selection -->
-        <div
-            class="bg-gradient-to-br from-amber-50 via-amber-100/30 to-[#fdf5e9] rounded-lg shadow-md p-6 border border-amber-100">
+        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
             <div class="flex items-center mb-4">
-                <div class="bg-[#faebd7] p-2 rounded-full mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#A66E38]" fill="none"
+                <div class="bg-green-100 p-2 rounded-full mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                     </svg>
                 </div>
-                <h2 class="text-xl font-semibold text-[#A66E38]">Pilih Lapangan & Waktu Bermain</h2>
+                <h2 class="text-xl font-semibold text-green-600">Pilih Lapangan & Waktu Bermain</h2>
             </div>
 
-            <div class="flex items-center mb-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#A66E38] mr-2" fill="none"
+            <div class="flex items-center mb-4 p-3 bg-green-50 rounded-lg border border-green-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 mr-2" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <p class="text-sm text-blue-700">Klik pada slot waktu yang tersedia untuk memesan. <span
-                        class="font-medium">Slot hijau tersedia</span>, <span class="font-medium">slot merah tidak tersedia</span>.</p>
+                <p class="text-sm text-green-700">Klik pada slot waktu yang tersedia untuk memesan. <span
+                        class="font-medium">Slot hijau tersedia</span>, <span class="font-medium">slot merah tidak
+                        tersedia</span>.</p>
             </div>
 
             <!-- Legend dengan keterangan member -->
@@ -196,8 +198,8 @@
                     <span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
                     <span>Tersedia</span>
                 </div>
-                <div class="flex items-center px-3 py-1 bg-blue-100 rounded-full text-sm text-blue-800">
-                    <span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
+                <div class="flex items-center px-3 py-1 bg-yellow-100 rounded-full text-sm text-yellow-800">
+                    <span class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></span>
                     <span>Terpilih</span>
                 </div>
                 <div class="flex items-center px-3 py-1 bg-red-100 rounded-full text-sm text-red-800">
@@ -232,30 +234,29 @@
 
         <div id="selected-slots-container" class="mt-5 hidden">
             <div class="flex items-center mb-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#A66E38] mr-2" fill="none"
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 mr-2" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <h3 class="font-medium text-gray-800">Kamu Pilih Slot:</h3>
+                <h3 class="font-medium text-green-600">Kamu Pilih Slot:</h3>
             </div>
-            <div id="selected-slots-summary" class="p-4 bg-blue-50 rounded-lg border border-blue-100 text-sm">
+            <div id="selected-slots-summary" class="p-4 bg-green-50 rounded-lg border border-green-100 text-sm">
             </div>
         </div>
         </div>
 
         <!-- Customer Information -->
-        <div
-            class="bg-gradient-to-br from-amber-50 via-amber-100/30 to-[#fdf5e9] rounded-lg shadow-md p-6 border border-amber-100">
+        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
             <div class="flex items-center mb-4">
-                <div class="bg-[#faebd7] p-2 rounded-full mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#A66E38]" fill="none"
+                <div class="bg-green-100 p-2 rounded-full mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                 </div>
-                <h2 class="text-xl font-semibold text-[#8B5A2B]">Informasi Pelanggan</h2>
+                <h2 class="text-xl font-semibold text-green-600">Informasi Pelanggan</h2>
             </div>
 
             <p class="text-sm text-gray-600 mb-4">Silakan berikan detail kontak Anda untuk konfirmasi pemesanan.</p>
@@ -272,7 +273,7 @@
                             </svg>
                         </div>
                         <input type="text" name="customer_name" id="customer_name" placeholder="John Doe"
-                            class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#A66E38] focus:border-[#A66E38]"
+                            class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-green-600"
                             required>
                     </div>
                     <span class="text-red-500 text-sm customer_name-error"></span>
@@ -290,7 +291,7 @@
                         </div>
                         <input type="email" name="customer_email" id="customer_email"
                             placeholder="johndoe@example.com"
-                            class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#A66E38] focus:border-[#A66E38]"
+                            class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-green-600"
                             required>
                     </div>
                     <p class="text-xs text-gray-500">Kami akan mengirimkan konfirmasi pemesanan ke email ini</p>
@@ -310,7 +311,7 @@
                         </div>
                         <input type="text" name="customer_phone" id="customer_phone"
                             placeholder="+62 812-3456-7890"
-                            class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#A66E38] focus:border-[#A66E38]"
+                            class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-green-600"
                             required>
                     </div>
                     <p class="text-xs text-gray-500">Untuk pemberitahuan mendesak tentang pemesanan Anda</p>
@@ -320,36 +321,39 @@
         </div>
 
         <!-- Payment Method -->
-        <div
-            class="bg-gradient-to-br from-amber-50 via-amber-100/30 to-[#fdf5e9] rounded-lg shadow-md p-6 border border-amber-100">
+        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
             <div class="flex items-center mb-4">
-                <div class="bg-[#faebd7] p-2 rounded-full mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#A66E38]" fill="none"
+                <div class="bg-green-100 p-2 rounded-full mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                     </svg>
                 </div>
-                <h2 class="text-xl font-semibold text-[#A66E38]">Metode Pembayaran</h2>
+                <h2 class="text-xl font-semibold text-green-600">Metode Pembayaran</h2>
             </div>
 
             <div class="space-y-3">
                 <label
-                    class="block p-4 border rounded-lg transition-all hover:border-blue-300 hover:bg-blue-50 cursor-pointer">
+                    class="block p-4 border rounded-lg transition-all hover:border-green-600 hover:bg-green-50 cursor-pointer border-gray-300 bg-gray-50">
                     <div class="flex items-center">
                         <input type="radio" name="payment_method" value="online" checked
-                            class="h-5 w-5 text-[#A66E38] focus:ring-[#A66E38]">
+                            class="h-5 w-5 text-green-600 focus:ring-green-600">
                         <div class="ml-3 flex-1">
                             <div class="flex items-center justify-between">
-                                <span class="text-gray-800 font-medium">Pembayaran Online</span>
+                                <span class="text-green-600 font-medium">Pembayaran Online</span>
                             </div>
-                            <p class="text-gray-500 text-sm mt-1">Bayar dengan aman secara online dengan kartu kredit,
+                            <p class="text-gray-600 text-sm mt-1">Bayar dengan aman secara online dengan kartu kredit,
                                 transfer bank, atau dompet elektronik</p>
                             <div class="mt-2 flex flex-wrap gap-2">
-                                <span class="inline-block px-2 py-1 bg-gray-100 text-xs rounded">Credit Card</span>
-                                <span class="inline-block px-2 py-1 bg-gray-100 text-xs rounded">Bank Transfer</span>
-                                <span class="inline-block px-2 py-1 bg-gray-100 text-xs rounded">GoPay</span>
-                                <span class="inline-block px-2 py-1 bg-gray-100 text-xs rounded">OVO</span>
+                                <span class="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded">Credit
+                                    Card</span>
+                                <span class="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded">Bank
+                                    Transfer</span>
+                                <span
+                                    class="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded">GoPay</span>
+                                <span
+                                    class="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded">OVO</span>
                             </div>
                         </div>
                     </div>
@@ -358,21 +362,20 @@
         </div>
 
         <!-- Booking Summary and Total -->
-        <div
-            class="bg-gradient-to-br from-amber-50 via-amber-100/30 to-[#fdf5e9] rounded-lg shadow-md p-6 border border-amber-100">
-            <h2 class="text-xl font-semibold mb-4 text-[#A66E38]">Ringkasan Pemesanan</h2>
+        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+            <h2 class="text-xl font-semibold mb-4 text-green-600">Ringkasan Pemesanan</h2>
             <div id="booking-summary" class="mb-4">
-                <p class="text-gray-500 italic">Please select field(s) and time slot(s) to see the summary</p>
+                <p class="text-gray-600 italic">Please select field(s) and time slot(s) to see the summary</p>
             </div>
-            <div class="flex justify-between items-center border-t pt-4 mt-4">
-                <span class="text-xl font-bold text-[#A66E38]">Total Biaya:</span>
-                <span id="total-price" class="text-xl font-bold text-[#A66E38]">Rp -</span>
+            <div class="flex justify-between items-center border-t border-gray-300 pt-4 mt-4">
+                <span class="text-xl font-bold text-green-600">Total Biaya:</span>
+                <span id="total-price" class="text-xl font-bold text-green-600">Rp -</span>
             </div>
         </div>
 
         <!-- Submit Button -->
         <button type="submit"
-            class="w-full py-4 px-6 bg-[#A66E38] hover:bg-[#8B5A2B] text-white font-bold rounded-lg shadow-lg transition-colors flex items-center justify-center">
+            class="w-full py-4 px-6 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg shadow-lg transition-colors flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -616,7 +619,7 @@
                 const dateButton = document.createElement('button');
                 dateButton.type = 'button';
                 dateButton.className = `date-selector px-4 py-2 border rounded-md transition-colors ${
-                    index === 0 ? 'bg-[#A66E38] text-white border-[#8B5A2B]' : 'bg-white text-gray-700 border-gray-300 hover:bg-amber-50'
+                    index === 0 ? 'bg-[#4ade80] text-white border-[#86efac]' : 'bg-white text-black border-white hover:bg-green-50'
                 }`;
                 dateButton.setAttribute('data-date', dateObj.date);
                 dateButton.innerHTML = `
@@ -631,16 +634,16 @@
                 button.addEventListener('click', function() {
                     // Reset semua tombol ke warna default
                     document.querySelectorAll('.date-selector').forEach(btn => {
-                        btn.classList.remove('bg-[#A66E38]', 'bg-blue-500', 'text-white',
-                            'border-[#8B5A2B]', 'border-blue-600');
-                        btn.classList.add('bg-white', 'text-gray-700', 'border-gray-300',
-                            'hover:bg-amber-50');
+                        btn.classList.remove('bg-[#4ade80]', 'bg-blue-500', 'text-white',
+                            'border-[#86efac]', 'border-blue-600');
+                        btn.classList.add('bg-white', 'text-black', 'border-white',
+                            'hover:bg-green-50');
                     });
 
                     // Ubah warna tombol yang diklik ke coklat keemasan
-                    this.classList.remove('bg-white', 'text-gray-700', 'border-gray-300',
-                        'hover:bg-amber-50');
-                    this.classList.add('bg-[#A66E38]', 'text-white', 'border-[#8B5A2B]');
+                    this.classList.remove('bg-white', 'text-black', 'border-white',
+                        'hover:bg-green-50');
+                    this.classList.add('bg-[#4ade80]', 'text-white', 'border-[#86efac]');
 
                     // Update tanggal yang dipilih
                     currentDate = this.getAttribute('data-date');
@@ -723,7 +726,8 @@
                 slots.forEach(slot => {
                     const tr = document.createElement('tr');
                     const slotHour = parseInt(slot.time.split(':')[0]);
-                    const slotPrice = getPriceByHour(slotHour); // Pastikan fungsi ini return angka yang valid
+                    const slotPrice = getPriceByHour(
+                        slotHour); // Pastikan fungsi ini return angka yang valid
 
                     // Kolom waktu dengan harga
                     const tdTime = document.createElement('td');
@@ -760,10 +764,12 @@
                         td.setAttribute('data-slot-price', slotPrice);
 
                         const div = document.createElement('div');
-                        div.className = 'flex flex-col items-center justify-center rounded-md text-xs font-medium h-12 transition duration-200 shadow-sm';
+                        div.className =
+                            'flex flex-col items-center justify-center rounded-md text-xs font-medium h-12 transition duration-200 shadow-sm';
 
                         if (isSelected) {
-                            div.classList.add('bg-blue-500', 'text-white', 'border', 'border-blue-600');
+                            div.classList.add('bg-blue-500', 'text-white', 'border',
+                                'border-blue-600');
                             div.innerHTML = `
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -773,7 +779,9 @@
                             td.setAttribute('data-available', 'true');
                             td.classList.add('time-slot');
                         } else if (slotData && slotData.available) {
-                            div.classList.add('bg-green-100', 'hover:bg-green-200', 'text-green-800', 'cursor-pointer', 'border', 'border-green-200', 'hover:border-green-300');
+                            div.classList.add('bg-green-100', 'hover:bg-green-200',
+                                'text-green-800', 'cursor-pointer', 'border',
+                                'border-green-200', 'hover:border-green-300');
                             div.innerHTML = `
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -787,7 +795,8 @@
                             const displayName = customerName.length > 12 ?
                                 customerName.substring(0, 12) + '...' : customerName;
 
-                            div.classList.add('bg-red-100', 'text-red-600', 'cursor-not-allowed', 'border', 'border-red-200');
+                            div.classList.add('bg-red-100', 'text-red-600', 'cursor-not-allowed',
+                                'border', 'border-red-200');
                             div.innerHTML = `
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -832,7 +841,8 @@
 
             function handleSlotClick(fieldId, timeSlot) {
                 const fieldCheckbox = document.getElementById(`field_${fieldId}`);
-                const slotElement = document.querySelector(`[data-field-id="${fieldId}"][data-time-slot="${timeSlot}"]`);
+                const slotElement = document.querySelector(
+                    `[data-field-id="${fieldId}"][data-time-slot="${timeSlot}"]`);
                 const slotPriceAttr = slotElement.getAttribute('data-slot-price');
                 const slotPrice = parseInt(slotPriceAttr) || 0; // Validasi untuk mencegah NaN
 
@@ -976,9 +986,9 @@
                         const hour = parseInt(slot.split(':')[0]);
                         const slotPrice = getPriceByHour(hour);
                         return `<div class="flex justify-between">
-                            <span>${formatTimeRange(slot)}:</span>
-                            <span>Rp ${slotPrice.toLocaleString("id-ID")}</span>
-                        </div>`;
+                                    <span>${formatTimeRange(slot)}:</span>
+                                    <span>Rp ${slotPrice.toLocaleString("id-ID")}</span>
+                                </div>`;
                     }).join('')}
                 </div>
                 <div class="flex justify-between font-medium text-gray-800 pt-2 border-t border-gray-300">
@@ -1074,7 +1084,8 @@
             // Show success message jika ada pembatalan
             if (isCancelled) {
                 const successDiv = document.createElement('div');
-                successDiv.className = 'mb-4 bg-green-50 border border-green-200 text-green-800 rounded-lg p-4 success-message';
+                successDiv.className =
+                    'mb-4 bg-green-50 border border-green-200 text-green-800 rounded-lg p-4 success-message';
                 successDiv.innerHTML = `
                     <div class="flex">
                         <div class="flex-shrink-0">

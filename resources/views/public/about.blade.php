@@ -40,11 +40,11 @@
 <!-- Scrollable Content -->
 <div class="relative z-30 bg-white">
     <!-- Our Story Section -->
-    <div class="py-20 bg-green-600/90">
+    <div class="py-20 bg-green-600 bg-opacity-90 bg-green-600-opacity">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                 <div data-aos="fade-right" data-aos-duration="1000">
-                    <h2 class="text-3xl font-bold text-green-300 mb-6">Cerita Kami</h2>
+                    <h2 class="text-3xl font-bold text-green-300 text-green-300-safe mb-6">Cerita Kami</h2>
                     <p class="text-white mb-4">
                         Karvin hadir pertama kali pada 30 Oktober 2024, lahir dari keinginan sederhana: menyediakan
                         tempat main bulu tangkis yang gak cuma nyaman, tapi juga bikin betah. Kami tahu, nyari lapangan
@@ -70,7 +70,7 @@
     </div>
 
     <!-- Our Mission Section -->
-    <div class="py-10 bg-green-700/90">
+    <div class="py-10 bg-green-700 bg-opacity-90 bg-green-700-opacity">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                 <div class="order-2 md:order-1" data-aos="fade-right" data-aos-duration="1000">
@@ -78,7 +78,7 @@
                         class="w-full h-auto rounded-lg max-w-md mx-auto">
                 </div>
                 <div class="order-1 md:order-2" data-aos="fade-left" data-aos-duration="1000">
-                    <h2 class="text-3xl font-bold text-green-300 mb-6">Misi Kami</h2>
+                    <h2 class="text-3xl font-bold text-green-300 text-green-300-safe mb-6">Misi Kami</h2>
                     <p class="text-white mb-4">
                         Misi kami di Karvin adalah menghadirkan lapangan bulu tangkis yang nyaman, bersih, dan mudah
                         diakses oleh siapa saja. Kami ingin menciptakan ruang di mana orang bisa berkumpul, bergerak
@@ -95,10 +95,10 @@
     </div>
 
     <!-- Our Values Section with Box Gradients -->
-    <div class="py-16 bg-gradient-to-b from-green-600/80 to-green-700/70">
+    <div class="py-16 bg-gradient-to-b from-green-600 to-green-700 gradient-green-fallback">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12" data-aos="fade-up" data-aos-duration="800">
-                <h2 class="text-3xl font-bold text-green-300">Nilai Nilai Kami</h2>
+                <h2 class="text-3xl font-bold text-green-300 text-green-300-safe">Nilai Nilai Kami</h2>
                 <br>
                 <p class="text-white mb-4 max-w-3xl mx-auto">
                     Kami berpegang pada prinsip-prinsip utama dalam setiap langkah yang diambil.
@@ -111,9 +111,9 @@
                     data-aos="fade-up" data-aos-duration="800" data-aos-delay="100">
                     <div
                         class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-md bg-white">
-                        <i class="fas fa-medal text-2xl text-green-600"></i>
+                        <i class="fas fa-medal text-2xl text-green-600 text-green-600-safe"></i>
                     </div>
-                    <h3 class="text-xl font-bold mb-2 text-center text-green-700">Sportivitas</h3>
+                    <h3 class="text-xl font-bold mb-2 text-center text-green-700 text-green-700-safe">Sportivitas</h3>
                     <p class="text-gray-700 text-center">
                         Kami menanamkan semangat fair play dan sikap saling menghargai dalam setiap aktivitas di
                         lapangan.
@@ -125,9 +125,9 @@
                     data-aos="fade-up" data-aos-duration="800" data-aos-delay="200">
                     <div
                         class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-md bg-white">
-                        <i class="fas fa-users text-2xl text-green-600"></i>
+                        <i class="fas fa-users text-2xl text-green-600 text-green-600-safe"></i>
                     </div>
-                    <h3 class="text-xl font-bold mb-2 text-center text-green-700">Kepuasan Pelanggan</h3>
+                    <h3 class="text-xl font-bold mb-2 text-center text-green-700 text-green-700-safe">Kepuasan Pelanggan</h3>
                     <p class="text-gray-700 text-center">
                         Kepuasan Anda adalah prioritas kami. Kami terus mendengarkan, memperbaiki, dan menyesuaikan
                         layanan sesuai kebutuhan pengguna.
@@ -139,9 +139,9 @@
                     data-aos="fade-up" data-aos-duration="800" data-aos-delay="300">
                     <div
                         class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-md bg-white">
-                        <i class="fas fa-person-running text-2xl text-green-600"></i>
+                        <i class="fas fa-person-running text-2xl text-green-600 text-green-600-safe"></i>
                     </div>
-                    <h3 class="text-xl font-bold mb-2 text-center text-green-700">Gaya Hidup Aktif</h3>
+                    <h3 class="text-xl font-bold mb-2 text-center text-green-700 text-green-700-safe">Gaya Hidup Aktif</h3>
                     <p class="text-gray-700 text-center">
                         Kami mendukung gaya hidup sehat dan aktif lewat kemudahan akses ke fasilitas olahraga.
                     </p>

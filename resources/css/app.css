@@ -1,10 +1,6 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
-
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Badminton Theme Colors */
 :root {
@@ -209,44 +205,82 @@
 }
 
 /* Form Elements */
-input[type="email"],
-input[type="password"],
-input[type="text"] {
-    @apply block w-full rounded-md border-gray-300 focus:border-badminton-blue focus:ring focus:ring-badminton-blue/20 focus:ring-opacity-50 transition duration-150;
+@layer components {
+
+    input[type="email"],
+    input[type="password"],
+    input[type="text"] {
+        @apply block w-full rounded-md border-gray-300 focus:border-badminton-blue focus:ring focus:ring-badminton-blue/20 focus:ring-opacity-50 transition duration-150;
+    }
+
+    /* Button Styling */
+    .btn,
+    button[type="submit"],
+    .primary-button {
+        @apply inline-flex items-center px-4 py-2 border border-transparent rounded-full text-sm font-medium transition ease-in-out duration-150;
+        background: var(--badminton-blue);
+        color: white;
+    }
+
+    .btn:hover,
+    button[type="submit"]:hover,
+    .primary-button:hover {
+        @apply transform -translate-y-0.5 shadow-md;
+        background: #0045a0;
+    }
+
+    .btn:focus,
+    button[type="submit"]:focus,
+    .primary-button:focus {
+        @apply outline-none ring-2 ring-offset-2 ring-badminton-blue;
+    }
+
+    /* Remember Me Checkbox */
+    input[type="checkbox"] {
+        @apply rounded border-gray-300 text-badminton-green shadow-sm focus:border-badminton-green focus:ring focus:ring-badminton-green/20 focus:ring-opacity-50;
+    }
+
+    /* Text Colors */
+    .text-badminton-blue {
+        color: var(--badminton-blue);
+    }
+
+    .text-badminton-green {
+        color: var(--badminton-green);
+    }
 }
 
-/* Button Styling */
-.btn,
-button[type="submit"],
-.primary-button {
-    @apply inline-flex items-center px-4 py-2 border border-transparent rounded-full text-sm font-medium transition ease-in-out duration-150;
-    background: var(--badminton-blue);
-    color: white;
-}
+@layer utilities {
+    .bg-green-600-safe {
+        background-color: #16a34a !important;
+    }
 
-.btn:hover,
-button[type="submit"]:hover,
-.primary-button:hover {
-    @apply transform -translate-y-0.5 shadow-md;
-    background: #0045a0;
-}
+    .bg-green-700-safe {
+        background-color: #15803d !important;
+    }
 
-.btn:focus,
-button[type="submit"]:focus,
-.primary-button:focus {
-    @apply outline-none ring-2 ring-offset-2 ring-badminton-blue;
-}
+    .bg-green-600-opacity {
+        background-color: rgba(22, 163, 74, 0.9) !important;
+    }
 
-/* Remember Me Checkbox */
-input[type="checkbox"] {
-    @apply rounded border-gray-300 text-badminton-green shadow-sm focus:border-badminton-green focus:ring focus:ring-badminton-green/20 focus:ring-opacity-50;
-}
+    .bg-green-700-opacity {
+        background-color: rgba(21, 128, 61, 0.9) !important;
+    }
 
-/* Text Colors */
-.text-badminton-blue {
-    color: var(--badminton-blue);
-}
+    .text-green-300-safe {
+        color: #86efac !important;
+    }
 
-.text-badminton-green {
-    color: var(--badminton-green);
+    .text-green-600-safe {
+        color: #16a34a !important;
+    }
+
+    .text-green-700-safe {
+        color: #15803d !important;
+    }
+
+    /* Gradient utilities untuk fallback */
+    .gradient-green-fallback {
+        background: linear-gradient(to bottom, rgba(22, 163, 74, 0.8), rgba(21, 128, 61, 0.7)) !important;
+    }
 }

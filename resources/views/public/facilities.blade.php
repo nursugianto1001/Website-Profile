@@ -41,10 +41,10 @@
 <!-- Scrollable Content -->
 <div class="relative z-30 bg-white">
     <!-- Facilities Overview Section -->
-    <div class="py-12 md:py-20 bg-green-600/90">
+    <div class="py-12 md:py-20 bg-green-600 bg-opacity-90 bg-green-600-opacity">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-8 md:mb-12" data-aos="fade-up" data-aos-duration="800">
-                <h2 class="text-2xl md:text-3xl font-bold text-green-300 mb-4">Fasilitas-Fasilitas Kami</h2>
+                <h2 class="text-2xl md:text-3xl font-bold text-green-300 text-green-300-safe mb-4">Fasilitas-Fasilitas Kami</h2>
                 <p class="text-white mb-12 md:mb-24 max-w-3xl mx-auto text-sm md:text-base">
                     Karvin menyediakan lapangan bulu tangkis berkualitas dengan lingkungan yang nyaman dan bersih.
                     Dilengkapi dengan peralatan modern dan akses mudah, kami memastikan setiap pemain dapat menikmati
@@ -64,7 +64,7 @@
                         </div>
                         <div class="p-6 w-3/5">
                             <h3
-                                class="text-2xl font-bold mb-4 {{ $index % 3 == 0 ? 'text-green-700' : 'text-green-600' }}">
+                                class="text-2xl font-bold mb-4 {{ $index % 3 == 0 ? 'text-green-700 text-green-700-safe' : 'text-green-600 text-green-600-safe' }}">
                                 {{ $facility->name }}
                             </h3>
                             <p class="text-gray-700">
@@ -91,7 +91,7 @@
                         <!-- Content Section -->
                         <div class="p-4">
                             <h3
-                                class="text-xl font-bold mb-3 {{ $index % 3 == 0 ? 'text-green-700' : 'text-green-600' }} text-center">
+                                class="text-xl font-bold mb-3 {{ $index % 3 == 0 ? 'text-green-700 text-green-700-safe' : 'text-green-600 text-green-600-safe' }} text-center">
                                 {{ $facility->name }}
                             </h3>
                             <p class="text-gray-700 text-sm leading-relaxed text-justify">

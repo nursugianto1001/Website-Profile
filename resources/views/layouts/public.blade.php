@@ -23,7 +23,24 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+    <!-- Tambahkan Tailwind CSS dengan konfigurasi yang lebih lengkap -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'blue-900': '#1e3a8a',
+                        'green-300': '#86efac',
+                        'green-600': '#16a34a',
+                        'gray-300': '#d1d5db',
+                        'gray-700': '#374151'
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 
 
@@ -51,7 +68,7 @@
 
                 <div class="hidden md:block flex-shrink-0">
                     <a href="{{ route('booking.form') }}"
-                        class="bg-green-600/90 text-white px-5 py-2 rounded-md text-sm font-bold border-2 border-green-600/90 transition duration-300 hover:bg-transparent hover:text-[#ffff] hover:border-white text-center">
+                        class="bg-green-600 bg-opacity-90 text-white px-5 py-2 rounded-md text-sm font-bold border-2 border-green-600 border-opacity-90 transition duration-300 hover:bg-transparent hover:text-white hover:border-white text-center">
                         Pesan Sekarang
                     </a>
                 </div>
@@ -69,22 +86,22 @@
             </div>
 
             <div id="mobileMenu"
-                class="hidden absolute top-full left-0 right-0 w-full z-50 bg-black/90 rounded-b-md p-2 shadow-lg">
+                class="hidden absolute top-full left-0 right-0 w-full z-50 bg-black bg-opacity-90 rounded-b-md p-2 shadow-lg">
                 <div class="px-2 pt-2 pb-3 space-y-1">
                     <a href="{{ route('home') }}"
-                        class="text-white block w-full px-3 py-3 rounded-md text-base font-bold hover:text-green-300 hover:bg-gray-700/70">Beranda</a>
+                        class="text-white block w-full px-3 py-3 rounded-md text-base font-bold hover:text-green-300 hover:bg-gray-700 hover:bg-opacity-70">Beranda</a>
                     <a href="{{ route('about') }}"
-                        class="text-white block w-full px-3 py-3 rounded-md text-base font-bold hover:text-green-300 hover:bg-gray-700/70">Tentang</a>
+                        class="text-white block w-full px-3 py-3 rounded-md text-base font-bold hover:text-green-300 hover:bg-gray-700 hover:bg-opacity-70">Tentang</a>
                     <a href="{{ route('facilities') }}"
-                        class="text-white block w-full px-3 py-3 rounded-md text-base font-bold hover:text-green-300 hover:bg-gray-700/70">Fasilitas</a>
+                        class="text-white block w-full px-3 py-3 rounded-md text-base font-bold hover:text-green-300 hover:bg-gray-700 hover:bg-opacity-70">Fasilitas</a>
                     <a href="{{ route('contact') }}"
-                        class="text-white block w-full px-3 py-3 rounded-md text-base font-bold hover:text-green-300 hover:bg-gray-700/70">Kontak</a>
+                        class="text-white block w-full px-3 py-3 rounded-md text-base font-bold hover:text-green-300 hover:bg-gray-700 hover:bg-opacity-70">Kontak</a>
                 </div>
             </div>
         </nav>
     </header>
 
-    <main class="mt-[70px] md:mt-[80px] flex-grow w-full">
+    <main class="mt-20 md:mt-20 flex-grow w-full">
         @yield('content')
     </main>
 
@@ -95,8 +112,8 @@
                     <div>
                         <h3 class="text-lg sm:text-xl font-bold mb-4 text-white">Kontak Kami</h3>
                         <ul class="text-white text-sm space-y-2">
-                            <li>Email: saranaseharborneo2@gmail.com</li>
-                            <li>No.HP: +62 822-1000-2256</li>
+                            <li>Email: saranasehatborneo2@gmail.com</li>
+                            <li>No. HP: +62 822-1000-2256</li>
                             <li>Alamat: Jalan Veteran, Jalan Karvin</li>
                         </ul>
                         <div class="mt-4 flex gap-4">
@@ -116,7 +133,7 @@
                     </div>
                 </div>
 
-                <div class="mt-6 border-t border-[#ffff] pt-6 text-center">
+                <div class="mt-6 border-t border-white pt-6 text-center">
                     <p class="text-white text-sm">&copy; {{ date('Y') }} Karvin Badminton. All rights reserved.</p>
                 </div>
             </div>

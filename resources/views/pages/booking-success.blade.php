@@ -155,16 +155,29 @@
                         </div>
                     </div>
 
-                    <div class="flex justify-between text-lg font-bold mt-4 pt-4 border-t border-green-200">
+                    <!-- Subtotal Pemesanan -->
+                    <div class="flex justify-between text-base font-medium mt-4 pt-4 border-t border-green-200">
+                        <span>Subtotal Pemesanan:</span>
+                        <span class="text-green-600">Rp {{ number_format($totalPrice, 0, ',', '.') }}</span>
+                    </div>
+
+                    <!-- Biaya Admin -->
+                    <div class="flex justify-between text-base font-medium">
+                        <span>Biaya Admin:</span>
+                        <span class="text-green-600">Rp {{ number_format(5000, 0, ',', '.') }}</span>
+                    </div>
+
+                    <!-- Total Akhir -->
+                    <div class="flex justify-between text-lg font-bold mt-2 pt-4 border-t border-green-300">
                         <span>Total Biaya:</span>
-                        <span id="total-amount" class="text-green-600">Rp {{ number_format($totalPrice, 0, ',', '.') }}</span>
+                        <span id="total-amount" class="text-green-600">Rp {{ number_format($totalPrice + 5000, 0, ',', '.') }}</span>
                     </div>
                 </div>
 
                 <div class="mt-8 space-y-4">
                     <div class="p-3 bg-green-100 border-l-4 border-green-600 text-green-700 rounded">
                         <b>Terima kasih atas pemesanan Anda!</b><br>
-                        Kami telah mengirimkan detail pemesanan ke email Anda. Silakan tunjukkan kode pemesanan saat Anda tiba di lokasi.
+                        Setiap transaksi yang dilakukan akan dikenakan biaya Admin sebesar Rp 5.000.<br>
 
                         <div class="mt-3 text-sm">
                             <p><strong>Catatan Penting:</strong></p>

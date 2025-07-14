@@ -348,7 +348,7 @@ class BookingPageController extends Controller
                     ->withInput();
             }
 
-            $tax = 2500;
+            $tax = 5000;
             $totalPrice += $tax;
 
             $tempOrderId = 'ORDER-' . time() . '-' . uniqid();
@@ -454,12 +454,6 @@ class BookingPageController extends Controller
         return view('pages.payment', compact('bookings', 'totalBookings', 'totalPrice', 'snapToken'));
     }
 
-    /**
-     * Display booking success page
-     */
-    /**
-     * Display booking success page - PERBAIKAN
-     */
     /**
      * Display booking success page - PERBAIKAN
      */

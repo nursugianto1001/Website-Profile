@@ -59,7 +59,7 @@
 
                     <div class="mt-4 p-3 bg-green-100 border-l-4 border-green-600 text-green-700 rounded">
                         <b>Informasi Pembayaran:</b><br>
-                        Setiap transaksi yang dilakukan akan dikenakan pajak Admin sebesar Rp2.500.<br>
+                        Setiap transaksi yang dilakukan akan dikenakan pajak Admin sebesar Rp5.000.<br>
                         Data booking Anda belum tersimpan di sistem. Booking akan otomatis tersimpan setelah pembayaran berhasil.<br>
                         Jika membatalkan pembayaran, slot waktu akan tetap tersedia untuk customer lain.
                     </div>

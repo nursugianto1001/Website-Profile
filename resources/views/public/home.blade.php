@@ -53,11 +53,11 @@
     </div>
 
     <!-- Scrollable Content - Clear separation from hero section -->
-    <div class="py-20 bg-green-600/90">
+    <div class="py-20 bg-green-600 bg-opacity-90 bg-green-600-opacity">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                 <div data-aos="fade-right" data-aos-duration="1000">
-                    <h2 class="text-3xl font-bold text-green-300 mb-6">Tentang Kami</h2>
+                    <h2 class="text-3xl font-bold text-green-300 text-green-300-safe mb-6">Tentang Kami</h2>
                     <p class="text-white mb-4">
                         Karvin hadir pertama kali pada 30 Oktober 2024, lahir dari keinginan sederhana: menyediakan tempat
                         main bulu tangkis yang gak cuma nyaman, tapi juga bikin betah. Kami tahu, nyari lapangan yang enak
@@ -81,10 +81,10 @@
 
     <!-- Featured Posters Section -->
     @if ($featuredPosters->count() > 0)
-        <div class="py-16 bg-green-700/90">
+        <div class="py-16 bg-green-700 bg-opacity-90 bg-green-700-opacity">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-12" data-aos="fade-up" data-aos-duration="800">
-                    <h2 class="text-3xl font-bold text-green-300">Poster Terbaru</h2>
+                    <h2 class="text-3xl font-bold text-green-300 text-green-300-safe">Poster Terbaru</h2>
                     <p class="text-white mt-4">
                         Temukan informasi terkini tentang turnamen, promosi spesial, dan program pelatihan menarik di
                         Karvin Badminton. Kami secara rutin mengadakan berbagai kegiatan untuk membangun komunitas
@@ -103,8 +103,9 @@
                                 <img src="{{ asset('storage/' . $poster->image_path) }}" alt="{{ $poster->title }}"
                                     class="w-full h-full object-cover transition-transform duration-700 hover:scale-110">
                             </div>
-                            <div class="p-6 bg-gradient-to-b from-white to-green-50">
-                                <h3 class="text-xl font-semibold mb-2 text-green-700">{{ $poster->title }}</h3>
+                            <div class="p-6 bg-gradient-to-b from-white to-green-50 gradient-white-fallback">
+                                <h3 class="text-xl font-semibold mb-2 text-green-700 text-green-700-safe">
+                                    {{ $poster->title }}</h3>
                                 @if ($poster->description)
                                     <p class="text-gray-700 text-sm">{{ Str::limit($poster->description, 100) }}</p>
                                 @endif
@@ -128,13 +129,14 @@
                                                 alt="{{ $poster->title }}"
                                                 class="w-full h-full object-cover transition-transform duration-700 ease-in-out poster-image hover:scale-110">
                                         </div>
-                                        <div class="p-5 bg-gradient-to-b from-white to-green-50 h-[180px] flex flex-col">
+                                        <div
+                                            class="p-5 bg-gradient-to-b from-white to-green-50 gradient-white-fallback h-[180px] flex flex-col">
                                             <h3
-                                                class="text-lg font-semibold mb-2 text-green-700 transition-colors duration-300">
+                                                class="text-lg font-semibold mb-2 text-green-700 text-green-700-safe transition-colors duration-300">
                                                 {{ $poster->title }}</h3>
                                             @if ($poster->description)
                                                 <p
-                                                    class="text-gray-700 text-sm flex-grow overflow-y-auto transition-colors duration-300">
+                                                    class="text-white text-sm flex-grow overflow-y-auto transition-colors duration-300">
                                                     {{ Str::limit($poster->description, 120) }}
                                                 </p>
                                             @endif
@@ -173,8 +175,9 @@
                         <img id="modalImage" src="" alt="Poster"
                             class="w-full h-full object-contain max-h-[60vh]">
                     </div>
-                    <div class="w-full md:w-1/2 p-6 md:p-8 bg-gradient-to-br from-green-50 to-white">
-                        <h3 id="modalTitle" class="text-2xl font-bold text-green-700 mb-4"></h3>
+                    <div
+                        class="w-full md:w-1/2 p-6 md:p-8 bg-gradient-to-br from-green-50 to-white gradient-white-fallback">
+                        <h3 id="modalTitle" class="text-2xl font-bold text-green-700 text-green-700-safe mb-4"></h3>
                         <div id="modalDescription" class="text-gray-700 prose max-w-none"></div>
                     </div>
                 </div>
@@ -183,10 +186,10 @@
     @endif
 
     <!-- Jadwal Ketersediaan Lapangan -->
-    <div class="py-16 bg-gradient-to-b from-green-600/80 to-green-700/70">
+    <div class="py-16 bg-gradient-to-b from-green-600 to-green-700 gradient-green-fallback">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12" data-aos="fade-up" data-aos-duration="800">
-                <h2 class="text-3xl font-bold text-green-300">Jadwal Ketersediaan Lapangan</h2>
+                <h2 class="text-3xl font-bold text-green-300 text-green-300-safe">Jadwal Ketersediaan Lapangan</h2>
                 <p class="text-white mt-4">
                     Lihat ketersediaan lapangan secara real-time untuk membantu Anda merencanakan waktu bermain yang tepat
                 </p>
@@ -194,22 +197,22 @@
 
             <!-- Date Selection dengan Kalender 1 Bulan -->
             <div
-                class="bg-gradient-to-br from-green-50 via-green-100/30 to-[#86efac] rounded-lg shadow-md p-6 border border-green-100 mb-8">
+                class="bg-gradient-to-br from-green-50 via-green-100/30 to-green-100 rounded-lg shadow-md p-6 border border-green-100 mb-8">
                 <div class="flex items-center mb-4">
-                    <div class="bg-[#86efac] p-2 rounded-full mr-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#16a34a]" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
+                    <div class="bg-green-200 bg-green-200-opacity p-2 rounded-full mr-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 text-green-600-safe"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold text-[#16a34a]">Pilih Tanggal</h3>
+                    <h3 class="text-xl font-semibold text-green-600 text-green-600-safe">Pilih Tanggal</h3>
                 </div>
 
                 <p class="text-sm text-gray-600 mb-4">Pilih tanggal untuk melihat ketersediaan lapangan</p>
 
                 <div class="mb-3">
-                    <div class="flex items-center text-sm text-[#16a34a] mb-3">
+                    <div class="flex items-center text-sm text-green-600 text-green-600-safe mb-3">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -250,7 +253,7 @@
             <!-- Tambahkan legend harga -->
             <div class="flex justify-center mb-8" data-aos="fade-up" data-aos-duration="800">
                 <div class="bg-white rounded-lg shadow-md p-4 border border-amber-100">
-                    <h3 class="text-center font-semibold text-[#16a34a] mb-3">Harga per Jam</h3>
+                    <h3 class="text-center font-semibold text-green-600 text-green-600-safe mb-3">Harga per Jam</h3>
                     <div class="flex flex-wrap justify-center gap-4 text-sm">
                         <div class="flex items-center px-3 py-2 bg-yellow-100 rounded-full text-yellow-800">
                             <span class="font-medium">06:00-12:00: Rp 40.000</span>
@@ -287,15 +290,15 @@
                                             <div class="flex flex-col items-center">
                                                 <div class="flex items-center mb-1">
                                                     <svg xmlns="http://www.w3.org/2000/svg"
-                                                        class="h-5 w-5 text-[#16a34a] mr-1" fill="none"
-                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        class="h-5 w-5 text-green-600 text-green-600-safe mr-1"
+                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             stroke-width="2"
                                                             d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                                                     </svg>
                                                     <span class="font-medium text-gray-800">{{ $field->name }}</span>
                                                 </div>
-                                                <div class="text-sm text-[#16a34a] font-medium">
+                                                <div class="text-sm text-green-600 text-green-600-safe font-medium">
                                                     Harga Dinamis
                                                 </div>
                                             </div>
@@ -346,7 +349,7 @@
             <div class="md:hidden space-y-4" data-aos="fade-up" data-aos-duration="800">
                 @foreach ($fields as $field)
                     <div class="bg-white rounded-lg shadow-lg border border-green-100 overflow-hidden">
-                        <div class="bg-gradient-to-r from-[#16a34a] to-[#86efac] text-white p-4">
+                        <div class="bg-gradient-to-r from-green-600 to-green-100 text-white p-4">
                             <h3 class="text-lg font-semibold">{{ $field->name }}</h3>
                             <p class="text-sm opacity-90">Harga Dinamis</p>
                         </div>
@@ -629,10 +632,10 @@
     </style>
 
     <!-- Facilities Section -->
-    <div class="py-10 bg-green-700/90">
+    <div class="py-10 bg-green-700 bg-opacity-90 bg-green-700-opacity">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12" data-aos="fade-up" data-aos-duration="800">
-                <h2 class="text-3xl font-bold text-green-300">Fasilitas-Fasilitas Kami</h2>
+                <h2 class="text-3xl font-bold text-green-300 text-green-300-safe">Fasilitas-Fasilitas Kami</h2>
                 <br>
                 <p class="text-white mb-4">
                     Karvin Badminton menyediakan fasilitas premium yang dirancang untuk memenuhi kebutuhan pemain
@@ -712,10 +715,10 @@
 
     <!-- Documentation Photos Gallery -->
     @if ($featuredDocumentations->count() > 0)
-        <div class="py-16 bg-gradient-to-b from-green-600/80 to-green-700/70">
+        <div class="py-16 bg-gradient-to-b from-green-600 to-green-700 gradient-green-fallback">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-12" data-aos="fade-up" data-aos-duration="800">
-                    <h2 class="text-3xl font-bold text-green-300">Galeri Dokumentasi</h2>
+                    <h2 class="text-3xl font-bold text-green-300 text-green-300-safe">Galeri Dokumentasi</h2>
                     <p class="text-white mt-4">
                         Lihat momen-momen berkesan dari berbagai kegiatan di Karvin Badminton. Kami menangkap semangat,
                         kegembiraan, dan sportivitas dalam setiap turnamen, pelatihan, dan aktivitas komunitas yang
@@ -732,7 +735,7 @@
                                 data-pswp-height="800" data-index="{{ $index }}"
                                 class="carousel-img block w-[250px] h-[250px] flex-shrink-0 snap-center relative">
                                 <div
-                                    class="absolute inset-0 bg-gradient-to-b from-transparent to-[#16a34a]/50 opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-xl z-10">
+                                    class="absolute inset-0 bg-gradient-to-b from-transparent to-green-600 bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-xl z-10">
                                 </div>
                                 <img src="{{ asset('storage/' . $doc->image_path) }}" alt="{{ $doc->title }}"
                                     class="w-full h-full object-cover rounded-xl shadow-md transition-all duration-300 ease-in-out cursor-pointer" />
@@ -748,7 +751,7 @@
 
                     <!-- Navigation arrows for carousel with warm colors -->
                     <button
-                        class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-[#16a34a]/80 hover:bg-[#16a34a] text-white rounded-full p-2 shadow-md z-30 transition-all duration-300 hover:scale-110 active:scale-95"
+                        class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-green-600 bg-opacity-80 hover:bg-green-600 hover:bg-opacity-100 text-white rounded-full p-2 shadow-md z-30 transition-all duration-300 hover:scale-110 active:scale-95"
                         onclick="document.getElementById('imageCarousel').scrollBy({left: -300, behavior: 'smooth'})">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                             stroke="currentColor" class="w-6 h-6">
@@ -757,7 +760,7 @@
                     </button>
 
                     <button
-                        class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-[#16a34a]/80 hover:bg-[#16a34a] text-white rounded-full p-2 shadow-md z-30 transition-all duration-300 hover:scale-110 active:scale-95"
+                        class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-green-600 bg-opacity-80 hover:bg-green-600 hover:bg-opacity-100 text-white rounded-full p-2 shadow-md z-30 transition-all duration-300 hover:scale-110 active:scale-95"
                         onclick="document.getElementById('imageCarousel').scrollBy({left: 300, behavior: 'smooth'})">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                             stroke="currentColor" class="w-6 h-6">

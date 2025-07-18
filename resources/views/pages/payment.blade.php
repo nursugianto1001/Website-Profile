@@ -61,7 +61,7 @@
                         <span class="font-medium">Waktu:</span>
                         <span>{{ \Carbon\Carbon::parse($bookings->first()->booking_date)->format('d M Y') }}</span>
                     </div>
-                    <!-- Ringkasan multi-lapangan tanpa bullet/titik -->
+                    <!-- Ringkasan multi-lapangan -->
                     <div class="border-t border-green-100 pt-4 mb-2">
                         <h3 class="font-semibold mb-2 text-green-700">Lapangan yang Dipesan:</h3>
                         <div class="space-y-1">
@@ -73,7 +73,19 @@
                             @endforeach
                         </div>
                     </div>
-                    <div class="flex justify-between text-lg font-bold mt-4">
+                    @php
+                    $tax = $tax ?? 5000;
+                    $subtotal = $totalPrice - $tax;
+                    @endphp
+                    <div class="flex justify-between text-base font-medium mt-4 pt-2 border-t border-green-100">
+                        <span>Subtotal:</span>
+                        <span>Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="flex justify-between text-base font-medium">
+                        <span>Biaya Admin:</span>
+                        <span>Rp {{ number_format($tax, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="flex justify-between text-lg font-bold mt-2 pt-2 border-t border-green-200">
                         <span>Total Biaya:</span>
                         <span id="total-amount" class="text-green-600">Rp {{ number_format($totalPrice, 0, ',', '.') }}</span>
                     </div>
@@ -81,7 +93,8 @@
                     <div class="mt-4 p-3 bg-green-100 border-l-4 border-green-600 text-green-700 rounded">
                         <b>Informasi Pembayaran:</b><br>
                         Anda akan diarahkan ke halaman pembayaran Midtrans untuk menyelesaikan transaksi.<br>
-                        Pastikan untuk tidak menutup halaman sebelum proses pembayaran selesai.
+                        Pastikan untuk tidak menutup halaman sebelum proses pembayaran selesai.<br>
+                        <span class="text-sm text-gray-600">Setiap transaksi dikenakan biaya admin Rp5.000.</span>
                     </div>
                 </div>
             </div>

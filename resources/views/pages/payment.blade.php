@@ -98,6 +98,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="text-center mt-6">
                 <a href="/" class="inline-flex items-center px-5 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg shadow transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -106,6 +107,7 @@
                     Kembali ke halaman utama
                 </a>
             </div>
+
             <!-- Loading indicator -->
             <div id="loading-indicator" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                 <div class="bg-white p-6 rounded-lg shadow-lg text-center">
@@ -116,29 +118,33 @@
             </div>
         </div>
     </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const loadingIndicator = document.getElementById('loading-indicator');
             const snapToken = "{{ $snapToken }}";
+
+            // Dapatkan base URL dinamis
+            const baseUrl = `${window.location.origin}`;
+
             setTimeout(function() {
                 if (snapToken) {
                     snap.pay(snapToken, {
                         onSuccess: function(result) {
                             loadingIndicator.classList.add('hidden');
-                            window.location.href = '/payment/finish';
+                            window.location.href = baseUrl + '/payment/finish?order_id=' + result.order_id;
                         },
                         onPending: function(result) {
                             loadingIndicator.classList.add('hidden');
-                            window.location.href = '/payment/unfinish';
+                            window.location.href = baseUrl + '/payment/unfinish?order_id=' + result.order_id;
                         },
                         onError: function(result) {
                             loadingIndicator.classList.add('hidden');
-                            window.location.href = '/payment/error';
+                            window.location.href = baseUrl + '/payment/error?order_id=' + result.order_id;
                         },
                         onClose: function() {
                             loadingIndicator.classList.add('hidden');
                             alert('Pembayaran dibatalkan. Silakan coba lagi untuk menyelesaikan pemesanan Anda.');
-                            window.location.href = '/';
                         }
                     });
                 } else {

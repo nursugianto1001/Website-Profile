@@ -242,7 +242,7 @@ class BookingPageController extends Controller
     }
 
     /**
-     * Process booking submission - DIPERBAIKI
+     * Process booking submission 
      */
     public function processBooking(Request $request)
     {
@@ -266,14 +266,6 @@ class BookingPageController extends Controller
         $selectedSlots = $request->selected_slots;
         $paymentMethod = $request->payment_method;
 
-        Log::info('Processing booking request:', [
-            'customer_name' => $request->customer_name,
-            'booking_date' => $bookingDate,
-            'selected_fields' => $selectedFields,
-            'selected_slots' => $selectedSlots,
-            'payment_method' => $paymentMethod
-        ]);
-
         $pendingBookings = [];
         $totalPrice = 0;
 
@@ -295,12 +287,6 @@ class BookingPageController extends Controller
                 $startTime = $timeSlots[0];
                 $endTime = Carbon::parse($timeSlots[count($timeSlots) - 1])->addHour()->format('H:i:s');
 
-                Log::info("Processing field {$fieldId}:", [
-                    'time_slots' => $timeSlots,
-                    'start_time' => $startTime,
-                    'end_time' => $endTime
-                ]);
-
                 $isAvailable = $this->bookingService->areSlotsAvailable(
                     $fieldId,
                     $bookingDate,
@@ -309,21 +295,14 @@ class BookingPageController extends Controller
                 );
 
                 if (!$isAvailable) {
-                    Log::error("Slots not available for field {$fieldId} at {$bookingDate} {$startTime}-{$endTime}");
                     return redirect()->back()
                         ->with('error', 'Slot tidak tersedia untuk lapangan yang dipilih. Silakan pilih waktu lain.')
                         ->withInput();
                 }
 
                 $field = Field::findOrFail($fieldId);
-
                 $subtotal = $field->calculateTotalPrice($timeSlots);
                 $totalPrice += $subtotal;
-
-                Log::info("Field {$fieldId} subtotal calculated:", [
-                    'time_slots_count' => count($timeSlots),
-                    'subtotal' => $subtotal
-                ]);
 
                 $pendingBookings[] = [
                     'field_id' => $fieldId,
@@ -337,12 +316,11 @@ class BookingPageController extends Controller
                     'duration_hours' => count($timeSlots),
                     'total_price' => $subtotal,
                     'payment_method' => $paymentMethod,
-                    'time_slots' => $timeSlots
+                    'time_slots' => $timeSlots,
                 ];
             }
 
             if (empty($pendingBookings)) {
-                Log::error('No valid bookings processed');
                 return redirect()->back()
                     ->with('error', 'Tidak ada pemesanan valid yang dapat diproses.')
                     ->withInput();
@@ -352,8 +330,6 @@ class BookingPageController extends Controller
             $totalPrice += $tax;
 
             $tempOrderId = 'ORDER-' . time() . '-' . uniqid();
-
-            Log::info('Generated temp order ID:', ['temp_order_id' => $tempOrderId]);
 
             $midtransResponse = app('App\Providers\MidtransService')->createTransaction([
                 'booking_id' => $tempOrderId,
@@ -372,16 +348,10 @@ class BookingPageController extends Controller
             ]);
 
             if (!$midtransResponse) {
-                Log::error('Failed to create Midtrans transaction');
                 return redirect()->back()
                     ->with('error', 'Gagal membuat transaksi pembayaran. Silakan coba lagi.')
                     ->withInput();
             }
-
-            Log::info('Midtrans transaction created:', [
-                'order_id' => $midtransResponse['order_id'],
-                'token' => substr($midtransResponse['token'], 0, 20) . '...'
-            ]);
 
             $sessionData = [
                 'bookings' => $pendingBookings,
@@ -395,16 +365,8 @@ class BookingPageController extends Controller
 
             Session::put('pending_booking_data', $sessionData);
 
-            Log::info('Session data saved:', [
-                'bookings_count' => count($pendingBookings),
-                'total_price' => $totalPrice,
-                'tax' => $tax,
-                'session_keys' => array_keys($sessionData)
-            ]);
-
             $verifySession = Session::get('pending_booking_data');
             if (!$verifySession) {
-                Log::error('Failed to save session data');
                 return redirect()->back()
                     ->with('error', 'Gagal menyimpan data sementara. Silakan coba lagi.')
                     ->withInput();
@@ -412,15 +374,13 @@ class BookingPageController extends Controller
 
             return redirect()->route('booking.payment.pending');
         } catch (\Exception $e) {
-            Log::error('Booking process error: ' . $e->getMessage(), [
-                'stack_trace' => $e->getTraceAsString(),
-                'request_data' => $request->all()
-            ]);
+            Log::error('Booking process error: ' . $e->getMessage());
             return redirect()->back()
                 ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
                 ->withInput();
         }
     }
+
 
     private function sendWhatsAppConfirmation($data)
     {
@@ -450,58 +410,41 @@ class BookingPageController extends Controller
         $bookings = Booking::with('field')->whereIn('id', $bookingIds)->get();
         $totalBookings = $bookings->count();
         $totalPrice = $bookings->sum('total_price');
+        $tax = 5000;
         $snapToken = $booking->snap_token;
-        return view('pages.payment', compact('bookings', 'totalBookings', 'totalPrice', 'snapToken'));
+        return view('pages.payment', compact('bookings', 'totalBookings', 'totalPrice', 'tax', 'snapToken'));
     }
+
 
     /**
      * Display booking success page - PERBAIKAN
      */
     public function bookingSuccess(Request $request, $booking = null)
     {
-        Log::info('Booking success page accessed:', [
-            'booking_param' => $booking,
-            'request_booking' => $request->get('booking'),
-            'session_booking_ids' => session('booking_ids')
-        ]);
-
         $bookingIds = session('booking_ids', []);
-
         if (empty($bookingIds) && $booking) {
             $bookingIds = explode(',', $booking);
         } elseif (empty($bookingIds) && $request->has('booking')) {
             $bookingIds = explode(',', $request->booking);
         }
-
-        Log::info('Final booking IDs:', ['booking_ids' => $bookingIds]);
-
         if (empty($bookingIds)) {
-            Log::error('No booking IDs found');
             return redirect()->route('booking.form')->with('error', 'Data booking tidak ditemukan.');
         }
 
-        // PENTING: Load relasi slots dengan field
         $bookings = Booking::with(['field', 'slots'])->whereIn('id', $bookingIds)->get();
 
         if ($bookings->isEmpty()) {
-            Log::error('No bookings found in database:', ['booking_ids' => $bookingIds]);
             return redirect()->route('booking.form')->with('error', 'Data booking tidak ditemukan di database.');
         }
 
         $totalBookings = $bookings->count();
         $totalPrice = $bookings->sum('total_price');
-
-        Log::info('Booking success data loaded:', [
-            'total_bookings' => $totalBookings,
-            'total_price' => $totalPrice,
-            'bookings' => $bookings->pluck('id')->toArray()
-        ]);
-
-        // Clear session setelah berhasil load data
+        $tax = 5000;
         Session::forget('booking_ids');
 
-        return view('pages.booking-success', compact('bookings', 'totalBookings', 'totalPrice'));
+        return view('pages.booking-success', compact('bookings', 'totalBookings', 'totalPrice', 'tax'));
     }
+
 
     /**
      * Handle payment success dari Midtrans - DIPERBAIKI
@@ -511,22 +454,12 @@ class BookingPageController extends Controller
         $orderId = $request->input('order_id');
         $pendingData = Session::get('pending_booking_data');
 
-        Log::info('Payment success handler called:', [
-            'order_id' => $orderId,
-            'has_pending_data' => !empty($pendingData),
-            'session_data' => $pendingData,
-            'all_session_keys' => array_keys(session()->all())
-        ]);
-
         if (!$pendingData) {
-            Log::error('No pending booking data found in session');
             return redirect()->route('booking.form')
                 ->with('error', 'Data booking tidak ditemukan. Session mungkin sudah expired. Silakan buat booking baru.');
         }
 
-        // Validasi struktur data session
         if (!isset($pendingData['bookings']) || !is_array($pendingData['bookings'])) {
-            Log::error('Invalid session data structure:', $pendingData);
             Session::forget('pending_booking_data');
             return redirect()->route('booking.form')
                 ->with('error', 'Data booking tidak valid. Silakan buat booking baru.');
@@ -536,17 +469,11 @@ class BookingPageController extends Controller
         try {
             $bookingIds = [];
 
-            // Proses setiap booking dari session data
             foreach ($pendingData['bookings'] as $index => $bookingData) {
-                Log::info("Processing booking data #{$index}:", $bookingData);
-
-                // Validasi data booking
                 if (!isset($bookingData['field_id'], $bookingData['booking_date'], $bookingData['start_time'], $bookingData['end_time'])) {
-                    Log::error("Missing required booking data for index {$index}:", $bookingData);
                     continue;
                 }
 
-                // Validasi availability sekali lagi
                 $isAvailable = $this->bookingService->areSlotsAvailable(
                     $bookingData['field_id'],
                     $bookingData['booking_date'],
@@ -557,19 +484,15 @@ class BookingPageController extends Controller
                 if (!$isAvailable) {
                     DB::rollBack();
                     Session::forget('pending_booking_data');
-                    Log::error("Slots not available for booking index {$index}");
                     return redirect()->route('booking.form')
                         ->with('error', 'Slot yang dipilih sudah tidak tersedia. Silakan pilih waktu lain.');
                 }
 
-                // PENTING: Pastikan time_slots ada dalam data
+                // Bangun ulang array time_slots jika perlu
                 if (!isset($bookingData['time_slots']) || empty($bookingData['time_slots'])) {
-                    Log::warning("No time_slots data found, generating from start/end time");
-                    // Generate time slots dari start dan end time
                     $startTime = Carbon::parse($bookingData['start_time']);
                     $endTime = Carbon::parse($bookingData['end_time']);
                     $timeSlots = [];
-
                     $current = $startTime->copy();
                     while ($current < $endTime) {
                         $timeSlots[] = $current->format('H:i:s');
@@ -578,14 +501,13 @@ class BookingPageController extends Controller
                     $bookingData['time_slots'] = $timeSlots;
                 }
 
-                // PENTING: Buat booking dengan status confirmed dan harga dinamis
+                // Buat/commit booking
                 $booking = $this->bookingService->createBooking($bookingData, true);
 
                 if (!$booking) {
                     throw new \Exception("Gagal membuat booking untuk field {$bookingData['field_id']}");
                 }
 
-                // Update dengan order_id dari Midtrans
                 $booking->update([
                     'booking_code' => $orderId,
                     'order_id' => $orderId,
@@ -595,7 +517,6 @@ class BookingPageController extends Controller
                 ]);
 
                 $bookingIds[] = $booking->id;
-                Log::info("Booking created successfully: {$booking->id} with total price: {$booking->total_price}");
             }
 
             if (empty($bookingIds)) {
@@ -604,37 +525,20 @@ class BookingPageController extends Controller
 
             DB::commit();
 
-            // Clear session data
             Session::forget('pending_booking_data');
-
-            // Simpan booking IDs untuk halaman success
             Session::put('booking_ids', $bookingIds);
 
-            Log::info('All bookings processed successfully:', [
-                'booking_ids' => $bookingIds,
-                'total_bookings' => count($bookingIds)
-            ]);
-
-            // Redirect ke halaman success dengan parameter yang benar
-            $bookingParam = implode(',', $bookingIds);
-
-            Log::info('Redirecting to booking success with param:', ['booking' => $bookingParam]);
-
-            return redirect()->route('booking.success', ['booking' => $bookingParam])
-                ->with('success', 'Pembayaran berhasil! Booking Anda telah dikonfirmasi.')
-                ->with('multipleBookings', count($bookingIds) > 1)
-                ->with('totalBookings', count($bookingIds));
+            // Redirect ke halaman sukses (booking-success)
+            return redirect()->route('booking.success', ['booking' => implode(',', $bookingIds)])
+                ->with('success', 'Pembayaran berhasil! Booking Anda telah dikonfirmasi.');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Payment success handler error: ' . $e->getMessage(), [
-                'stack_trace' => $e->getTraceAsString(),
-                'pending_data' => $pendingData
-            ]);
             Session::forget('pending_booking_data');
             return redirect()->route('booking.form')
                 ->with('error', 'Terjadi kesalahan saat menyimpan booking: ' . $e->getMessage());
         }
     }
+
 
     /**
      * Handle pembayaran belum selesai dari Midtrans

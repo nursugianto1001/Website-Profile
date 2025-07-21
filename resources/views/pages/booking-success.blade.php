@@ -80,7 +80,6 @@
                                         {{ $booking->payment_status === 'settlement' ? 'Lunas' : ucfirst($booking->payment_status) }}
                                     </span>
                                 </div>
-
                                 <div class="text-sm text-gray-600 space-y-1">
                                     <div class="flex items-center justify-between">
                                         <span class="flex items-center">
@@ -91,7 +90,6 @@
                                         </span>
                                         <span class="font-medium">{{ \Carbon\Carbon::parse($booking->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($booking->end_time)->format('H:i') }}</span>
                                     </div>
-
                                     <div class="flex items-center justify-between">
                                         <span class="flex items-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -101,8 +99,6 @@
                                         </span>
                                         <span class="font-medium">{{ $booking->duration_hours }} jam</span>
                                     </div>
-
-                                    <!-- Breakdown Harga per Slot Waktu -->
                                     @if($booking->slots && $booking->slots->count() > 0)
                                     <div class="mt-3 pt-2 border-t border-gray-200">
                                         <span class="text-xs text-gray-500 mb-2 block">Rincian Harga per Jam:</span>
@@ -114,103 +110,117 @@
                                         @endforeach
                                     </div>
                                     @else
-                                    <!-- Fallback jika tidak ada data slots -->
                                     <div class="mt-3 pt-2 border-t border-gray-200">
                                         <span class="text-xs text-gray-500 mb-2 block">Rincian Harga:</span>
                                         @php
-                                            $startHour = \Carbon\Carbon::parse($booking->start_time)->format('H');
-                                            $endHour = \Carbon\Carbon::parse($booking->end_time)->format('H');
-                                            $totalSlots = $endHour - $startHour;
+                                        $startHour = \Carbon\Carbon::parse($booking->start_time)->format('H');
+                                        $endHour = \Carbon\Carbon::parse($booking->end_time)->format('H');
+                                        $totalSlots = $endHour - $startHour;
                                         @endphp
                                         @for($i = 0; $i < $totalSlots; $i++)
                                             @php
-                                                $currentHour = $startHour + $i;
-                                                $nextHour = $currentHour + 1;
-                                                // Hitung harga berdasarkan waktu (sesuai sistem booking form)
-                                                if($currentHour >= 6 && $currentHour < 12) {
-                                                    $slotPrice = 40000; // Pagi
-                                                } elseif($currentHour >= 12 && $currentHour < 17) {
-                                                    $slotPrice = 25000; // Siang
-                                                } elseif($currentHour >= 17 && $currentHour < 23) {
-                                                    $slotPrice = 60000; // Malam
-                                                } else {
-                                                    $slotPrice = 40000; // Default
-                                                }
-                                            @endphp
-                                            <div class="flex justify-between text-xs">
-                                                <span>{{ sprintf('%02d:00-%02d:00', $currentHour, $nextHour) }}:</span>
-                                                <span>Rp {{ number_format($slotPrice, 0, ',', '.') }}</span>
-                                            </div>
-                                        @endfor
+                                            $currentHour=$startHour + $i;
+                                            $nextHour=$currentHour + 1;
+                                            if($currentHour>= 6 && $currentHour < 12) {
+                                                $slotPrice=40000;
+                                                } elseif($currentHour>= 12 && $currentHour < 17) {
+                                                    $slotPrice=25000;
+                                                    } elseif($currentHour>= 17 && $currentHour < 23) {
+                                                        $slotPrice=60000;
+                                                        } else {
+                                                        $slotPrice=40000;
+                                                        }
+                                                        @endphp
+                                                        <div class="flex justify-between text-xs">
+                                                        <span>{{ sprintf('%02d:00-%02d:00', $currentHour, $nextHour) }}:</span>
+                                                        <span>Rp {{ number_format($slotPrice, 0, ',', '.') }}</span>
                                     </div>
-                                    @endif
+                                    @endfor
+                                </div>
+                                @endif
 
-                                    <div class="flex justify-between font-medium text-green-600 pt-2 border-t border-gray-300 mt-2">
-                                        <span>Subtotal:</span>
-                                        <span>Rp {{ number_format($booking->total_price, 0, ',', '.') }}</span>
-                                    </div>
+                                <div class="flex justify-between font-medium text-green-600 pt-2 border-t border-gray-300 mt-2">
+                                    <span>Subtotal:</span>
+                                    <span>Rp {{ number_format($booking->total_price, 0, ',', '.') }}</span>
                                 </div>
                             </div>
-                            @endforeach
                         </div>
-                    </div>
-
-                    <!-- Subtotal Pemesanan -->
-                    <div class="flex justify-between text-base font-medium mt-4 pt-4 border-t border-green-200">
-                        <span>Subtotal Pemesanan:</span>
-                        <span class="text-green-600">Rp {{ number_format($totalPrice, 0, ',', '.') }}</span>
-                    </div>
-
-                    <!-- Biaya Admin -->
-                    <div class="flex justify-between text-base font-medium">
-                        <span>Biaya Admin:</span>
-                        <span class="text-green-600">Rp {{ number_format(5000, 0, ',', '.') }}</span>
-                    </div>
-
-                    <!-- Total Akhir -->
-                    <div class="flex justify-between text-lg font-bold mt-2 pt-4 border-t border-green-300">
-                        <span>Total Biaya:</span>
-                        <span id="total-amount" class="text-green-600">Rp {{ number_format($totalPrice + 5000, 0, ',', '.') }}</span>
+                        @endforeach
                     </div>
                 </div>
 
-                <div class="mt-8 space-y-4">
-                    <div class="p-3 bg-green-100 border-l-4 border-green-600 text-green-700 rounded">
-                        <b>Terima kasih atas pemesanan Anda!</b><br>
-                        Setiap transaksi yang dilakukan akan dikenakan biaya Admin sebesar Rp 5.000.<br>
+                @php
+                $tax = 5000;
+                $subtotal = $totalPrice - $tax;
+                @endphp
+                <div class="flex justify-between text-base font-medium mt-4 pt-4 border-t border-green-200">
+                    <span>Subtotal Pemesanan:</span>
+                    <span class="text-green-600">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
+                </div>
 
-                        <div class="mt-3 text-sm">
-                            <p><strong>Catatan Penting:</strong></p>
-                            <ul class="list-disc list-inside mt-1 space-y-1">
-                                <li>Harap datang 15 menit sebelum waktu bermain</li>
-                                <li>Bawa kode pemesanan dan identitas diri</li>
-                                <li>Pembatalan dapat dilakukan maksimal 2 jam sebelum waktu bermain</li>
-                            </ul>
-                        </div>
-                    </div>
+                <div class="flex justify-between text-base font-medium">
+                    <span>Biaya Admin:</span>
+                    <span class="text-green-600">Rp {{ number_format($tax, 0, ',', '.') }}</span>
+                </div>
 
-                    <div class="flex justify-center space-x-4 mt-6">
-                        <a href="/" class="inline-flex items-center px-5 py-3 bg-green-100 hover:bg-green-200 text-green-700 font-medium rounded-lg shadow transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                            </svg>
-                            Kembali ke Beranda
-                        </a>
-                        <a href="/fields/book" class="inline-flex items-center px-5 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg shadow transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                            </svg>
-                            Buat Pemesanan Lain
-                        </a>
+                <div class="flex justify-between text-lg font-bold mt-2 pt-4 border-t border-green-300">
+                    <span>Total Biaya:</span>
+                    <span id="total-amount" class="text-green-600">Rp {{ number_format($totalPrice, 0, ',', '.') }}</span>
+                </div>
+            </div>
+
+            <div class="mt-8 space-y-4">
+                <div class="p-3 bg-green-100 border-l-4 border-green-600 text-green-700 rounded">
+                    <b>Terima kasih atas pemesanan Anda!</b><br>
+                    Setiap transaksi yang dilakukan akan dikenakan biaya Admin sebesar Rp 5.000.<br>
+                    <div class="mt-3 text-sm">
+                        <p><strong>Catatan Penting:</strong></p>
+                        <ul class="list-disc list-inside mt-1 space-y-1">
+                            <li>Harap datang 15 menit sebelum waktu bermain</li>
+                            <li>Bawa kode pemesanan dan identitas diri</li>
+                            <li>Pembatalan dapat dilakukan maksimal 2 jam sebelum waktu bermain</li>
+                        </ul>
                     </div>
+                </div>
+                <div class="text-center text-gray-600 text-sm mt-4">
+                    <span>Anda akan diarahkan ke WhatsApp Admin untuk konfirmasi pemesanan.</span>
+                </div>
+                <div class="flex justify-center space-x-4 mt-6">
+                    <a href="/" class="inline-flex items-center px-5 py-3 bg-green-100 hover:bg-green-200 text-green-700 font-medium rounded-lg shadow transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        Kembali ke Beranda
+                    </a>
+                    <a href="/fields/book" class="inline-flex items-center px-5 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg shadow transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        Buat Pemesanan Lain
+                    </a>
                 </div>
             </div>
         </div>
     </div>
+    </div>
 
+    <div class="text-center text-gray-600 text-sm mt-4">
+        <span>Anda akan diarahkan ke WhatsApp Admin untuk konfirmasi pemesanan secara otomatis.</span>
+    </div>
     <script>
-        console.log('Booking success page loaded at:', new Date().toISOString());
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const waNumber = "6281258811801";
+                const customerName = "{{ $bookings->first()->customer_name }}";
+                const kodeBooking = "{{ $bookings->first()->booking_code ?? '-' }}";
+                const total = "{{ number_format($totalPrice, 0, ',', '.') }}";
+                const message = encodeURIComponent(`Halo Admin, saya (${customerName}) telah melakukan pembayaran booking.\nKode Booking: ${kodeBooking}\nTotal: Rp ${total}\nMohon konfirmasinya ya.`);
+                window.location.href = `https://wa.me/${waNumber}?text=${message}`;
+            }, 4000);
+        });
     </script>
+
+
 </body>
 
 </html>

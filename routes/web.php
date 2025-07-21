@@ -34,7 +34,7 @@ Route::get('/booking/{booking}/payment', [BookingPageController::class, 'payment
     ->name('booking.payment');
 
 // Rute payment yang memerlukan validasi session
-Route::get('/payment/finish', [BookingPageController::class, 'finishPayment'])->name('payment.finish');
+Route::get('/payment/finish', [BookingPageController::class, 'handlePaymentSuccess'])->name('payment.finish');
 Route::get('/payment/unfinish', [BookingPageController::class, 'unfinishPayment'])->name('payment.unfinish');
 Route::get('/payment/error', [BookingPageController::class, 'errorPayment'])->name('payment.error');
 

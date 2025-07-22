@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -61,6 +60,7 @@
                         <span class="font-medium">Waktu:</span>
                         <span>{{ \Carbon\Carbon::parse($bookings->first()->booking_date)->format('d M Y') }}</span>
                     </div>
+
                     <!-- Ringkasan multi-lapangan -->
                     <div class="border-t border-green-100 pt-4 mb-2">
                         <h3 class="font-semibold mb-2 text-green-700">Lapangan yang Dipesan:</h3>
@@ -156,5 +156,4 @@
         });
     </script>
 </body>
-
 </html>

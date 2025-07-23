@@ -41,11 +41,11 @@
 <!-- Scrollable Content -->
 <div class="relative z-30 bg-white">
     <!-- Facilities Overview Section -->
-    <div class="py-12 md:py-20 bg-green-600 bg-opacity-90 bg-green-600-opacity">
+    <div class="py-12 md:py-20 bg-green-900 bg-opacity-95">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-8 md:mb-12" data-aos="fade-up" data-aos-duration="800">
-                <h2 class="text-2xl md:text-3xl font-bold text-green-300 text-green-300-safe mb-4">Fasilitas-Fasilitas Kami</h2>
-                <p class="text-white mb-12 md:mb-24 max-w-3xl mx-auto text-sm md:text-base">
+                <h2 class="text-2xl md:text-3xl font-bold text-green-400 mb-4">Fasilitas-Fasilitas Kami</h2>
+                <p class="text-gray-100 mb-12 md:mb-24 max-w-3xl mx-auto text-sm md:text-base">
                     Karvin menyediakan lapangan bulu tangkis berkualitas dengan lingkungan yang nyaman dan bersih.
                     Dilengkapi dengan peralatan modern dan akses mudah, kami memastikan setiap pemain dapat menikmati
                     pengalaman bermain yang menyenangkan dan mendukung gaya hidup sehat.
@@ -54,20 +54,20 @@
                 <!-- Desktop View - Grid -->
                 <div class="hidden md:grid md:grid-cols-2 gap-12">
                     @foreach ($facilities as $index => $facility)
-                    <div class="bg-gradient-to-br {{ $index % 3 == 0 ? 'from-white via-green-50 to-green-100' : ($index % 3 == 1 ? 'from-green-50 via-white to-green-100' : 'from-green-100 via-white to-green-50') }} shadow-lg rounded-lg overflow-hidden flex flex-row transition transform hover:scale-105"
+                    <div class="bg-gradient-to-br {{ $index % 3 == 0 ? 'from-green-700 via-green-600 to-green-700' : ($index % 3 == 1 ? 'from-green-600 via-green-700 to-green-600' : 'from-green-700 via-green-600 to-green-700') }} shadow-lg rounded-lg overflow-hidden flex flex-row transition transform hover:scale-105"
                         data-aos="{{ $index % 2 == 0 ? 'fade-right' : 'fade-left' }}" data-aos-duration="800"
                         data-aos-delay="{{ $index * 100 }}">
                         <div
-                            class="max-w-[250px] max-h-[250px] flex justify-center items-center {{ $index % 3 == 0 ? 'bg-white' : ($index % 3 == 1 ? 'bg-green-50' : 'bg-green-100') }}">
+                            class="max-w-[250px] max-h-[250px] flex justify-center items-center {{ $index % 3 == 0 ? 'bg-green-800' : ($index % 3 == 1 ? 'bg-green-700' : 'bg-green-800') }}">
                             <img src="{{ asset('storage/' . $facility->image_path) }}" alt="{{ $facility->name }}"
                                 class="w-full h-[250px] object-cover aspect-square">
                         </div>
                         <div class="p-6 w-3/5">
                             <h3
-                                class="text-2xl font-bold mb-4 {{ $index % 3 == 0 ? 'text-green-700 text-green-700-safe' : 'text-green-600 text-green-600-safe' }}">
+                                class="text-2xl font-bold mb-4 {{ $index % 3 == 0 ? 'text-green-400' : 'text-green-300' }}">
                                 {{ $facility->name }}
                             </h3>
-                            <p class="text-gray-700">
+                            <p class="text-gray-100">
                                 {{ $facility->description }}
                             </p>
                         </div>
@@ -78,12 +78,12 @@
                 <!-- Mobile View - Card Layout -->
                 <div class="md:hidden space-y-6">
                     @foreach ($facilities as $index => $facility)
-                    <div class="bg-gradient-to-br {{ $index % 3 == 0 ? 'from-white via-green-50 to-green-100' : ($index % 3 == 1 ? 'from-green-50 via-white to-green-100' : 'from-green-100 via-white to-green-50') }} shadow-lg rounded-lg overflow-hidden mx-2"
+                    <div class="bg-gradient-to-br {{ $index % 3 == 0 ? 'from-green-700 via-green-600 to-green-700' : ($index % 3 == 1 ? 'from-green-600 via-green-700 to-green-600' : 'from-green-700 via-green-600 to-green-700') }} shadow-lg rounded-lg overflow-hidden mx-2"
                         data-aos="fade-up" data-aos-duration="600" data-aos-delay="{{ $index * 100 }}">
 
                         <!-- Image Section -->
                         <div
-                            class="{{ $index % 3 == 0 ? 'bg-white' : ($index % 3 == 1 ? 'bg-green-50' : 'bg-green-100') }} flex justify-center items-center">
+                            class="{{ $index % 3 == 0 ? 'bg-green-800' : ($index % 3 == 1 ? 'bg-green-700' : 'bg-green-800') }} flex justify-center items-center">
                             <img src="{{ asset('storage/' . $facility->image_path) }}" alt="{{ $facility->name }}"
                                 class="w-full h-48 object-cover">
                         </div>
@@ -91,10 +91,10 @@
                         <!-- Content Section -->
                         <div class="p-4">
                             <h3
-                                class="text-xl font-bold mb-3 {{ $index % 3 == 0 ? 'text-green-700 text-green-700-safe' : 'text-green-600 text-green-600-safe' }} text-center">
+                                class="text-xl font-bold mb-3 {{ $index % 3 == 0 ? 'text-green-400' : 'text-green-300' }} text-center">
                                 {{ $facility->name }}
                             </h3>
-                            <p class="text-gray-700 text-sm leading-relaxed text-justify">
+                            <p class="text-gray-100 text-sm leading-relaxed text-justify">
                                 {{ $facility->description }}
                             </p>
                         </div>

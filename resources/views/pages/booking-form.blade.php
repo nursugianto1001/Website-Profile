@@ -76,7 +76,7 @@
     }
 </style>
 
-<body class="bg-green-500/90">
+<body class="bg-emerald-900/95">
     <div class>
 
         <!-- Content -->
@@ -84,14 +84,14 @@
             <!-- Header with elegant styling -->
             <div class="text-center mb-6 sm:mb-8 pt-16 sm:pt-12">
                 <div
-                    class="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-white/60 backdrop-blur-sm rounded-2xl mb-3 sm:mb-4 shadow-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sm:h-7 sm:w-7 text-green-600" fill="none"
+                    class="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-white/90 backdrop-blur-sm rounded-2xl mb-3 sm:mb-4 shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sm:h-7 sm:w-7 text-emerald-600" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                             d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                 </div>
-                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-green-300 mb-2 tracking-tight px-4">
+                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-green-400 mb-2 tracking-tight px-4">
                     Pesan Lapangan Badminton Karvin
                 </h1>
                 <div class="w-8 sm:w-20 h-0.5 bg-gradient-to-r from-green-600 to-green-300 mx-auto"></div>
@@ -99,7 +99,7 @@
 
             <!-- Button Kembali - Pojok Kanan Atas -->
             <a href="/"
-                class="absolute top-4 right-4 sm:top-6 sm:right-6 inline-flex items-center px-3 py-2 sm:px-4 sm:py-2.5 bg-white/70 backdrop-blur-sm hover:bg-white/90 text-green-600 font-medium rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-green-600/10 hover:border-green-600/20 text-sm sm:text-base">
+                class="absolute top-4 right-4 sm:top-6 sm:right-6 inline-flex items-center px-3 py-2 sm:px-4 sm:py-2.5 bg-white/90 backdrop-blur-sm hover:bg-white/90 text-green-600 font-medium rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-green-600/10 hover:border-green-600/20 text-sm sm:text-base">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 sm:mr-2" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -619,7 +619,7 @@
                 const dateButton = document.createElement('button');
                 dateButton.type = 'button';
                 dateButton.className = `date-selector px-4 py-2 border rounded-md transition-colors ${
-                    index === 0 ? 'bg-[#4ade80] text-white border-[#86efac]' : 'bg-white text-black border-white hover:bg-green-50'
+                    index === 0 ? 'bg-[#059669] text-white border-[#10b981]' : 'bg-white text-black border-white hover:bg-green-50'
                 }`;
                 dateButton.setAttribute('data-date', dateObj.date);
                 dateButton.innerHTML = `
@@ -634,8 +634,8 @@
                 button.addEventListener('click', function() {
                     // Reset semua tombol ke warna default
                     document.querySelectorAll('.date-selector').forEach(btn => {
-                        btn.classList.remove('bg-[#4ade80]', 'bg-blue-500', 'text-white',
-                            'border-[#86efac]', 'border-blue-600');
+                        btn.classList.remove('bg-[#059669]', 'bg-blue-500', 'text-white',
+                            'border-[#10b981]', 'border-blue-600');
                         btn.classList.add('bg-white', 'text-black', 'border-white',
                             'hover:bg-green-50');
                     });
@@ -643,7 +643,7 @@
                     // Ubah warna tombol yang diklik ke coklat keemasan
                     this.classList.remove('bg-white', 'text-black', 'border-white',
                         'hover:bg-green-50');
-                    this.classList.add('bg-[#4ade80]', 'text-white', 'border-[#86efac]');
+                    this.classList.add('bg-[#059669]', 'text-white', 'border-[#10b981]');
 
                     // Update tanggal yang dipilih
                     currentDate = this.getAttribute('data-date');

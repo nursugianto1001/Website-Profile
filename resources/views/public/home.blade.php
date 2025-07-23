@@ -43,8 +43,8 @@
                 <div class="flex sm:hidden mt-4">
                     <a href="{{ route('booking.form') }}"
                         class="inline-block px-6 py-3 text-white font-medium rounded text-center transition duration-300"
-                        style="background-color: #16a34a;" onmouseover="this.style.backgroundColor='#15803d';"
-                        onmouseout="this.style.backgroundColor='#16a34a';">
+                        style="background-color: #059669;" onmouseover="this.style.backgroundColor='#10b981';"
+                        onmouseout="this.style.backgroundColor='#059669';">
                         Pesan Sekarang
                     </a>
                 </div>
@@ -53,12 +53,12 @@
     </div>
 
     <!-- Scrollable Content - Clear separation from hero section -->
-    <div class="py-20 bg-green-600 bg-opacity-90 bg-green-600-opacity">
+    <div class="py-20 bg-green-900 bg-opacity-95">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                 <div data-aos="fade-right" data-aos-duration="1000">
-                    <h2 class="text-3xl font-bold text-green-300 text-green-300-safe mb-6">Tentang Kami</h2>
-                    <p class="text-white mb-4">
+                    <h2 class="text-3xl font-bold text-green-300 text-green-400 mb-6">Tentang Kami</h2>
+                    <p class="text-gray-100 mb-4">
                         Karvin hadir pertama kali pada 30 Oktober 2024, lahir dari keinginan sederhana: menyediakan tempat
                         main bulu tangkis yang gak cuma nyaman, tapi juga bikin betah. Kami tahu, nyari lapangan yang enak
                         itu kadang susah yang nggak antre panjang, bersih, pencahayaannya oke, dan suasananya bikin
@@ -81,11 +81,11 @@
 
     <!-- Featured Posters Section -->
     @if ($featuredPosters->count() > 0)
-        <div class="py-16 bg-green-700 bg-opacity-90 bg-green-700-opacity">
+        <div class="py-16 bg-green-800 bg-opacity-95">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-12" data-aos="fade-up" data-aos-duration="800">
-                    <h2 class="text-3xl font-bold text-green-300 text-green-300-safe">Poster Terbaru</h2>
-                    <p class="text-white mt-4">
+                    <h2 class="text-3xl font-bold text-green-400">Poster Terbaru</h2>
+                    <p class="text-gray-100 mt-4">
                         Temukan informasi terkini tentang turnamen, promosi spesial, dan program pelatihan menarik di
                         Karvin Badminton. Kami secara rutin mengadakan berbagai kegiatan untuk membangun komunitas
                         badminton yang aktif dan bersemangat.
@@ -104,7 +104,7 @@
                                     class="w-full h-full object-cover transition-transform duration-700 hover:scale-110">
                             </div>
                             <div class="p-6 bg-gradient-to-b from-white to-green-50 gradient-white-fallback">
-                                <h3 class="text-xl font-semibold mb-2 text-green-700 text-green-700-safe">
+                                <h3 class="text-xl font-semibold mb-2 text-green-700 text-green-700">
                                     {{ $poster->title }}</h3>
                                 @if ($poster->description)
                                     <p class="text-gray-700 text-sm">{{ Str::limit($poster->description, 100) }}</p>
@@ -132,7 +132,7 @@
                                         <div
                                             class="p-5 bg-gradient-to-b from-white to-green-50 gradient-white-fallback h-[180px] flex flex-col">
                                             <h3
-                                                class="text-lg font-semibold mb-2 text-green-700 text-green-700-safe transition-colors duration-300">
+                                                class="text-lg font-semibold mb-2 text-green-700 text-green-700 transition-colors duration-300">
                                                 {{ $poster->title }}</h3>
                                             @if ($poster->description)
                                                 <p
@@ -177,7 +177,7 @@
                     </div>
                     <div
                         class="w-full md:w-1/2 p-6 md:p-8 bg-gradient-to-br from-green-50 to-white gradient-white-fallback">
-                        <h3 id="modalTitle" class="text-2xl font-bold text-green-700 text-green-700-safe mb-4"></h3>
+                        <h3 id="modalTitle" class="text-2xl font-bold text-green-700 text-green-700 mb-4"></h3>
                         <div id="modalDescription" class="text-gray-700 prose max-w-none"></div>
                     </div>
                 </div>
@@ -186,10 +186,10 @@
     @endif
 
     <!-- Jadwal Ketersediaan Lapangan -->
-    <div class="py-16 bg-gradient-to-b from-green-600 to-green-700 gradient-green-fallback">
+    <div class="py-16 bg-gradient-to-b from-green-900 to-green-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12" data-aos="fade-up" data-aos-duration="800">
-                <h2 class="text-3xl font-bold text-green-300 text-green-300-safe">Jadwal Ketersediaan Lapangan</h2>
+                <h2 class="text-3xl font-bold text-green-400">Jadwal Ketersediaan Lapangan</h2>
                 <p class="text-white mt-4">
                     Lihat ketersediaan lapangan secara real-time untuk membantu Anda merencanakan waktu bermain yang tepat
                 </p>
@@ -200,19 +200,19 @@
                 class="bg-gradient-to-br from-green-50 via-green-100/30 to-green-100 rounded-lg shadow-md p-6 border border-green-100 mb-8">
                 <div class="flex items-center mb-4">
                     <div class="bg-green-200 bg-green-200-opacity p-2 rounded-full mr-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 text-green-600-safe"
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 text-green-600"
                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold text-green-600 text-green-600-safe">Pilih Tanggal</h3>
+                    <h3 class="text-xl font-semibold text-green-600 text-green-600">Pilih Tanggal</h3>
                 </div>
 
                 <p class="text-sm text-gray-600 mb-4">Pilih tanggal untuk melihat ketersediaan lapangan</p>
 
                 <div class="mb-3">
-                    <div class="flex items-center text-sm text-green-600 text-green-600-safe mb-3">
+                    <div class="flex items-center text-sm text-green-600 text-green-600 mb-3">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -253,7 +253,7 @@
             <!-- Tambahkan legend harga -->
             <div class="flex justify-center mb-8" data-aos="fade-up" data-aos-duration="800">
                 <div class="bg-white rounded-lg shadow-md p-4 border border-amber-100">
-                    <h3 class="text-center font-semibold text-green-600 text-green-600-safe mb-3">Harga per Jam</h3>
+                    <h3 class="text-center font-semibold text-green-600 text-green-600 mb-3">Harga per Jam</h3>
                     <div class="flex flex-wrap justify-center gap-4 text-sm">
                         <div class="flex items-center px-3 py-2 bg-yellow-100 rounded-full text-yellow-800">
                             <span class="font-medium">06:00-12:00: Rp 40.000</span>
@@ -290,7 +290,7 @@
                                             <div class="flex flex-col items-center">
                                                 <div class="flex items-center mb-1">
                                                     <svg xmlns="http://www.w3.org/2000/svg"
-                                                        class="h-5 w-5 text-green-600 text-green-600-safe mr-1"
+                                                        class="h-5 w-5 text-green-600 text-green-600 mr-1"
                                                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             stroke-width="2"
@@ -298,7 +298,7 @@
                                                     </svg>
                                                     <span class="font-medium text-gray-800">{{ $field->name }}</span>
                                                 </div>
-                                                <div class="text-sm text-green-600 text-green-600-safe font-medium">
+                                                <div class="text-sm text-green-600 text-green-600 font-medium">
                                                     Harga Dinamis
                                                 </div>
                                             </div>
@@ -349,7 +349,7 @@
             <div class="md:hidden space-y-4" data-aos="fade-up" data-aos-duration="800">
                 @foreach ($fields as $field)
                     <div class="bg-white rounded-lg shadow-lg border border-green-100 overflow-hidden">
-                        <div class="bg-gradient-to-r from-green-600 to-green-100 text-white p-4">
+                        <div class="bg-gradient-to-r from-emerald-600 to-emerald-300 text-gray-100 p-4">
                             <h3 class="text-lg font-semibold">{{ $field->name }}</h3>
                             <p class="text-sm opacity-90">Harga Dinamis</p>
                         </div>
@@ -367,8 +367,8 @@
                 <p class="text-white mb-4">Ingin memesan lapangan? Klik tombol di bawah ini untuk melakukan booking</p>
                 <a href="{{ route('booking.form') }}"
                     class="inline-block px-6 py-3 text-white font-medium rounded text-center transition duration-300"
-                    style="background-color: #16a34a;" onmouseover="this.style.backgroundColor='#15803d';"
-                    onmouseout="this.style.backgroundColor='#16a34a';">
+                    style="background-color: #059669;" onmouseover="this.style.backgroundColor='#10b981';"
+                    onmouseout="this.style.backgroundColor='#059669';">
                     Pesan Sekarang
                 </a>
             </div>
@@ -632,12 +632,12 @@
     </style>
 
     <!-- Facilities Section -->
-    <div class="py-10 bg-green-700 bg-opacity-90 bg-green-700-opacity">
+    <div class="py-10 bg-green-900 bg-opacity-95">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12" data-aos="fade-up" data-aos-duration="800">
-                <h2 class="text-3xl font-bold text-green-300 text-green-300-safe">Fasilitas-Fasilitas Kami</h2>
+                <h2 class="text-3xl font-bold text-green-400">Fasilitas-Fasilitas Kami</h2>
                 <br>
-                <p class="text-white mb-4">
+                <p class="text-gray-100 mb-4">
                     Karvin Badminton menyediakan fasilitas premium yang dirancang untuk memenuhi kebutuhan pemain
                     berbagai level. Dari sistem pencahayaan berstandar internasional hingga area istirahat yang nyaman,
                     setiap detail disiapkan untuk memastikan Anda mendapatkan pengalaman bermain terbaik.
@@ -647,20 +647,20 @@
             <!-- Desktop View - Grid -->
             <div class="hidden md:grid md:grid-cols-2 gap-12">
                 @foreach ($facilities->take(3) as $index => $facility)
-                    <div class="bg-gradient-to-br {{ $index % 3 == 0 ? 'from-white via-green-5- to-green-100' : ($index % 3 == 1 ? 'from-green-50 via-white to-green-100' : 'from-green-100 via-white to-green-50') }} shadow-lg rounded-lg overflow-hidden flex flex-row transition transform hover:scale-105"
+                    <div class="bg-gradient-to-br {{ $index % 3 == 0 ? 'from-green-700 via-green-600 to-green-700' : ($index % 3 == 1 ? 'from-green-600 via-green-700 to-green-600' : 'from-green-700 via-green-600 to-green-700') }} shadow-lg rounded-lg overflow-hidden flex flex-row transition transform hover:scale-105"
                         data-aos="{{ $index % 2 == 0 ? 'fade-right' : 'fade-left' }}" data-aos-duration="800"
                         data-aos-delay="{{ $index * 100 }}">
                         <div
-                            class="max-w-[250px] max-h-[250px] flex justify-center items-center {{ $index % 3 == 0 ? 'bg-white' : ($index % 3 == 1 ? 'bg-green-50' : 'bg-green-100') }}">
+                            class="max-w-[250px] max-h-[250px] flex justify-center items-center {{ $index % 3 == 0 ? 'bg-green-800' : ($index % 3 == 1 ? 'bg-green-700' : 'bg-green-800') }}">
                             <img src="{{ asset('storage/' . $facility->image_path) }}" alt="{{ $facility->name }}"
                                 class="w-full h-[250px] object-cover aspect-square">
                         </div>
                         <div class="p-6 w-3/5">
                             <h3
-                                class="text-2xl font-bold mb-4 {{ $index % 3 == 0 ? 'text-green-700' : 'text-green-600' }}">
+                                class="text-2xl font-bold mb-4 {{ $index % 3 == 0 ? 'text-green-400' : 'text-green-300' }}">
                                 {{ $facility->name }}
                             </h3>
-                            <p class="text-gray-700">
+                            <p class="text-gray-100">
                                 {{ $facility->description }}
                             </p>
                         </div>
@@ -675,18 +675,18 @@
                         @foreach ($facilities->take(3) as $index => $facility)
                             <div class="swiper-slide px-1">
                                 <div
-                                    class="bg-gradient-to-br {{ $index % 3 == 0 ? 'from-white via-green-50 to-green-100' : ($index % 3 == 1 ? 'from-green-50 via-white to-green-100' : 'from-green-100 via-white to-green-50') }} shadow-lg rounded-lg overflow-hidden flex flex-col h-[400px]">
+                                    class="bg-gradient-to-br {{ $index % 3 == 0 ? 'from-green-700 via-green-600 to-green-700' : ($index % 3 == 1 ? 'from-green-600 via-green-700 to-green-600' : 'from-green-700 via-green-600 to-green-700') }} shadow-lg rounded-lg overflow-hidden flex flex-col h-[400px]">
                                     <div
-                                        class="{{ $index % 3 == 0 ? 'bg-white' : ($index % 3 == 1 ? 'bg-green-50' : 'bg-green-100') }} flex justify-center items-center h-[180px]">
+                                        class="{{ $index % 3 == 0 ? 'bg-green-800' : ($index % 3 == 1 ? 'bg-green-700' : 'bg-green-800') }} flex justify-center items-center h-[180px]">
                                         <img src="{{ asset('storage/' . $facility->image_path) }}"
                                             alt="{{ $facility->name }}" class="w-full h-full object-cover">
                                     </div>
                                     <div class="p-4 flex-grow overflow-y-auto">
                                         <h3
-                                            class="text-lg font-bold mb-2 {{ $index % 3 == 0 ? 'text-green-700' : 'text-green-600' }}">
+                                            class="text-lg font-bold mb-2 {{ $index % 3 == 0 ? 'text-green-400' : 'text-green-300' }}">
                                             {{ $facility->name }}
                                         </h3>
-                                        <p class="text-gray-700 text-sm">
+                                        <p class="text-gray-100 text-sm">
                                             {{ Str::limit($facility->description, 120) }}
                                         </p>
                                     </div>
@@ -705,8 +705,8 @@
             <div class="text-center mt-12">
                 <a href="{{ route('facilities') }}"
                     class="inline-block px-6 py-3 text-white font-medium rounded transition duration-300"
-                    style="background-color: #16a34a;" onmouseover="this.style.backgroundColor='#15803d';"
-                    onmouseout="this.style.backgroundColor='#16a34a';" data-aos="fade-up" data-aos-duration="800">
+                    style="background-color: #059669;" onmouseover="this.style.backgroundColor='#10b981';"
+                    onmouseout="this.style.backgroundColor='#059669';" data-aos="fade-up" data-aos-duration="800">
                     Lihat Semua Fasilitas
                 </a>
             </div>
@@ -715,11 +715,11 @@
 
     <!-- Documentation Photos Gallery -->
     @if ($featuredDocumentations->count() > 0)
-        <div class="py-16 bg-gradient-to-b from-green-600 to-green-700 gradient-green-fallback">
+        <div class="py-16 bg-gradient-to-b from-green-800 to-green-900">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-12" data-aos="fade-up" data-aos-duration="800">
-                    <h2 class="text-3xl font-bold text-green-300 text-green-300-safe">Galeri Dokumentasi</h2>
-                    <p class="text-white mt-4">
+                    <h2 class="text-3xl font-bold text-green-400">Galeri Dokumentasi</h2>
+                    <p class="text-gray-100 mt-4">
                         Lihat momen-momen berkesan dari berbagai kegiatan di Karvin Badminton. Kami menangkap semangat,
                         kegembiraan, dan sportivitas dalam setiap turnamen, pelatihan, dan aktivitas komunitas yang
                         berlangsung di fasilitas kami.
@@ -735,7 +735,7 @@
                                 data-pswp-height="800" data-index="{{ $index }}"
                                 class="carousel-img block w-[250px] h-[250px] flex-shrink-0 snap-center relative">
                                 <div
-                                    class="absolute inset-0 bg-gradient-to-b from-transparent to-green-600 bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-xl z-10">
+                                    class="absolute inset-0 bg-gradient-to-b from-transparent to-green-600 opacity-0 hover:opacity-50 transition-opacity duration-300 rounded-xl z-10">
                                 </div>
                                 <img src="{{ asset('storage/' . $doc->image_path) }}" alt="{{ $doc->title }}"
                                     class="w-full h-full object-cover rounded-xl shadow-md transition-all duration-300 ease-in-out cursor-pointer" />
@@ -776,17 +776,17 @@
     <div id="previewModal"
         class="hidden fixed inset-0 z-[9999] bg-black bg-opacity-90 flex items-center justify-center p-4">
         <button id="prevButton" onclick="previewPrev()"
-            class="absolute left-4 md:left-8 top-1/2 transform -translate-y-1/2 bg-white/90 border-2 border-[#16a34a] rounded-full w-10 h-10 md:w-12 md:h-12 flex items-center justify-center shadow-md hover:scale-105 transition z-[10000]">
+            class="absolute left-4 md:left-8 top-1/2 transform -translate-y-1/2 bg-white/90 border-2 border-[#059669] rounded-full w-10 h-10 md:w-12 md:h-12 flex items-center justify-center shadow-md hover:scale-105 transition z-[10000]">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                stroke="#16a34a" class="w-5 h-5 md:w-6 md:h-6">
+                stroke="#059669" class="w-5 h-5 md:w-6 md:h-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
         </button>
 
         <button id="nextButton" onclick="previewNext()"
-            class="absolute right-4 md:right-8 top-1/2 transform -translate-y-1/2 bg-white/90 border-2 border-[#16a34a] rounded-full w-10 h-10 md:w-12 md:h-12 flex items-center justify-center shadow-md hover:scale-105 transition z-[10000]">
+            class="absolute right-4 md:right-8 top-1/2 transform -translate-y-1/2 bg-white/90 border-2 border-[#059669] rounded-full w-10 h-10 md:w-12 md:h-12 flex items-center justify-center shadow-md hover:scale-105 transition z-[10000]">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                stroke="#16a34a" class="w-5 h-5 md:w-6 md:h-6">
+                stroke="#059669" class="w-5 h-5 md:w-6 md:h-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
             </svg>
         </button>
@@ -797,8 +797,8 @@
                 alt="Preview">
 
             <!-- Optional title and description for posters with warm color theme -->
-            <div id="posterInfo" class="hidden bg-[#86efac]/95 rounded-lg p-4 mt-4 max-w-lg text-center">
-                <h3 id="posterTitle" class="text-xl font-semibold mb-2 text-[#16a34a]"></h3>
+            <div id="posterInfo" class="hidden bg-[#10b981]/95 rounded-lg p-4 mt-4 max-w-lg text-center">
+                <h3 id="posterTitle" class="text-xl font-semibold mb-2 text-[#059669]"></h3>
                 <p id="posterDescription" class="text-gray-700"></p>
             </div>
         </div>
@@ -1291,6 +1291,5 @@
             transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
             transition-duration: 300ms;
         }
-        
     </style>
 @endsection

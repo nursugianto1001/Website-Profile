@@ -31,13 +31,13 @@
             theme: {
                 extend: {
                     colors: {
-                        'gray-800': '#1f2937',
-                        'gray-900': '#111827',
+                        'slate-200': '#e2e8f0',
+                        'slate-700': '#334155',
+                        'slate-800': '#1e293b',
+                        'slate-900': '#0f172a',
                         'emerald-400': '#34d399',
                         'emerald-500': '#10b981',
-                        'emerald-600': '#059669',
-                        'gray-200': '#e5e7eb',
-                        'gray-700': '#374151'
+                        'emerald-600': '#059669'
                     }
                 }
             }
@@ -53,8 +53,7 @@
                 <div class="flex-shrink-0 flex items-center relative">
                     <img src="{{ Vite::asset(asset: 'resources/images/Karvin.png') }}" alt="Karvin Logo"
                         class="h-12 w-auto">
-                    <span
-                        class="italic font-black text-white">Karvin Badminton</span>
+                    <span class="italic font-black text-white">Karvin Badminton</span>
                 </div>
 
                 <div id="desktopMenu" class="hidden md:flex flex-grow justify-center space-x-6">
@@ -88,7 +87,7 @@
             </div>
 
             <div id="mobileMenu"
-                class="hidden absolute top-full left-0 right-0 w-full z-50 bg-gray-800 bg-opacity-90 rounded-b-md p-2 shadow-lg">
+                class="hidden absolute top-full left-0 right-0 w-full z-50 bg-black rounded-b-md p-2 shadow-lg">
                 <div class="px-2 pt-2 pb-3 space-y-1">
                     <a href="{{ route('home') }}"
                         class="text-white block w-full px-3 py-3 rounded-md text-base font-bold hover:text-emerald-400 hover:bg-gray-700 hover:bg-opacity-70">Beranda</a>
@@ -108,7 +107,7 @@
     </main>
 
     <footer class="w-full mt-auto">
-        <div class="bg-gray-800 backdrop-blur p-8">
+        <div class="bg-slate-700 backdrop-blur p-8">
             <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 gap-8">
                     <div>
@@ -136,7 +135,8 @@
                 </div>
 
                 <div class="mt-6 border-t border-gray-200 pt-6 text-center">
-                    <p class="text-gray-200 text-sm">&copy; {{ date('Y') }} Karvin Badminton. All rights reserved.</p>
+                    <p class="text-gray-200 text-sm">&copy; {{ date('Y') }} Karvin Badminton. All rights reserved.
+                    </p>
                 </div>
             </div>
         </div>
@@ -147,9 +147,9 @@
             const header = document.getElementById('main-header');
             if (window.scrollY > 50) {
                 header.classList.remove('bg-transparent');
-                header.classList.add('bg-gray-800');
+                header.classList.add('bg-slate-700');
             } else {
-                header.classList.remove('bg-gray-800');
+                header.classList.remove('bg-slate-700');
                 header.classList.add('bg-transparent');
             }
         }

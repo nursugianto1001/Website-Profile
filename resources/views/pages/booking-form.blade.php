@@ -76,7 +76,7 @@
     }
 </style>
 
-<body class="bg-emerald-900/95">
+<body class="bg-gradient-to-b from-green-50 via-emerald-50 to-teal-50">
     <div class>
 
         <!-- Content -->
@@ -91,15 +91,15 @@
                             d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                 </div>
-                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-green-400 mb-2 tracking-tight px-4">
+                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-emerald-600 mb-2 tracking-tight px-4">
                     Pesan Lapangan Badminton Karvin
                 </h1>
-                <div class="w-8 sm:w-20 h-0.5 bg-gradient-to-r from-green-600 to-green-300 mx-auto"></div>
+                <div class="w-8 sm:w-20 h-0.5 bg-gradient-to-r from-green-300 to-green-200 mx-auto"></div>
             </div>
 
             <!-- Button Kembali - Pojok Kanan Atas -->
             <a href="/"
-                class="absolute top-4 right-4 sm:top-6 sm:right-6 inline-flex items-center px-3 py-2 sm:px-4 sm:py-2.5 bg-white/90 backdrop-blur-sm hover:bg-white/90 text-green-600 font-medium rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-green-600/10 hover:border-green-600/20 text-sm sm:text-base">
+                class="absolute top-4 right-4 sm:top-6 sm:right-6 inline-flex items-center px-3 py-2 sm:px-4 sm:py-2.5 bg-white/90 backdrop-blur-sm hover:bg-white/90 text-emerald-600 font-medium rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-emerald-600/10 hover:border-emerald-600/20 text-sm sm:text-base">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 sm:mr-2" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -135,7 +135,7 @@
         @csrf
 
         <!-- Date Selection -->
-        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+        <div class="bg-gradient-to-br from-green-200 via-emerald-300/30 to-green-300 rounded-lg shadow-md p-6 border border-gray-200">
             <div class="flex items-center mb-4">
                 <div class="bg-green-100 p-2 rounded-full mr-3">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none"
@@ -144,10 +144,10 @@
                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                 </div>
-                <h2 class="text-xl font-semibold text-green-600">Pilih Tanggal</h2>
+                <h2 class="text-xl font-semibold text-emerald-600">Pilih Tanggal</h2>
             </div>
 
-            <p class="text-sm text-gray-600 mb-4">Pilih tanggal pemesanan yang Anda inginkan dari pilihan yang tersedia
+            <p class="text-sm text-slate-700 mb-4">Pilih tanggal pemesanan yang Anda inginkan dari pilihan yang tersedia
                 di bawah ini.</p>
 
             <div class="mb-3">
@@ -169,7 +169,7 @@
         </div>
 
         <!-- Field and Time Selection -->
-        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+        <div class="bg-gradient-to-br from-green-200 via-emerald-300/30 to-green-300 rounded-lg shadow-md p-6 border border-gray-200">
             <div class="flex items-center mb-4">
                 <div class="bg-green-100 p-2 rounded-full mr-3">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none"
@@ -178,16 +178,16 @@
                             d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                     </svg>
                 </div>
-                <h2 class="text-xl font-semibold text-green-600">Pilih Lapangan & Waktu Bermain</h2>
+                <h2 class="text-xl font-semibold text-emerald-600">Pilih Lapangan & Waktu Bermain</h2>
             </div>
 
-            <div class="flex items-center mb-4 p-3 bg-green-50 rounded-lg border border-green-200">
+            <div class="flex items-center mb-4 p-3 bg-white rounded-lg border border-white">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 mr-2" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <p class="text-sm text-green-700">Klik pada slot waktu yang tersedia untuk memesan. <span
+                <p class="text-sm text-emerald-700">Klik pada slot waktu yang tersedia untuk memesan. <span
                         class="font-medium">Slot hijau tersedia</span>, <span class="font-medium">slot merah tidak
                         tersedia</span>.</p>
             </div>
@@ -213,7 +213,7 @@
             <table class="w-full border-collapse booking-table">
                 <thead>
                     <tr>
-                        <th class="border px-4 py-3 bg-gray-50 text-gray-700">
+                        <th class="border px-4 py-3 bg-gray-50">
                             <div class="flex items-center justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-gray-500"
                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -247,7 +247,7 @@
         </div>
 
         <!-- Customer Information -->
-        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+        <div class="bg-gradient-to-br from-green-200 via-emerald-300/30 to-green-300 rounded-lg shadow-md p-6 border border-gray-200">
             <div class="flex items-center mb-4">
                 <div class="bg-green-100 p-2 rounded-full mr-3">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none"
@@ -256,10 +256,10 @@
                             d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                 </div>
-                <h2 class="text-xl font-semibold text-green-600">Informasi Pelanggan</h2>
+                <h2 class="text-xl font-semibold text-emerald-600">Informasi Pelanggan</h2>
             </div>
 
-            <p class="text-sm text-gray-600 mb-4">Silakan berikan detail kontak Anda untuk konfirmasi pemesanan.</p>
+            <p class="text-sm text-slate-700 mb-4">Silakan berikan detail kontak Anda untuk konfirmasi pemesanan.</p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div class="space-y-1">
@@ -321,7 +321,7 @@
         </div>
 
         <!-- Payment Method -->
-        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+        <div class="bg-gradient-to-br from-green-200 via-emerald-300/30 to-green-300 rounded-lg shadow-md p-6 border border-gray-200">
             <div class="flex items-center mb-4">
                 <div class="bg-green-100 p-2 rounded-full mr-3">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none"
@@ -330,7 +330,7 @@
                             d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                     </svg>
                 </div>
-                <h2 class="text-xl font-semibold text-green-600">Metode Pembayaran</h2>
+                <h2 class="text-xl font-semibold text-emerald-600">Metode Pembayaran</h2>
             </div>
 
             <div class="space-y-3">
@@ -362,20 +362,20 @@
         </div>
 
         <!-- Booking Summary and Total -->
-        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-            <h2 class="text-xl font-semibold mb-4 text-green-600">Ringkasan Pemesanan</h2>
+        <div class="bg-gradient-to-br from-green-200 via-emerald-300/30 to-green-300 rounded-lg shadow-md p-6 border border-gray-200">
+            <h2 class="text-xl font-semibold mb-4 text-emerald-600">Ringkasan Pemesanan</h2>
             <div id="booking-summary" class="mb-4">
                 <p class="text-gray-600 italic">Please select field(s) and time slot(s) to see the summary</p>
             </div>
             <div class="flex justify-between items-center border-t border-gray-300 pt-4 mt-4">
-                <span class="text-xl font-bold text-green-600">Total Biaya:</span>
-                <span id="total-price" class="text-xl font-bold text-green-600">Rp -</span>
+                <span class="text-xl font-bold text-slate-700">Total Biaya:</span>
+                <span id="total-price" class="text-xl font-bold text-slate-700">Rp -</span>
             </div>
         </div>
 
         <!-- Submit Button -->
         <button type="submit"
-            class="w-full py-4 px-6 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg shadow-lg transition-colors flex items-center justify-center">
+            class="w-full py-4 px-6 bg-green-400 hover:bg-green-500 text-white font-bold rounded-lg shadow-lg transition-colors flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -619,7 +619,7 @@
                 const dateButton = document.createElement('button');
                 dateButton.type = 'button';
                 dateButton.className = `date-selector px-4 py-2 border rounded-md transition-colors ${
-                    index === 0 ? 'bg-[#059669] text-white border-[#10b981]' : 'bg-white text-black border-white hover:bg-green-50'
+                    index === 0 ? 'bg-[#16a34a] text-white border-[#86efac]' : 'bg-white text-black border-white hover:bg-green-50'
                 }`;
                 dateButton.setAttribute('data-date', dateObj.date);
                 dateButton.innerHTML = `
@@ -634,8 +634,8 @@
                 button.addEventListener('click', function() {
                     // Reset semua tombol ke warna default
                     document.querySelectorAll('.date-selector').forEach(btn => {
-                        btn.classList.remove('bg-[#059669]', 'bg-blue-500', 'text-white',
-                            'border-[#10b981]', 'border-blue-600');
+                        btn.classList.remove('bg-[#16a34a]', 'bg-blue-500', 'text-white',
+                            'border-[#86efac]', 'border-blue-600');
                         btn.classList.add('bg-white', 'text-black', 'border-white',
                             'hover:bg-green-50');
                     });
@@ -643,7 +643,7 @@
                     // Ubah warna tombol yang diklik ke coklat keemasan
                     this.classList.remove('bg-white', 'text-black', 'border-white',
                         'hover:bg-green-50');
-                    this.classList.add('bg-[#059669]', 'text-white', 'border-[#10b981]');
+                    this.classList.add('bg-[#16a34a]', 'text-white', 'border-[#86efac]');
 
                     // Update tanggal yang dipilih
                     currentDate = this.getAttribute('data-date');

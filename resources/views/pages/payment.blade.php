@@ -35,39 +35,39 @@
     @endif
 </head>
 
-<body class="bg-white">
+<body class="bg-gradient-to-br from-emerald-50 via-green-100 to-teal-50 min-h-screen">
     <div class="container mx-auto px-4 py-8">
         <div class="max-w-2xl mx-auto">
-            <h1 class="text-3xl font-bold mb-6 text-green-600">Detail Pembayaran</h1>
-            <div class="bg-gradient-to-br from-green-50 via-green-100/30 to-white rounded-lg shadow-lg overflow-hidden mb-6">
-                <div class="bg-green-600 text-white px-6 py-4">
+            <h1 class="text-3xl font-bold mb-6 text-emerald-600">Detail Pembayaran</h1>
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-6 border border-emerald-100">
+                <div class="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-6 py-4">
                     <h2 class="text-xl font-semibold">Ringkasan Pemesanan</h2>
                 </div>
                 <div class="p-6 space-y-4">
-                    <div class="flex justify-between border-b border-green-100 pb-3">
-                        <span class="font-medium">Nama Pemesan:</span>
-                        <span>{{ $bookings->first()->customer_name }}</span>
+                    <div class="flex justify-between border-b border-emerald-200 pb-3">
+                        <span class="font-medium text-slate-700">Nama Pemesan:</span>
+                        <span class="text-slate-700">{{ $bookings->first()->customer_name }}</span>
                     </div>
-                    <div class="flex justify-between border-b border-green-100 pb-3">
-                        <span class="font-medium">Email:</span>
-                        <span>{{ $bookings->first()->customer_email }}</span>
+                    <div class="flex justify-between border-b border-emerald-200 pb-3">
+                        <span class="font-medium text-slate-700">Email:</span>
+                        <span class="text-slate-700">{{ $bookings->first()->customer_email }}</span>
                     </div>
-                    <div class="flex justify-between border-b border-green-100 pb-3">
-                        <span class="font-medium">Nomor Handphone:</span>
-                        <span>{{ $bookings->first()->customer_phone }}</span>
+                    <div class="flex justify-between border-b border-emerald-200 pb-3">
+                        <span class="font-medium text-slate-700">Nomor Handphone:</span>
+                        <span class="text-slate-700">{{ $bookings->first()->customer_phone }}</span>
                     </div>
-                    <div class="flex justify-between border-b border-green-100 pb-3">
-                        <span class="font-medium">Waktu:</span>
-                        <span>{{ \Carbon\Carbon::parse($bookings->first()->booking_date)->format('d M Y') }}</span>
+                    <div class="flex justify-between border-b border-emerald-200 pb-3">
+                        <span class="font-medium text-slate-700">Waktu:</span>
+                        <span class="text-slate-700">{{ \Carbon\Carbon::parse($bookings->first()->booking_date)->format('d M Y') }}</span>
                     </div>
 
                     <!-- Ringkasan multi-lapangan -->
-                    <div class="border-t border-green-100 pt-4 mb-2">
-                        <h3 class="font-semibold mb-2 text-green-700">Lapangan yang Dipesan:</h3>
+                    <div class="border-t border-emerald-200 pt-4 mb-2">
+                        <h3 class="font-semibold mb-2 text-emerald-700">Lapangan yang Dipesan:</h3>
                         <div class="space-y-1">
                             @foreach($bookings as $b)
                             <div>
-                                <span class="font-bold text-green-600">{{ $b->field->name }}</span>:
+                                <span class="font-bold text-emerald-700">{{ $b->field->name }}</span>:
                                 {{ \Carbon\Carbon::parse($b->start_time)->format('H:i') }}-{{ \Carbon\Carbon::parse($b->end_time)->format('H:i') }}
                             </div>
                             @endforeach
@@ -77,30 +77,30 @@
                     $tax = $tax ?? 5000;
                     $subtotal = $totalPrice - $tax;
                     @endphp
-                    <div class="flex justify-between text-base font-medium mt-4 pt-2 border-t border-green-100">
-                        <span>Subtotal:</span>
-                        <span>Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
+                    <div class="flex justify-between text-base font-medium mt-4 pt-2 border-t border-emerald-200">
+                        <span class="text-slate-700">Subtotal:</span>
+                        <span class="text-slate-700">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
                     </div>
                     <div class="flex justify-between text-base font-medium">
-                        <span>Biaya Admin:</span>
-                        <span>Rp {{ number_format($tax, 0, ',', '.') }}</span>
+                        <span class="text-slate-700">Biaya Admin:</span>
+                        <span class="text-slate-700">Rp {{ number_format($tax, 0, ',', '.') }}</span>
                     </div>
-                    <div class="flex justify-between text-lg font-bold mt-2 pt-2 border-t border-green-200">
-                        <span>Total Biaya:</span>
-                        <span id="total-amount" class="text-green-600">Rp {{ number_format($totalPrice, 0, ',', '.') }}</span>
+                    <div class="flex justify-between text-lg font-bold mt-2 pt-2 border-t border-emerald-200">
+                        <span class="text-slate-700">Total Biaya:</span>
+                        <span id="total-amount" class="text-emerald-700">Rp {{ number_format($totalPrice, 0, ',', '.') }}</span>
                     </div>
 
-                    <div class="mt-4 p-3 bg-green-100 border-l-4 border-green-600 text-green-700 rounded">
+                    <div class="mt-4 p-3 bg-gradient-to-br from-emerald-50 via-emerald-100 to-green-100 border-l-4 border-emerald-600 text-slate-700 rounded">
                         <b>Informasi Pembayaran:</b><br>
                         Anda akan diarahkan ke halaman pembayaran Midtrans untuk menyelesaikan transaksi.<br>
                         Pastikan untuk tidak menutup halaman sebelum proses pembayaran selesai.<br>
-                        <span class="text-sm text-gray-600">Setiap transaksi dikenakan biaya admin Rp5.000.</span>
+                        <span class="text-sm text-slate-600">Setiap transaksi dikenakan biaya admin Rp5.000.</span>
                     </div>
                 </div>
             </div>
 
             <div class="text-center mt-6">
-                <a href="/" class="inline-flex items-center px-5 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg shadow transition-colors">
+                <a href="/" class="inline-flex items-center px-5 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-lg shadow-lg transition-all duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
@@ -111,9 +111,9 @@
             <!-- Loading indicator -->
             <div id="loading-indicator" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                 <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-                    <p class="text-green-700 font-medium">Mempersiapkan pembayaran...</p>
-                    <p class="text-gray-600 text-sm mt-2">Mohon tunggu sebentar</p>
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
+                    <p class="text-emerald-700 font-medium">Mempersiapkan pembayaran...</p>
+                    <p class="text-slate-600 text-sm mt-2">Mohon tunggu sebentar</p>
                 </div>
             </div>
         </div>

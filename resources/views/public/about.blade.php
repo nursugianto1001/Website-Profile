@@ -40,18 +40,18 @@
 <!-- Scrollable Content -->
 <div class="relative z-30 bg-white">
     <!-- Our Story Section -->
-    <div class="py-20 bg-green-900 bg-opacity-95">
+    <div class="py-20 bg-gradient-to-br from-emerald-50 via-green-100 to-teal-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                 <div data-aos="fade-right" data-aos-duration="1000">
-                    <h2 class="text-3xl font-bold text-green-400 mb-6">Cerita Kami</h2>
-                    <p class="text-gray-100 mb-4">
+                    <h2 class="text-3xl font-bold text-emerald-600 mb-6">Cerita Kami</h2>
+                    <p class="text-slate-700 mb-4 leading-relaxed">
                         Karvin hadir pertama kali pada 30 Oktober 2024, lahir dari keinginan sederhana: menyediakan
                         tempat main bulu tangkis yang gak cuma nyaman, tapi juga bikin betah. Kami tahu, nyari lapangan
                         yang enak itu kadang susah yang nggak antre panjang, bersih, pencahayaannya oke, dan suasananya
                         bikin semangat. Maka dari itu, Karvin coba jadi jawaban.
                     </p>
-                    <p class="text-gray-100 mb-6">
+                    <p class="text-slate-700 mb-6 leading-relaxed">
                         Berlokasi di Jalan Veteran, Jalan Karvin, kami bangun ruang olahraga yang modern tapi tetap
                         terasa akrab. Di sini, kamu bisa main serius, sparing santai, atau sekadar nongkrong sambil
                         nunggu giliran main. Karvin bukan cuma tentang bulu tangkis tapi tentang komunitas, semangat
@@ -63,28 +63,28 @@
                 </div>
                 <div class="order-1 md:order-2" data-aos="fade-left" data-aos-duration="1000">
                     <img src="{{ Vite::asset('resources/images/servis.jpg') }}" alt="Our Cafe Story"
-                        class="w-full h-auto rounded-lg max-w-md mx-auto">
+                        class="w-full h-auto rounded-lg max-w-md mx-auto shadow-lg">
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Our Mission Section -->
-    <div class="py-10 bg-green-800 bg-opacity-95">
+    <div class="py-10 bg-gradient-to-tl from-teal-50 via-emerald-100 to-green-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                 <div class="order-2 md:order-1" data-aos="fade-right" data-aos-duration="1000">
                     <img src="{{ Vite::asset('resources/images/tim 2.jpg') }}" alt="Our Mission"
-                        class="w-full h-auto rounded-lg max-w-md mx-auto">
+                        class="w-full h-auto rounded-lg max-w-md mx-auto shadow-lg">
                 </div>
                 <div class="order-1 md:order-2" data-aos="fade-left" data-aos-duration="1000">
-                    <h2 class="text-3xl font-bold text-green-400 mb-6">Misi Kami</h2>
-                    <p class="text-gray-100 mb-4">
+                    <h2 class="text-3xl font-bold text-emerald-600 mb-6">Misi Kami</h2>
+                    <p class="text-slate-700 mb-4 leading-relaxed">
                         Misi kami di Karvin adalah menghadirkan lapangan bulu tangkis yang nyaman, bersih, dan mudah
                         diakses oleh siapa saja. Kami ingin menciptakan ruang di mana orang bisa berkumpul, bergerak
                         bersama, dan membangun koneksi lewat semangat olahraga.
                     </p>
-                    <p class="text-gray-100 mb-6">
+                    <p class="text-slate-700 mb-6 leading-relaxed">
                         Lewat pengalaman bermain yang seru dan bebas ribet, kami mendorong gaya hidup yang aktif dan
                         sehat. Selain itu, kami selalu berusaha memberikan pelayanan yang ramah dan profesional, supaya
                         setiap orang yang datang merasa dihargai dan betah.
@@ -95,54 +95,54 @@
     </div>
 
     <!-- Our Values Section with Box Gradients -->
-    <div class="py-16 bg-gradient-to-b from-green-900 to-green-800">
+    <div class="py-16 bg-gradient-to-b from-green-50 via-emerald-50 to-teal-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12" data-aos="fade-up" data-aos-duration="800">
-                <h2 class="text-3xl font-bold text-green-400">Nilai Nilai Kami</h2>
+                <h2 class="text-3xl font-bold text-emerald-700">Nilai Nilai Kami</h2>
                 <br>
-                <p class="text-gray-100 mb-4 max-w-3xl mx-auto">
+                <p class="text-slate-700 mb-4 max-w-3xl mx-auto leading-relaxed">
                     Kami berpegang pada prinsip-prinsip utama dalam setiap langkah yang diambil.
                 </p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- Sportivitas -->
-                <div class="bg-gradient-to-br from-green-700 via-green-600 to-green-700 shadow-lg rounded-lg overflow-hidden transition transform hover:scale-105 p-6"
+                <div class="bg-gradient-to-br from-emerald-100 via-emerald-200 to-green-100 shadow-lg rounded-xl overflow-hidden transition transform hover:scale-105 hover:shadow-xl p-6 border border-emerald-100"
                     data-aos="fade-up" data-aos-duration="800" data-aos-delay="100">
                     <div
-                        class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-md bg-green-500">
+                        class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-md bg-gradient-to-br from-emerald-400 to-emerald-500">
                         <i class="fas fa-medal text-2xl text-white"></i>
                     </div>
-                    <h3 class="text-xl font-bold mb-2 text-center text-green-400">Sportivitas</h3>
-                    <p class="text-gray-100 text-center">
+                    <h3 class="text-xl font-bold mb-2 text-center text-emerald-700">Sportivitas</h3>
+                    <p class="text-slate-600 text-center leading-relaxed">
                         Kami menanamkan semangat fair play dan sikap saling menghargai dalam setiap aktivitas di
                         lapangan.
                     </p>
                 </div>
 
                 <!-- Kepuasan Pelanggan -->
-                <div class="bg-gradient-to-br from-green-600 via-green-700 to-green-600 shadow-lg rounded-lg overflow-hidden transition transform hover:scale-105 p-6"
+                <div class="bg-gradient-to-br from-green-100 via-green-200 to-emerald-100 shadow-lg rounded-xl overflow-hidden transition transform hover:scale-105 hover:shadow-xl p-6 border border-green-100"
                     data-aos="fade-up" data-aos-duration="800" data-aos-delay="200">
                     <div
-                        class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-md bg-green-500">
+                        class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-md bg-gradient-to-br from-green-400 to-green-500">
                         <i class="fas fa-users text-2xl text-white"></i>
                     </div>
-                    <h3 class="text-xl font-bold mb-2 text-center text-green-400">Kepuasan Pelanggan</h3>
-                    <p class="text-gray-100 text-center">
+                    <h3 class="text-xl font-bold mb-2 text-center text-emerald-700">Kepuasan Pelanggan</h3>
+                    <p class="text-slate-600 text-center leading-relaxed">
                         Kepuasan Anda adalah prioritas kami. Kami terus mendengarkan, memperbaiki, dan menyesuaikan
                         layanan sesuai kebutuhan pengguna.
                     </p>
                 </div>
 
                 <!-- Gaya Hidup Aktif -->
-                <div class="bg-gradient-to-br from-green-700 via-green-600 to-green-700 shadow-lg rounded-lg overflow-hidden transition transform hover:scale-105 p-6"
+                <div class="bg-gradient-to-br from-green-100 via-green-200 to-emerald-100 shadow-lg rounded-xl overflow-hidden transition transform hover:scale-105 hover:shadow-xl p-6 border border-teal-100"
                     data-aos="fade-up" data-aos-duration="800" data-aos-delay="300">
                     <div
-                        class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-md bg-green-500">
+                        class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-md bg-gradient-to-br from-green-400 to-green-500">
                         <i class="fas fa-person-running text-2xl text-white"></i>
                     </div>
-                    <h3 class="text-xl font-bold mb-2 text-center text-green-400">Gaya Hidup Aktif</h3>
-                    <p class="text-gray-100 text-center">
+                    <h3 class="text-xl font-bold mb-2 text-center text-emerald-700">Gaya Hidup Aktif</h3>
+                    <p class="text-slate-600 text-center leading-relaxed">
                         Kami mendukung gaya hidup sehat dan aktif lewat kemudahan akses ke fasilitas olahraga.
                     </p>
                 </div>
@@ -154,7 +154,7 @@
     <div class="fixed bottom-6 right-6 z-50">
         <a href="https://wa.me/6282210002256?text=Halo%20admin%20Karvin%20Badminton,%20saya%20ingin%20bertanya%20tentang%20booking%20lapangan."
             target="_blank"
-            class="group flex items-center justify-center w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110">
+            class="group flex items-center justify-center w-14 h-14 bg-gradient-to-br from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110">
 
             <!-- Primary: SVG Icon (selalu tersedia) -->
             <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
@@ -163,9 +163,9 @@
         </a>
 
         <!-- Tooltip -->
-        <div class="absolute right-16 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white text-sm px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none">
+        <div class="absolute right-16 top-1/2 transform -translate-y-1/2 bg-slate-800 text-white text-sm px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none shadow-lg">
             Chat dengan Admin
-            <div class="absolute left-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-l-gray-800"></div>
+            <div class="absolute left-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-l-slate-800"></div>
         </div>
     </div>
 </div>

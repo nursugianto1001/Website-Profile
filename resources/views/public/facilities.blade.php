@@ -41,11 +41,11 @@
 <!-- Scrollable Content -->
 <div class="relative z-30 bg-white">
     <!-- Facilities Overview Section -->
-    <div class="py-12 md:py-20 bg-green-900 bg-opacity-95">
+    <div class="py-12 md:py-20 bg-gradient-to-br from-emerald-50 via-green-100 to-teal-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-8 md:mb-12" data-aos="fade-up" data-aos-duration="800">
-                <h2 class="text-2xl md:text-3xl font-bold text-green-400 mb-4">Fasilitas-Fasilitas Kami</h2>
-                <p class="text-gray-100 mb-12 md:mb-24 max-w-3xl mx-auto text-sm md:text-base">
+                <h2 class="text-2xl md:text-3xl font-bold text-emerald-600 mb-4">Fasilitas-Fasilitas Kami</h2>
+                <p class="text-slate-700 mb-12 md:mb-24 max-w-3xl mx-auto text-sm md:text-base leading-relaxed">
                     Karvin menyediakan lapangan bulu tangkis berkualitas dengan lingkungan yang nyaman dan bersih.
                     Dilengkapi dengan peralatan modern dan akses mudah, kami memastikan setiap pemain dapat menikmati
                     pengalaman bermain yang menyenangkan dan mendukung gaya hidup sehat.
@@ -54,20 +54,20 @@
                 <!-- Desktop View - Grid -->
                 <div class="hidden md:grid md:grid-cols-2 gap-12">
                     @foreach ($facilities as $index => $facility)
-                    <div class="bg-gradient-to-br {{ $index % 3 == 0 ? 'from-green-700 via-green-600 to-green-700' : ($index % 3 == 1 ? 'from-green-600 via-green-700 to-green-600' : 'from-green-700 via-green-600 to-green-700') }} shadow-lg rounded-lg overflow-hidden flex flex-row transition transform hover:scale-105"
+                    <div class="bg-gradient-to-br {{ $index % 3 == 0 ? 'from-emerald-100 via-emerald-200 to-green-100' : ($index % 3 == 1 ? 'from-green-100 via-green-200 to-emerald-100' : 'from-emerald-100 via-emerald-200 to-green-100') }} shadow-lg rounded-xl overflow-hidden flex flex-row transition transform hover:scale-105 hover:shadow-xl border border-emerald-100"
                         data-aos="{{ $index % 2 == 0 ? 'fade-right' : 'fade-left' }}" data-aos-duration="800"
                         data-aos-delay="{{ $index * 100 }}">
                         <div
-                            class="max-w-[250px] max-h-[250px] flex justify-center items-center {{ $index % 3 == 0 ? 'bg-green-800' : ($index % 3 == 1 ? 'bg-green-700' : 'bg-green-800') }}">
+                            class="max-w-[250px] max-h-[250px] flex justify-center items-center {{ $index % 3 == 0 ? 'bg-emerald-50' : ($index % 3 == 1 ? 'bg-green-50' : 'bg-emerald-50') }}">
                             <img src="{{ asset('storage/' . $facility->image_path) }}" alt="{{ $facility->name }}"
                                 class="w-full h-[250px] object-cover aspect-square">
                         </div>
                         <div class="p-6 w-3/5">
                             <h3
-                                class="text-2xl font-bold mb-4 {{ $index % 3 == 0 ? 'text-green-400' : 'text-green-300' }}">
+                                class="text-2xl font-bold mb-4 {{ $index % 3 == 0 ? 'text-emerald-700' : 'text-emerald-600' }}">
                                 {{ $facility->name }}
                             </h3>
-                            <p class="text-gray-100">
+                            <p class="text-slate-600 leading-relaxed">
                                 {{ $facility->description }}
                             </p>
                         </div>
@@ -78,12 +78,12 @@
                 <!-- Mobile View - Card Layout -->
                 <div class="md:hidden space-y-6">
                     @foreach ($facilities as $index => $facility)
-                    <div class="bg-gradient-to-br {{ $index % 3 == 0 ? 'from-green-700 via-green-600 to-green-700' : ($index % 3 == 1 ? 'from-green-600 via-green-700 to-green-600' : 'from-green-700 via-green-600 to-green-700') }} shadow-lg rounded-lg overflow-hidden mx-2"
+                    <div class="bg-gradient-to-br {{ $index % 3 == 0 ? 'from-emerald-100 via-emerald-200 to-green-100' : ($index % 3 == 1 ? 'from-green-100 via-green-200 to-emerald-100' : 'from-emerald-100 via-emerald-200 to-green-100') }} shadow-lg rounded-xl overflow-hidden mx-2 border border-emerald-100"
                         data-aos="fade-up" data-aos-duration="600" data-aos-delay="{{ $index * 100 }}">
 
                         <!-- Image Section -->
                         <div
-                            class="{{ $index % 3 == 0 ? 'bg-green-800' : ($index % 3 == 1 ? 'bg-green-700' : 'bg-green-800') }} flex justify-center items-center">
+                            class="{{ $index % 3 == 0 ? 'bg-emerald-50' : ($index % 3 == 1 ? 'bg-green-50' : 'bg-emerald-50') }} flex justify-center items-center">
                             <img src="{{ asset('storage/' . $facility->image_path) }}" alt="{{ $facility->name }}"
                                 class="w-full h-48 object-cover">
                         </div>
@@ -91,10 +91,10 @@
                         <!-- Content Section -->
                         <div class="p-4">
                             <h3
-                                class="text-xl font-bold mb-3 {{ $index % 3 == 0 ? 'text-green-400' : 'text-green-300' }} text-center">
+                                class="text-xl font-bold mb-3 {{ $index % 3 == 0 ? 'text-emerald-700' : 'text-emerald-600' }} text-center">
                                 {{ $facility->name }}
                             </h3>
-                            <p class="text-gray-100 text-sm leading-relaxed text-justify">
+                            <p class="text-slate-600 text-sm leading-relaxed text-justify">
                                 {{ $facility->description }}
                             </p>
                         </div>
@@ -110,7 +110,7 @@
 <div class="fixed bottom-6 right-6 z-50">
     <a href="https://wa.me/6282210002256?text=Halo%20admin%20Karvin%20Badminton,%20saya%20ingin%20bertanya%20tentang%20booking%20lapangan."
         target="_blank"
-        class="group flex items-center justify-center w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110">
+        class="group flex items-center justify-center w-14 h-14 bg-gradient-to-br from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110">
 
         <!-- Primary: SVG Icon (selalu tersedia) -->
         <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
@@ -119,9 +119,9 @@
     </a>
 
     <!-- Tooltip -->
-    <div class="absolute right-16 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white text-sm px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none">
+    <div class="absolute right-16 top-1/2 transform -translate-y-1/2 bg-slate-800 text-white text-sm px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none shadow-lg">
         Chat dengan Admin
-        <div class="absolute left-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-l-gray-800"></div>
+        <div class="absolute left-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-l-slate-800"></div>
     </div>
 </div>
 

@@ -43,8 +43,8 @@
                 <div class="flex sm:hidden mt-4">
                     <a href="{{ route('booking.form') }}"
                         class="inline-block px-6 py-3 text-white font-medium rounded text-center transition duration-300"
-                        style="background-color: #059669;" onmouseover="this.style.backgroundColor='#10b981';"
-                        onmouseout="this.style.backgroundColor='#059669';">
+                        style="background-color: #10b981;" onmouseover="this.style.backgroundColor='#34d399';"
+                        onmouseout="this.style.backgroundColor='#10b981';">
                         Pesan Sekarang
                     </a>
                 </div>
@@ -53,12 +53,12 @@
     </div>
 
     <!-- Scrollable Content - Clear separation from hero section -->
-    <div class="py-20 bg-green-900 bg-opacity-95">
+    <div class="py-20 bg-gradient-to-br from-emerald-50 via-green-100 to-teal-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                 <div data-aos="fade-right" data-aos-duration="1000">
-                    <h2 class="text-3xl font-bold text-green-300 text-green-400 mb-6">Tentang Kami</h2>
-                    <p class="text-gray-100 mb-4">
+                    <h2 class="text-3xl font-bold text-emerald-600 mb-6">Tentang Kami</h2>
+                    <p class="text-slate-700 mb-4">
                         Karvin hadir pertama kali pada 30 Oktober 2024, lahir dari keinginan sederhana: menyediakan tempat
                         main bulu tangkis yang gak cuma nyaman, tapi juga bikin betah. Kami tahu, nyari lapangan yang enak
                         itu kadang susah yang nggak antre panjang, bersih, pencahayaannya oke, dan suasananya bikin
@@ -66,7 +66,7 @@
                     </p>
                     <a href="{{ route('about') }}"
                         class="text-black font-medium border-b-2 border-black transition duration-300"
-                        onmouseover="this.style.color='#86efac'; this.style.borderColor='#86efac';"
+                        onmouseover="this.style.color='#10b399'; this.style.borderColor='#10b399';"
                         onmouseout="this.style.color='#000000'; this.style.borderColor='#000000';">
                         Pelajari lebih lanjut tentang perjalanan kami
                     </a>
@@ -81,11 +81,11 @@
 
     <!-- Featured Posters Section -->
     @if ($featuredPosters->count() > 0)
-        <div class="py-16 bg-green-800 bg-opacity-95">
+        <div class="py-16 bg-gradient-to-tl from-teal-50 via-emerald-100 to-green-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-12" data-aos="fade-up" data-aos-duration="800">
-                    <h2 class="text-3xl font-bold text-green-400">Poster Terbaru</h2>
-                    <p class="text-gray-100 mt-4">
+                    <h2 class="text-3xl font-bold text-emerald-600">Poster Terbaru</h2>
+                    <p class="text-slate-700 mt-4">
                         Temukan informasi terkini tentang turnamen, promosi spesial, dan program pelatihan menarik di
                         Karvin Badminton. Kami secara rutin mengadakan berbagai kegiatan untuk membangun komunitas
                         badminton yang aktif dan bersemangat.
@@ -186,20 +186,20 @@
     @endif
 
     <!-- Jadwal Ketersediaan Lapangan -->
-    <div class="py-16 bg-gradient-to-b from-green-900 to-green-800">
+    <div class="py-16 bg-gradient-to-b from-green-50 via-emerald-50 to-teal-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12" data-aos="fade-up" data-aos-duration="800">
-                <h2 class="text-3xl font-bold text-green-400">Jadwal Ketersediaan Lapangan</h2>
-                <p class="text-white mt-4">
+                <h2 class="text-3xl font-bold text-emerald-700">Jadwal Ketersediaan Lapangan</h2>
+                <p class="text-slate-700 mt-4">
                     Lihat ketersediaan lapangan secara real-time untuk membantu Anda merencanakan waktu bermain yang tepat
                 </p>
             </div>
 
             <!-- Date Selection dengan Kalender 1 Bulan -->
             <div
-                class="bg-gradient-to-br from-green-50 via-green-100/30 to-green-100 rounded-lg shadow-md p-6 border border-green-100 mb-8">
+                class="bg-gradient-to-br from-green-100 via-emerald-200/30 to-green-200 rounded-lg shadow-md p-6 border border-green-200 mb-8">
                 <div class="flex items-center mb-4">
-                    <div class="bg-green-200 bg-green-200-opacity p-2 rounded-full mr-3">
+                    <div class="bg-green-200 p-2 rounded-full mr-3">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 text-green-600"
                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -364,7 +364,7 @@
 
             <!-- Info Text -->
             <div class="text-center mt-8" data-aos="fade-up" data-aos-duration="800">
-                <p class="text-white mb-4">Ingin memesan lapangan? Klik tombol di bawah ini untuk melakukan booking</p>
+                <p class="text-slate-700 mb-4">Ingin memesan lapangan? Klik tombol di bawah ini untuk melakukan booking</p>
                 <a href="{{ route('booking.form') }}"
                     class="inline-block px-6 py-3 text-white font-medium rounded text-center transition duration-300"
                     style="background-color: #059669;" onmouseover="this.style.backgroundColor='#10b981';"
@@ -632,12 +632,12 @@
     </style>
 
     <!-- Facilities Section -->
-    <div class="py-10 bg-green-900 bg-opacity-95">
+    <div class="py-10 bg-gradient-to-tl from-teal-50 via-emerald-50 to-green-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12" data-aos="fade-up" data-aos-duration="800">
-                <h2 class="text-3xl font-bold text-green-400">Fasilitas-Fasilitas Kami</h2>
+                <h2 class="text-3xl font-bold text-emerald-600">Fasilitas-Fasilitas Kami</h2>
                 <br>
-                <p class="text-gray-100 mb-4">
+                <p class="text-slate-700 mb-4">
                     Karvin Badminton menyediakan fasilitas premium yang dirancang untuk memenuhi kebutuhan pemain
                     berbagai level. Dari sistem pencahayaan berstandar internasional hingga area istirahat yang nyaman,
                     setiap detail disiapkan untuk memastikan Anda mendapatkan pengalaman bermain terbaik.
@@ -647,20 +647,20 @@
             <!-- Desktop View - Grid -->
             <div class="hidden md:grid md:grid-cols-2 gap-12">
                 @foreach ($facilities->take(3) as $index => $facility)
-                    <div class="bg-gradient-to-br {{ $index % 3 == 0 ? 'from-green-700 via-green-600 to-green-700' : ($index % 3 == 1 ? 'from-green-600 via-green-700 to-green-600' : 'from-green-700 via-green-600 to-green-700') }} shadow-lg rounded-lg overflow-hidden flex flex-row transition transform hover:scale-105"
+                    <div class="bg-gradient-to-br {{ $index % 3 == 0 ? 'from-emerald-100 via-emerald-200 to-green-100' : ($index % 3 == 1 ? 'from-green-100 via-green-200 to-emerald-100' : 'from-emerald-100 via-emerald-200 to-green-100') }} shadow-lg rounded-lg overflow-hidden flex flex-row transition transform hover:scale-105"
                         data-aos="{{ $index % 2 == 0 ? 'fade-right' : 'fade-left' }}" data-aos-duration="800"
                         data-aos-delay="{{ $index * 100 }}">
                         <div
-                            class="max-w-[250px] max-h-[250px] flex justify-center items-center {{ $index % 3 == 0 ? 'bg-green-800' : ($index % 3 == 1 ? 'bg-green-700' : 'bg-green-800') }}">
+                            class="max-w-[250px] max-h-[250px] flex justify-center items-center {{ $index % 3 == 0 ? 'bg-emerald-50' : ($index % 3 == 1 ? 'bg-green-50' : 'bg-emerald-50') }}">
                             <img src="{{ asset('storage/' . $facility->image_path) }}" alt="{{ $facility->name }}"
                                 class="w-full h-[250px] object-cover aspect-square">
                         </div>
                         <div class="p-6 w-3/5">
                             <h3
-                                class="text-2xl font-bold mb-4 {{ $index % 3 == 0 ? 'text-green-400' : 'text-green-300' }}">
+                                class="text-2xl font-bold mb-4 {{ $index % 3 == 0 ? 'text-emerald-700' : 'text-emerald-600' }}">
                                 {{ $facility->name }}
                             </h3>
-                            <p class="text-gray-100">
+                            <p class="text-slate-600">
                                 {{ $facility->description }}
                             </p>
                         </div>
@@ -675,18 +675,18 @@
                         @foreach ($facilities->take(3) as $index => $facility)
                             <div class="swiper-slide px-1">
                                 <div
-                                    class="bg-gradient-to-br {{ $index % 3 == 0 ? 'from-green-700 via-green-600 to-green-700' : ($index % 3 == 1 ? 'from-green-600 via-green-700 to-green-600' : 'from-green-700 via-green-600 to-green-700') }} shadow-lg rounded-lg overflow-hidden flex flex-col h-[400px]">
+                                    class="bg-gradient-to-br {{ $index % 3 == 0 ? 'from-emerlad-100 via-emerald-200 to-green-100' : ($index % 3 == 1 ? 'from-green-100 via-green-200 to-emerald-100' : 'from-green-100 via-emerald-100 to-green-100') }} shadow-lg rounded-lg overflow-hidden flex flex-col h-[400px]">
                                     <div
-                                        class="{{ $index % 3 == 0 ? 'bg-green-800' : ($index % 3 == 1 ? 'bg-green-700' : 'bg-green-800') }} flex justify-center items-center h-[180px]">
+                                        class="{{ $index % 3 == 0 ? 'bg-emerald-50' : ($index % 3 == 1 ? 'bg-green-50' : 'bg-emerald-50') }} flex justify-center items-center h-[180px]">
                                         <img src="{{ asset('storage/' . $facility->image_path) }}"
                                             alt="{{ $facility->name }}" class="w-full h-full object-cover">
                                     </div>
                                     <div class="p-4 flex-grow overflow-y-auto">
                                         <h3
-                                            class="text-lg font-bold mb-2 {{ $index % 3 == 0 ? 'text-green-400' : 'text-green-300' }}">
+                                            class="text-lg font-bold mb-2 {{ $index % 3 == 0 ? 'text-emerald-700' : 'text-emerald-600' }}">
                                             {{ $facility->name }}
                                         </h3>
-                                        <p class="text-gray-100 text-sm">
+                                        <p class="text-slate-600 text-sm">
                                             {{ Str::limit($facility->description, 120) }}
                                         </p>
                                     </div>
@@ -715,11 +715,11 @@
 
     <!-- Documentation Photos Gallery -->
     @if ($featuredDocumentations->count() > 0)
-        <div class="py-16 bg-gradient-to-b from-green-800 to-green-900">
+        <div class="py-16 bg-gradient-to-b from-green-100 via-emerald-50 to-teal-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-12" data-aos="fade-up" data-aos-duration="800">
-                    <h2 class="text-3xl font-bold text-green-400">Galeri Dokumentasi</h2>
-                    <p class="text-gray-100 mt-4">
+                    <h2 class="text-3xl font-bold text-emerald-600">Galeri Dokumentasi</h2>
+                    <p class="text-slate-700 mt-4">
                         Lihat momen-momen berkesan dari berbagai kegiatan di Karvin Badminton. Kami menangkap semangat,
                         kegembiraan, dan sportivitas dalam setiap turnamen, pelatihan, dan aktivitas komunitas yang
                         berlangsung di fasilitas kami.

@@ -13,38 +13,38 @@
     @endif
 </head>
 
-<body class="bg-gradient-to-br from-emerald-50 via-green-100 to-teal-50 min-h-screen">
+<body class="bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800 min-h-screen">
     <div class="container mx-auto px-4 py-8">
         <div class="max-w-2xl mx-auto">
-            <h1 class="text-3xl font-bold mb-6 text-emerald-700">Detail Pembayaran</h1>
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-6 border border-emerald-100">
+            <h1 class="text-3xl font-bold mb-6 text-emerald-200">Detail Pembayaran</h1>
+            <div class="bg-white rounded-lg shadow-xl overflow-hidden mb-6">
                 <div class="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-6 py-4">
                     <h2 class="text-xl font-semibold">Ringkasan Pemesanan</h2>
                 </div>
                 <div class="p-6 space-y-4">
-                    <div class="flex justify-between border-b border-emerald-200 pb-3">
-                        <span class="font-medium text-slate-700">Nama Pemesan:</span>
-                        <span class="text-slate-600">{{ $bookings[0]['customer_name'] }}</span>
+                    <div class="flex justify-between border-b border-emerald-600 pb-3">
+                        <span class="font-medium text-emerald-800">Nama Pemesan:</span>
+                        <span class="text-emerald-700">{{ $bookings[0]['customer_name'] }}</span>
                     </div>
-                    <div class="flex justify-between border-b border-emerald-200 pb-3">
-                        <span class="font-medium text-slate-700">Email:</span>
-                        <span class="text-slate-600">{{ $bookings[0]['customer_email'] }}</span>
+                    <div class="flex justify-between border-b border-emerald-600 pb-3">
+                        <span class="font-medium text-emerald-800">Email:</span>
+                        <span class="text-emerald-700">{{ $bookings[0]['customer_email'] }}</span>
                     </div>
-                    <div class="flex justify-between border-b border-emerald-200 pb-3">
-                        <span class="font-medium text-slate-700">Nomor Handphone:</span>
-                        <span class="text-slate-600">{{ $bookings[0]['customer_phone'] }}</span>
+                    <div class="flex justify-between border-b border-emerald-600 pb-3">
+                        <span class="font-medium text-emerald-800">Nomor Handphone:</span>
+                        <span class="text-emerald-700">{{ $bookings[0]['customer_phone'] }}</span>
                     </div>
-                    <div class="flex justify-between border-b border-emerald-200 pb-3">
-                        <span class="font-medium text-slate-700">Tanggal:</span>
-                        <span class="text-slate-600">{{ \Carbon\Carbon::parse($bookings[0]['booking_date'])->format('d M Y') }}</span>
+                    <div class="flex justify-between border-b border-emerald-600 pb-3">
+                        <span class="font-medium text-emerald-800">Tanggal:</span>
+                        <span class="text-emerald-700">{{ \Carbon\Carbon::parse($bookings[0]['booking_date'])->format('d M Y') }}</span>
                     </div>
 
-                    <div class="border-t border-emerald-200 pt-4 mb-2">
-                        <h3 class="font-semibold mb-2 text-emerald-700">Lapangan yang Dipesan:</h3>
+                    <div class="border-t border-emerald-600 pt-4 mb-2">
+                        <h3 class="font-semibold mb-2 text-emerald-800">Lapangan yang Dipesan:</h3>
                         <div class="space-y-1">
                             @foreach($bookings as $booking)
                             <div>
-                                <span class="font-bold text-emerald-600">{{ $booking['field_name'] }}</span>:
+                                <span class="font-bold text-emerald-800">{{ $booking['field_name'] }}</span>:
                                 {{ \Carbon\Carbon::parse($booking['start_time'])->format('H:i') }}-{{ \Carbon\Carbon::parse($booking['end_time'])->format('H:i') }}
                                 (Rp {{ number_format($booking['total_price'], 0, ',', '.') }})
                             </div>
@@ -53,11 +53,11 @@
                     </div>
 
                     <div class="flex justify-between text-lg font-bold mt-4">
-                        <span class="text-slate-700">Total Biaya:</span>
-                        <span class="text-emerald-600">Rp {{ number_format($totalPrice, 0, ',', '.') }}</span>
+                        <span class="text-emerald-800">Total Biaya:</span>
+                        <span class="text-emerald-800">Rp {{ number_format($totalPrice, 0, ',', '.') }}</span>
                     </div>
 
-                    <div class="mt-4 p-3 bg-gradient-to-br from-emerald-50 via-emerald-100 to-green-100 border-l-4 border-emerald-600 text-slate-700 rounded">
+                    <div class="mt-4 p-3 bg-gradient-to-br from-emerald-600 to-emerald-700 border-l-4 border-emerald-800 text-white rounded">
                         <b>Informasi Pembayaran:</b><br>
                         Setiap transaksi yang dilakukan akan dikenakan pajak Admin sebesar Rp5.000.<br>
                         Data booking Anda belum tersimpan di sistem. Booking akan otomatis tersimpan setelah pembayaran berhasil.<br>
@@ -67,14 +67,14 @@
             </div>
 
             <div class="text-center mt-6">
-                <a href="/fields/book" class="inline-flex items-center px-5 py-3 bg-white/80 backdrop-blur-sm hover:bg-white/95 text-emerald-700 border border-emerald-300 hover:border-emerald-400 font-medium rounded-lg shadow-lg transition-all duration-300 mr-4">
+                <a href="/fields/book" class="inline-flex items-center px-5 py-3 bg-gradient-to-br from-emerald-300 via-emerald-400 to-emerald-500 hover:from-emerald-400 hover:to-emerald-600 text-emerald-800 border border-emerald-400 font-medium rounded-lg shadow-lg transition-all duration-300 mr-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
                     Kembali ke Form Booking
                 </a>
 
-                <button id="pay-button" class="inline-flex items-center px-5 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-lg shadow-lg transition-all duration-300">
+                <button id="pay-button" class="inline-flex items-center px-5 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-medium rounded-lg shadow-lg transition-all duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-3a2 2 0 00-2-2H9a2 2 0 00-2 2v3a2 2 0 002 2z" />
                     </svg>
@@ -84,10 +84,10 @@
 
             <!-- Loading indicator -->
             <div id="loading-indicator" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-                <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
-                    <p class="text-emerald-700 font-medium">Memproses pembayaran...</p>
-                    <p class="text-slate-600 text-sm mt-2">Mohon tunggu sebentar</p>
+                <div class="bg-gradient-to-br from-emerald-300 via-emerald-400 to-emerald-500 p-6 rounded-lg shadow-lg text-center">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-800 mx-auto mb-4"></div>
+                    <p class="text-emerald-800 font-medium">Memproses pembayaran...</p>
+                    <p class="text-emerald-700 text-sm mt-2">Mohon tunggu sebentar</p>
                 </div>
             </div>
         </div>

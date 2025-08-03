@@ -34,6 +34,7 @@
                         'slate-200': '#e2e8f0',
                         'slate-700': '#334155',
                         'slate-800': '#1e293b',
+                        'slate-850': '#172032',
                         'slate-900': '#0f172a',
                         'emerald-400': '#34d399',
                         'emerald-500': '#10b981',
@@ -87,16 +88,16 @@
             </div>
 
             <div id="mobileMenu"
-                class="hidden absolute top-full left-0 right-0 w-full z-50 bg-black rounded-b-md p-2 shadow-lg">
+                class="hidden absolute top-full left-0 right-0 w-full z-50 bg-slate-850 rounded-b-md p-2 shadow-lg">
                 <div class="px-2 pt-2 pb-3 space-y-1">
                     <a href="{{ route('home') }}"
-                        class="text-white block w-full px-3 py-3 rounded-md text-base font-bold hover:text-emerald-400 hover:bg-gray-700 hover:bg-opacity-70">Beranda</a>
+                        class="text-white block w-full px-3 py-3 rounded-md text-base font-bold hover:text-emerald-400 hover:bg-slate-700 hover:bg-opacity-70">Beranda</a>
                     <a href="{{ route('about') }}"
-                        class="text-white block w-full px-3 py-3 rounded-md text-base font-bold hover:text-emerald-400 hover:bg-gray-700 hover:bg-opacity-70">Tentang</a>
+                        class="text-white block w-full px-3 py-3 rounded-md text-base font-bold hover:text-emerald-400 hover:bg-slate-700 hover:bg-opacity-70">Tentang</a>
                     <a href="{{ route('facilities') }}"
-                        class="text-white block w-full px-3 py-3 rounded-md text-base font-bold hover:text-emerald-400 hover:bg-gray-700 hover:bg-opacity-70">Fasilitas</a>
+                        class="text-white block w-full px-3 py-3 rounded-md text-base font-bold hover:text-emerald-400 hover:bg-slate-700 hover:bg-opacity-70">Fasilitas</a>
                     <a href="{{ route('contact') }}"
-                        class="text-white block w-full px-3 py-3 rounded-md text-base font-bold hover:text-emerald-400 hover:bg-gray-700 hover:bg-opacity-70">Kontak</a>
+                        class="text-white block w-full px-3 py-3 rounded-md text-base font-bold hover:text-emerald-400 hover:bg-slate-700 hover:bg-opacity-70">Kontak</a>
                 </div>
             </div>
         </nav>
@@ -107,7 +108,7 @@
     </main>
 
     <footer class="w-full mt-auto">
-        <div class="bg-slate-700 backdrop-blur p-8">
+        <div class="bg-slate-850 backdrop-blur p-8">
             <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 gap-8">
                     <div>
@@ -147,9 +148,9 @@
             const header = document.getElementById('main-header');
             if (window.scrollY > 50) {
                 header.classList.remove('bg-transparent');
-                header.classList.add('bg-slate-700');
+                header.classList.add('bg-slate-850');
             } else {
-                header.classList.remove('bg-slate-700');
+                header.classList.remove('bg-slate-850');
                 header.classList.add('bg-transparent');
             }
         }

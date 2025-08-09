@@ -11,30 +11,14 @@
             theme: {
                 extend: {
                     colors: {
-                        'green-50': '#f0fdf4',
-                        'green-100': '#dcfce7',
-                        'green-200': '#bbf7d0',
-                        'green-300': '#86efac',
-                        'green-400': '#4ade80',
-                        'green-500': '#22c55e',
-                        'green-600': '#16a34a',
-                        'green-700': '#15803d',
-                        'green-800': '#166534',
-                        'green-900': '#14532d',
-                        'emerald-50': '#ecfdf5',
-                        'emerald-100': '#d1fae5',
-                        'emerald-200': '#a7f3d0',
-                        'emerald-300': '#6ee7b7',
-                        'emerald-400': '#34d399',
-                        'emerald-500': '#10b981',
-                        'emerald-600': '#059669',
-                        'emerald-700': '#047857',
-                        'emerald-800': '#065f46',
-                        'emerald-900': '#064e3b',
-                        'teal-50': '#f0fdfa',
-                        'slate-600': '#475569',
-                        'slate-700': '#334155',
-                        'slate-800': '#1e293b',
+                        'starbucks-green': '#00704A',
+                        'starbucks-dark-green': '#1e3932',
+                        'starbucks-light-green': '#00A862',
+                        'starbucks-cream': '#f7f5f3',
+                        'starbucks-beige': '#d4af37',
+                        'forest-green': '#2d5939',
+                        'sage-green': '#87A96B',
+                        'mint-green': '#A8D8B9'
                     }
                 }
             }
@@ -42,11 +26,11 @@
     </script>
 </head>
 
-<body class="bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800">
+<body class="bg-gradient-to-br from-starbucks-green via-starbucks-dark-green to-forest-green">
     <div class="container mx-auto px-4 py-8">
         <div
             class="max-w-2xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden">
-            <div class="bg-gradient-to-br from-emerald-600 to-emerald-700 text-white px-6 py-4">
+            <div class="bg-gradient-to-br from-starbucks-green to-starbucks-dark-green text-white px-6 py-4">
                 <h1 class="text-2xl font-bold flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -56,50 +40,50 @@
                 </h1>
             </div>
             <div class="p-6">
-                <div class="bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-lg p-4 mb-6 border border-emerald-400">
+                <div class="bg-gradient-to-br from-starbucks-green to-starbucks-dark-green rounded-lg p-4 mb-6 border border-starbucks-light-green">
                     <h2 class="font-semibold text-lg mb-2 text-white">Kode Pemesanan</h2>
                     <p class="text-xl font-mono text-white">{{ $bookings->first()->booking_code }}</p>
-                    <p class="text-sm text-emerald-200 mt-1">Silakan simpan kode referensi ini untuk catatan Anda</p>
+                    <p class="text-sm text-starbucks-cream mt-1">Silakan simpan kode referensi ini untuk catatan Anda</p>
                 </div>
 
                 <div class="space-y-4">
                     @if ($bookings->count() > 1)
-                        <div class="flex justify-between pb-2 border-b border-emerald-600">
-                            <span class="font-medium text-emerald-800">Total Pemesanan:</span>
-                            <span class="text-emerald-700">{{ $bookings->count() }} Lapangan</span>
+                        <div class="flex justify-between pb-2 border-b border-starbucks-light-green">
+                            <span class="font-medium text-starbucks-dark-green">Total Pemesanan:</span>
+                            <span class="text-starbucks-green">{{ $bookings->count() }} Lapangan</span>
                         </div>
                     @endif
-                    <div class="flex justify-between pb-2 border-b border-emerald-600">
-                        <span class="font-medium text-emerald-800">Nama Pemesan:</span>
-                        <span class="text-emerald-700">{{ $bookings->first()->customer_name }}</span>
+                    <div class="flex justify-between pb-2 border-b border-starbucks-light-green">
+                        <span class="font-medium text-starbucks-dark-green">Nama Pemesan:</span>
+                        <span class="text-starbucks-green">{{ $bookings->first()->customer_name }}</span>
                     </div>
-                    <div class="flex justify-between pb-2 border-b border-emerald-600">
-                        <span class="font-medium text-emerald-800">Email:</span>
-                        <span class="text-emerald-700">{{ $bookings->first()->customer_email }}</span>
+                    <div class="flex justify-between pb-2 border-b border-starbucks-light-green">
+                        <span class="font-medium text-starbucks-dark-green">Email:</span>
+                        <span class="text-starbucks-green">{{ $bookings->first()->customer_email }}</span>
                     </div>
-                    <div class="flex justify-between pb-2 border-b border-emerald-600">
-                        <span class="font-medium text-emerald-800">Nomor Handphone:</span>
-                        <span class="text-emerald-700">{{ $bookings->first()->customer_phone }}</span>
+                    <div class="flex justify-between pb-2 border-b border-starbucks-light-green">
+                        <span class="font-medium text-starbucks-dark-green">Nomor Handphone:</span>
+                        <span class="text-starbucks-green">{{ $bookings->first()->customer_phone }}</span>
                     </div>
-                    <div class="flex justify-between pb-2 border-b border-emerald-600">
-                        <span class="font-medium text-emerald-800">Tanggal Pemesanan:</span>
+                    <div class="flex justify-between pb-2 border-b border-starbucks-light-green">
+                        <span class="font-medium text-starbucks-dark-green">Tanggal Pemesanan:</span>
                         <span
-                            class="text-emerald-700">{{ \Carbon\Carbon::parse($bookings->first()->booking_date)->format('d M Y') }}</span>
+                            class="text-starbucks-green">{{ \Carbon\Carbon::parse($bookings->first()->booking_date)->format('d M Y') }}</span>
                     </div>
 
                     <!-- Detail Lapangan dengan Harga Dinamis -->
-                    <div class="border-t border-emerald-600 pt-4 mb-2">
-                        <h3 class="font-semibold mb-3 text-emerald-800">Detail Pemesanan:</h3>
+                    <div class="border-t border-starbucks-light-green pt-4 mb-2">
+                        <h3 class="font-semibold mb-3 text-starbucks-dark-green">Detail Pemesanan:</h3>
                         <div class="space-y-3">
                             @foreach ($bookings as $booking)
-                                <div class="bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-lg p-4 border border-emerald-500">
+                                <div class="bg-gradient-to-br from-starbucks-green to-starbucks-dark-green rounded-lg p-4 border border-sage-green">
                                     <div class="flex justify-between items-start mb-2">
                                         <span class="font-bold text-white">{{ $booking->field->name }}</span>
-                                        <span class="text-xs bg-emerald-800 text-emerald-200 px-2 py-1 rounded">
+                                        <span class="text-xs bg-forest-green text-starbucks-cream px-2 py-1 rounded">
                                             {{ $booking->payment_status === 'settlement' ? 'Lunas' : ucfirst($booking->payment_status) }}
                                         </span>
                                     </div>
-                                    <div class="text-sm text-emerald-200 space-y-1">
+                                    <div class="text-sm text-starbucks-cream space-y-1">
                                         <div class="flex items-center justify-between">
                                             <span class="flex items-center">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1"
@@ -127,8 +111,8 @@
                                             <span class="font-medium text-white">{{ $booking->duration_hours }} jam</span>
                                         </div>
                                         @if ($booking->slots && $booking->slots->count() > 0)
-                                            <div class="mt-3 pt-2 border-t border-emerald-800">
-                                                <span class="text-xs text-emerald-200 mb-2 block">Rincian Harga per
+                                            <div class="mt-3 pt-2 border-t border-forest-green">
+                                                <span class="text-xs text-starbucks-cream mb-2 block">Rincian Harga per
                                                     Jam:</span>
                                                 @foreach ($booking->slots as $slot)
                                                     <div class="flex justify-between text-xs">
@@ -139,8 +123,8 @@
                                                 @endforeach
                                             </div>
                                         @else
-                                            <div class="mt-3 pt-2 border-t border-emerald-800">
-                                                <span class="text-xs text-emerald-200 mb-2 block">Rincian Harga:</span>
+                                            <div class="mt-3 pt-2 border-t border-forest-green">
+                                                <span class="text-xs text-starbucks-cream mb-2 block">Rincian Harga:</span>
                                                 @php
                                                     $startHour = \Carbon\Carbon::parse($booking->start_time)->format(
                                                         'H',
@@ -171,7 +155,7 @@
                                         @endif
 
                                         <div
-                                            class="flex justify-between font-medium text-white pt-2 border-t border-emerald-800 mt-2">
+                                            class="flex justify-between font-medium text-white pt-2 border-t border-forest-green mt-2">
                                             <span>Subtotal:</span>
                                             <span>Rp {{ number_format($booking->total_price, 0, ',', '.') }}</span>
                                         </div>
@@ -185,25 +169,25 @@
                         $tax = 5000;
                         $subtotal = $totalPrice - $tax;
                     @endphp
-                    <div class="flex justify-between text-base font-medium mt-4 pt-4 border-t border-emerald-600">
-                        <span class="text-emerald-800">Subtotal Pemesanan:</span>
-                        <span class="text-emerald-800">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
+                    <div class="flex justify-between text-base font-medium mt-4 pt-4 border-t border-starbucks-light-green">
+                        <span class="text-starbucks-dark-green">Subtotal Pemesanan:</span>
+                        <span class="text-starbucks-dark-green">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
                     </div>
 
                     <div class="flex justify-between text-base font-medium">
-                        <span class="text-emerald-800">Biaya Admin:</span>
-                        <span class="text-emerald-800">Rp {{ number_format($tax, 0, ',', '.') }}</span>
+                        <span class="text-starbucks-dark-green">Biaya Admin:</span>
+                        <span class="text-starbucks-dark-green">Rp {{ number_format($tax, 0, ',', '.') }}</span>
                     </div>
 
-                    <div class="flex justify-between text-lg font-bold mt-2 pt-4 border-t border-emerald-600">
-                        <span class="text-emerald-800">Total Biaya:</span>
-                        <span id="total-amount" class="text-emerald-800">Rp
+                    <div class="flex justify-between text-lg font-bold mt-2 pt-4 border-t border-starbucks-light-green">
+                        <span class="text-starbucks-dark-green">Total Biaya:</span>
+                        <span id="total-amount" class="text-starbucks-dark-green">Rp
                             {{ number_format($totalPrice, 0, ',', '.') }}</span>
                     </div>
                 </div>
 
                 <div class="mt-8 space-y-4">
-                    <div class="p-3 bg-gradient-to-br from-emerald-600 to-emerald-700 border-l-4 border-emerald-800 text-white rounded">
+                    <div class="p-3 bg-gradient-to-br from-starbucks-green to-starbucks-dark-green border-l-4 border-forest-green text-white rounded">
                         <b>Terima kasih atas pemesanan Anda!</b><br>
                         Setiap transaksi yang dilakukan akan dikenakan biaya Admin sebesar Rp 5.000.<br>
                         <div class="mt-3 text-sm">
@@ -215,12 +199,12 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="text-center text-emerald-200 text-sm mt-4">
+                    <div class="text-center text-starbucks-cream text-sm mt-4">
                         <span>Anda akan diarahkan ke WhatsApp Admin untuk konfirmasi pemesanan.</span>
                     </div>
                     <div class="flex justify-center space-x-4 mt-6">
                         <a href="/"
-                            class="inline-flex items-center px-5 py-3 bg-gradient-to-br from-emerald-300 via-emerald-400 to-emerald-500 hover:from-emerald-400 hover:to-emerald-600 text-emerald-800 font-medium rounded-lg shadow transition-colors">
+                            class="inline-flex items-center px-5 py-3 bg-gradient-to-br from-starbucks-light-green via-sage-green to-mint-green hover:from-sage-green hover:to-starbucks-light-green text-starbucks-dark-green font-medium rounded-lg shadow transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -229,7 +213,7 @@
                             Kembali ke Beranda
                         </a>
                         <a href="/fields/book"
-                            class="inline-flex items-center px-5 py-3 bg-gradient-to-br from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-medium rounded-lg shadow transition-colors">
+                            class="inline-flex items-center px-5 py-3 bg-gradient-to-br from-starbucks-green to-starbucks-dark-green hover:from-starbucks-dark-green hover:to-forest-green text-white font-medium rounded-lg shadow transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -243,7 +227,7 @@
         </div>
     </div>
 
-    <div class="text-center text-emerald-200 text-sm mt-4">
+    <div class="text-center text-starbucks-cream text-sm mt-4">
         <span>Anda akan diarahkan ke WhatsApp Admin untuk konfirmasi pemesanan secara otomatis.</span>
     </div>
     <script>

@@ -43,8 +43,8 @@
                 <div class="flex sm:hidden mt-4">
                     <a href="{{ route('booking.form') }}"
                         class="inline-block px-6 py-3 text-white font-medium rounded text-center transition duration-300"
-                        style="background-color: #10b981;" onmouseover="this.style.backgroundColor='#34d399';"
-                        onmouseout="this.style.backgroundColor='#10b981';">
+                        style="background-color: #00704A;" onmouseover="this.style.backgroundColor='#00704A';"
+                        onmouseout="this.style.backgroundColor='#00704A';">
                         Pesan Sekarang
                     </a>
                 </div>
@@ -53,12 +53,12 @@
     </div>
 
     <!-- Scrollable Content - Clear separation from hero section -->
-    <div class="py-20 bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800">
+    <div class="py-20 bg-gradient-to-br from-starbucks-green via-starbucks-dark-green to-forest-green">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                 <div data-aos="fade-right" data-aos-duration="1000">
-                    <h2 class="text-3xl font-bold text-emerald-200 mb-6">Tentang Kami</h2>
-                    <p class="text-emerald-100 mb-4">
+                    <h2 class="text-3xl font-bold text-starbucks-cream mb-6">Tentang Kami</h2>
+                    <p class="text-starbucks-beige mb-4">
                         Karvin hadir pertama kali pada 30 Oktober 2024, lahir dari keinginan sederhana: menyediakan tempat
                         main bulu tangkis yang gak cuma nyaman, tapi juga bikin betah. Kami tahu, nyari lapangan yang enak
                         itu kadang susah yang nggak antre panjang, bersih, pencahayaannya oke, dan suasananya bikin
@@ -81,11 +81,11 @@
 
     <!-- Featured Posters Section -->
     @if ($featuredPosters->count() > 0)
-        <div class="py-16 bg-gradient-to-tl from-emerald-700 via-emerald-800 to-emerald-900">
+        <div class="py-16 bg-white">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-12" data-aos="fade-up" data-aos-duration="800">
-                    <h2 class="text-3xl font-bold text-emerald-200">Poster Terbaru</h2>
-                    <p class="text-emerald-100 mt-4">
+                    <h2 class="text-3xl font-bold text-starbucks-green">Poster Terbaru</h2>
+                    <p class="text-gray-700-100 mt-4">
                         Temukan informasi terkini tentang turnamen, promosi spesial, dan program pelatihan menarik di
                         Karvin Badminton. Kami secara rutin mengadakan berbagai kegiatan untuk membangun komunitas
                         badminton yang aktif dan bersemangat.
@@ -95,7 +95,7 @@
                 <!-- Desktop Grid View -->
                 <div class="hidden md:grid md:grid-cols-3 gap-8" data-aos="fade-up" data-aos-duration="800">
                     @foreach ($featuredPosters->take(3) as $index => $poster)
-                        <div class="bg-white rounded-lg overflow-hidden shadow-lg transition transform hover:scale-[1.02] cursor-pointer poster-item hover:shadow-green-200"
+                        <div class="bg-gradient-to-br from-sage-green via-mint-green to-starbucks-light-green rounded-lg overflow-hidden shadow-lg transition transform hover:scale-[1.02] cursor-pointer poster-item hover:shadow-green-200"
                             data-image="{{ asset('storage/' . $poster->image_path) }}" data-title="{{ $poster->title }}"
                             data-description="{{ $poster->description }}" data-index="{{ $index }}"
                             onclick="showPosterPreview(this)">
@@ -104,10 +104,10 @@
                                     class="w-full h-full object-cover transition-transform duration-700 hover:scale-110">
                             </div>
                             <div class="p-6 bg-gradient-to-br from emerald-300 via-emerald-400 to emerald-500">
-                                <h3 class="text-xl font-semibold mb-2 text-emerald-200">
+                                <h3 class="text-xl font-semibold mb-2 text-white">
                                     {{ $poster->title }}</h3>
                                 @if ($poster->description)
-                                    <p class="text-g text-emerald-100">{{ Str::limit($poster->description, 100) }}</p>
+                                    <p class="text-g text-white">{{ Str::limit($poster->description, 100) }}</p>
                                 @endif
                             </div>
                         </div>
@@ -120,7 +120,7 @@
                         <div class="swiper-wrapper">
                             @foreach ($featuredPosters as $index => $poster)
                                 <div class="swiper-slide">
-                                    <div class="bg-white rounded-lg overflow-hidden shadow-lg transition-all duration-500 ease-out transform hover:shadow-green-200 hover:scale-[1.02] h-[420px] cursor-pointer poster-item"
+                                    <div class="bg-gradient-to-br from-sage-green to-starbucks-light-green rounded-lg overflow-hidden shadow-lg transition-all duration-500 ease-out transform hover:shadow-green-200 hover:scale-[1.02] h-[420px] cursor-pointer poster-item"
                                         data-image="{{ asset('storage/' . $poster->image_path) }}"
                                         data-title="{{ $poster->title }}" data-description="{{ $poster->description }}"
                                         data-index="{{ $index }}" onclick="showPosterPreview(this)">
@@ -132,7 +132,7 @@
                                         <div
                                             class="p-5 bg-gradient-to-br from emerald-300 via-emerald-400 to emerald-500 h-[180px] flex flex-col">
                                             <h3
-                                                class="text-lg font-semibold mb-2 text-emerald-200 transition-colors duration-300">
+                                                class="text-lg font-semibold mb-2 text-white transition-colors duration-300">
                                                 {{ $poster->title }}</h3>
                                             @if ($poster->description)
                                                 <p
@@ -186,11 +186,11 @@
     @endif
 
     <!-- Jadwal Ketersediaan Lapangan -->
-    <div class="py-16 bg-gradient-to-b from-emerald-800 via-emerald-700 to-emerald-600">
+    <div class="py-16 bg-gradient-to-b from-forest-green via-starbucks-dark-green to-starbucks-green">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12" data-aos="fade-up" data-aos-duration="800">
-                <h2 class="text-3xl font-bold text-emerald-200">Jadwal Ketersediaan Lapangan</h2>
-                <p class="text-emerald-100 mt-4">
+                <h2 class="text-3xl font-bold text-starbucks-cream">Jadwal Ketersediaan Lapangan</h2>
+                <p class="text-starbucks-beige mt-4">
                     Lihat ketersediaan lapangan secara real-time untuk membantu Anda merencanakan waktu bermain yang tepat
                 </p>
             </div>
@@ -206,13 +206,13 @@
                                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold text-emerald-600">Pilih Tanggal</h3>
+                    <h3 class="text-xl font-semibold text-starbucks-light-green">Pilih Tanggal</h3>
                 </div>
 
                 <p class="text-sm text-gray-600 mb-4">Pilih tanggal untuk melihat ketersediaan lapangan</p>
 
                 <div class="mb-3">
-                    <div class="flex items-center text-sm text-emerald-900 mb-3">
+                    <div class="flex items-center text-sm text-starbucks-green mb-3">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -298,7 +298,7 @@
                                                     </svg>
                                                     <span class="font-medium text-gray-800">{{ $field->name }}</span>
                                                 </div>
-                                                <div class="text-sm text-emerald-600 font-medium">
+                                                <div class="text-sm text-starbucks-green font-medium">
                                                     Harga Dinamis
                                                 </div>
                                             </div>
@@ -349,7 +349,7 @@
             <div class="md:hidden space-y-4" data-aos="fade-up" data-aos-duration="800">
                 @foreach ($fields as $field)
                     <div class="bg-white rounded-lg shadow-lg border border-green-100 overflow-hidden">
-                        <div class="bg-gradient-to-r from-emerald-600 to-emerald-300 text-gray-100 p-4">
+                        <div class="bg-gradient-to-r from-starbucks-green to-starbucks-dark text-gray-100 p-4">
                             <h3 class="text-lg font-semibold">{{ $field->name }}</h3>
                             <p class="text-sm opacity-90">Harga Dinamis</p>
                         </div>
@@ -364,12 +364,12 @@
 
             <!-- Info Text -->
             <div class="text-center mt-8" data-aos="fade-up" data-aos-duration="800">
-                <p class="text-emerald-100 mb-4">Ingin memesan lapangan? Klik tombol di bawah ini untuk melakukan booking
+                <p class="text-starbucks-beige mb-4">Ingin memesan lapangan? Klik tombol di bawah ini untuk melakukan booking
                 </p>
                 <a href="{{ route('booking.form') }}"
                     class="inline-block px-6 py-3 text-white font-medium rounded text-center transition duration-300"
-                    style="background-color: #34d399;" onmouseover="this.style.backgroundColor='#10b981';"
-                    onmouseout="this.style.backgroundColor='#34d399';">
+                    style="background-color: #4CAF50;" onmouseover="this.style.backgroundColor='#347928';"
+                    onmouseout="this.style.backgroundColor='#4CAF50';">
                     Pesan Sekarang
                 </a>
             </div>
@@ -448,7 +448,7 @@
                 const dateButton = document.createElement('button');
                 dateButton.type = 'button';
                 dateButton.className = `date-selector px-4 py-2 border rounded-md transition-colors ${
-            index === 0 ? 'bg-[#10b981] text-white border-[#34d399]' : 'bg-white text-black hover:bg-green-50'
+            index === 0 ? 'bg-[#00704A] text-white border-[#005A3C]' : 'bg-white text-black hover:bg-green-50'
         }`;
                 dateButton.setAttribute('data-date', dateObj.date);
                 dateButton.innerHTML = `
@@ -462,14 +462,14 @@
             document.querySelectorAll('.date-selector').forEach(button => {
                 button.addEventListener('click', function() {
                     document.querySelectorAll('.date-selector').forEach(btn => {
-                        btn.classList.remove('bg-[#10b981]', 'text-white',
-                            'border-[#34d399]');
+                        btn.classList.remove('bg-[#00704A]', 'text-white',
+                            'border-[#005A3C]');
                         btn.classList.add('bg-white', 'text-black',
                             'hover:bg-green-50');
                     });
                     this.classList.remove('bg-white', 'text-white',
                         'hover:bg-green-50');
-                    this.classList.add('bg-[#10b981]', 'text-white', 'border-[#34d399]');
+                    this.classList.add('bg-[#00704A]', 'text-white', 'border-[#005A3C]');
                     currentDate = this.getAttribute('data-date');
                     fetchAvailability(currentDate);
                 });
@@ -633,12 +633,12 @@
     </style>
 
     <!-- Facilities Section -->
-    <div class="py-10 bg-gradient-to-tl from-emerald-500 via-emerald-600 to-emerald-700">
+    <div class="py-10 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12" data-aos="fade-up" data-aos-duration="800">
-                <h2 class="text-3xl font-bold text-emerald-200">Fasilitas-Fasilitas Kami</h2>
+                <h2 class="text-3xl font-bold text-starbucks-green">Fasilitas-Fasilitas Kami</h2>
                 <br>
-                <p class="text-emerald-100 mb-4">
+                <p class="text-gray-700 mb-4">
                     Karvin Badminton menyediakan fasilitas premium yang dirancang untuk memenuhi kebutuhan pemain
                     berbagai level. Dari sistem pencahayaan berstandar internasional hingga area istirahat yang nyaman,
                     setiap detail disiapkan untuk memastikan Anda mendapatkan pengalaman bermain terbaik.
@@ -648,20 +648,20 @@
             <!-- Desktop View - Grid -->
             <div class="hidden md:grid md:grid-cols-2 gap-12">
                 @foreach ($facilities->take(3) as $index => $facility)
-                    <div class="bg-gradient-to-br {{ $index % 3 == 0 ? 'from-emerald-100 via-emerald-200 to-green-100' : ($index % 3 == 1 ? 'from-green-100 via-green-200 to-emerald-100' : 'from-emerald-100 via-emerald-200 to-green-100') }} shadow-lg rounded-lg overflow-hidden flex flex-row transition transform hover:scale-105"
+                    <div class="bg-gradient-to-br {{ $index % 3 == 0 ? 'from-starbucks-light-green via-sage-green to-mint-green' : ($index % 3 == 1 ? 'from-starbucks-light-green via-sage-green to-mint-green' : 'from-starbucks-light-green via-sage-green to-mint-green') }} shadow-lg rounded-lg overflow-hidden flex flex-row transition transform hover:scale-105"
                         data-aos="{{ $index % 2 == 0 ? 'fade-right' : 'fade-left' }}" data-aos-duration="800"
                         data-aos-delay="{{ $index * 100 }}">
                         <div
-                            class="max-w-[250px] max-h-[250px] flex justify-center items-center {{ $index % 3 == 0 ? 'bg-emerald-50' : ($index % 3 == 1 ? 'bg-green-50' : 'bg-emerald-50') }}">
+                            class="max-w-[250px] max-h-[250px] flex justify-center items-center {{ $index % 3 == 0 ? 'bg-starbucks-light-green' : ($index % 3 == 1 ? 'bg-mint-green' : 'bg-starbucks-light-green') }}">
                             <img src="{{ asset('storage/' . $facility->image_path) }}" alt="{{ $facility->name }}"
                                 class="w-full h-[250px] object-cover aspect-square">
                         </div>
                         <div class="p-6 w-3/5">
                             <h3
-                                class="text-2xl font-bold mb-4 {{ $index % 3 == 0 ? 'text-emerald-700' : 'text-emerald-600' }}">
+                                class="text-2xl font-bold mb-4 {{ $index % 3 == 0 ? 'text-starbucks-dark-green' : 'text-starbucks-dark-green' }}">
                                 {{ $facility->name }}
                             </h3>
-                            <p class="text-slate-600">
+                            <p class="text-white">
                                 {{ $facility->description }}
                             </p>
                         </div>
@@ -676,7 +676,7 @@
                         @foreach ($facilities->take(3) as $index => $facility)
                             <div class="swiper-slide px-1">
                                 <div
-                                    class="bg-gradient-to-br {{ $index % 3 == 0 ? 'from-emerald-100 via-emerald-200 to-green-100' : ($index % 3 == 1 ? 'from-green-100 via-green-200 to-emerald-100' : 'from-green-100 via-emerald-100 to-green-100') }} shadow-lg rounded-lg overflow-hidden flex flex-col h-[400px]">
+                                    class="bg-gradient-to-br {{ $index % 3 == 0 ? 'from-starbucks-light-green via-sage-green to-mint-green' : ($index % 3 == 1 ? 'from-starbucks-light-green via-sage-green to-mint-green' : 'from-starbucks-light-green via-sage-green to-mint-green') }} shadow-lg rounded-lg overflow-hidden flex flex-col h-[400px]">
                                     <div
                                         class="{{ $index % 3 == 0 ? 'bg-emerald-50' : ($index % 3 == 1 ? 'bg-green-50' : 'bg-emerald-50') }} flex justify-center items-center h-[180px]">
                                         <img src="{{ asset('storage/' . $facility->image_path) }}"
@@ -684,10 +684,10 @@
                                     </div>
                                     <div class="p-4 flex-grow overflow-y-auto">
                                         <h3
-                                            class="text-lg font-bold mb-2 {{ $index % 3 == 0 ? 'text-emerald-700' : 'text-emerald-600' }}">
+                                            class="text-lg font-bold mb-2 {{ $index % 3 == 0 ? 'text-starbucks-dark-green' : 'text-starbucks-dark-green' }}">
                                             {{ $facility->name }}
                                         </h3>
-                                        <p class="text-slate-600 text-sm">
+                                        <p class="text-white text-sm">
                                             {{ Str::limit($facility->description, 120) }}
                                         </p>
                                     </div>
@@ -706,8 +706,8 @@
             <div class="text-center mt-12">
                 <a href="{{ route('facilities') }}"
                     class="inline-block px-6 py-3 text-white font-medium rounded transition duration-300"
-                    style="background-color: #059669;" onmouseover="this.style.backgroundColor='#10b981';"
-                    onmouseout="this.style.backgroundColor='#059669';" data-aos="fade-up" data-aos-duration="800">
+                    style="background-color: #00704A;" onmouseover="this.style.backgroundColor='#005A3C';"
+                    onmouseout="this.style.backgroundColor='#00704A';" data-aos="fade-up" data-aos-duration="800">
                     Lihat Semua Fasilitas
                 </a>
             </div>
@@ -716,11 +716,11 @@
 
     <!-- Documentation Photos Gallery -->
     @if ($featuredDocumentations->count() > 0)
-        <div class="py-16 bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800">
+        <div class="py-16 bg-gradient-to-br from-starbucks-light-green via-starbucks-dark-green to-forest-green">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-12" data-aos="fade-up" data-aos-duration="800">
-                    <h2 class="text-3xl font-bold text-emerald-200">Galeri Dokumentasi</h2>
-                    <p class="text-emerald-100 mt-4">
+                    <h2 class="text-3xl font-bold text-starbucks-cream">Galeri Dokumentasi</h2>
+                    <p class="text-starbucks-beige mt-4">
                         Lihat momen-momen berkesan dari berbagai kegiatan di Karvin Badminton. Kami menangkap semangat,
                         kegembiraan, dan sportivitas dalam setiap turnamen, pelatihan, dan aktivitas komunitas yang
                         berlangsung di fasilitas kami.

@@ -76,7 +76,7 @@
     }
 </style>
 
-<body class="bg-gradient-to-b from-emerald-600 via-emerald-700 to-emerald-800">
+<body class="bg-gradient-to-br from-[#00704A] via-[#005A3C] to-[#1E3A32]">
     <div class>
 
         <!-- Content -->
@@ -91,15 +91,15 @@
                             d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                 </div>
-                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-emerald-300 mb-2 tracking-tight px-4">
+                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#F7F7F3] mb-2 tracking-tight px-4">
                     Pesan Lapangan Badminton Karvin
                 </h1>
-                <div class="w-8 sm:w-20 h-0.5 bg-gradient-to-r from-green-300 to-green-200 mx-auto"></div>
+                <div class="w-8 sm:w-20 h-0.5 bg-gradient-to-r from-[#F7F7F7] to-[#F2F0EB] mx-auto"></div>
             </div>
 
             <!-- Button Kembali - Pojok Kanan Atas -->
             <a href="/"
-                class="absolute top-4 right-4 sm:top-6 sm:right-6 inline-flex items-center px-3 py-2 sm:px-4 sm:py-2.5 bg-white/90 backdrop-blur-sm hover:bg-white/90 text-emerald-600 font-medium rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-emerald-600/10 hover:border-emerald-600/20 text-sm sm:text-base">
+                class="absolute top-4 right-4 sm:top-6 sm:right-6 inline-flex items-center px-3 py-2 sm:px-4 sm:py-2.5 bg-white/90 backdrop-blur-sm hover:bg-white/90 text-[#00704A] font-medium rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-emerald-600/10 hover:border-emerald-600/20 text-sm sm:text-base">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 sm:mr-2" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -135,7 +135,7 @@
         @csrf
 
         <!-- Date Selection -->
-        <div class="bg-gray-200 rounded-lg shadow-md p-6 border border-gray-200">
+        <div class="bg-gray-100 rounded-lg shadow-md p-6 border border-gray-100">
             <div class="flex items-center mb-4">
                 <div class="bg-green-100 p-2 rounded-full mr-3">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none"
@@ -169,7 +169,7 @@
         </div>
 
         <!-- Field and Time Selection -->
-        <div class="bg-gray-200 rounded-lg shadow-md p-6 border border-gray-200">
+        <div class="bg-gray-100 rounded-lg shadow-md p-6 border border-gray-100">
             <div class="flex items-center mb-4">
                 <div class="bg-green-100 p-2 rounded-full mr-3">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none"
@@ -209,7 +209,7 @@
             </div>
         </div>
 
-        <div class="overflow-x-auto rounded-lg border border-gray-200">
+        <div class="overflow-x-auto rounded-lg border border-gray-100">
             <table class="w-full border-collapse booking-table">
                 <thead>
                     <tr>
@@ -247,7 +247,7 @@
         </div>
 
         <!-- Customer Information -->
-        <div class="bg-gray-200 rounded-lg shadow-md p-6 border border-gray-200">
+        <div class="bg-gray-100 rounded-lg shadow-md p-6 border border-gray-100">
             <div class="flex items-center mb-4">
                 <div class="bg-green-100 p-2 rounded-full mr-3">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none"
@@ -321,7 +321,7 @@
         </div>
 
         <!-- Payment Method -->
-        <div class="bg-gray-200 rounded-lg shadow-md p-6 border border-gray-200">
+        <div class="bg-gray-100 rounded-lg shadow-md p-6 border border-gray-100">
             <div class="flex items-center mb-4">
                 <div class="bg-green-100 p-2 rounded-full mr-3">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none"
@@ -362,7 +362,7 @@
         </div>
 
         <!-- Booking Summary and Total -->
-        <div class="bg-gray-200 rounded-lg shadow-md p-6 border border-gray-200">
+        <div class="bg-gray-100 rounded-lg shadow-md p-6 border border-gray-100">
             <h2 class="text-xl font-semibold mb-4 text-emerald-600">Ringkasan Pemesanan</h2>
             <div id="booking-summary" class="mb-4">
                 <p class="text-gray-600 italic">Please select field(s) and time slot(s) to see the summary</p>
@@ -375,7 +375,7 @@
 
         <!-- Submit Button -->
         <button type="submit"
-            class="w-full py-4 px-6 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg shadow-lg transition-colors flex items-center justify-center">
+            class="w-full py-4 px-6 bg-[#4CAF50] hover:bg-[#347928] text-white font-bold rounded-lg shadow-lg transition-colors flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -619,7 +619,7 @@
                 const dateButton = document.createElement('button');
                 dateButton.type = 'button';
                 dateButton.className = `date-selector px-4 py-2 border rounded-md transition-colors ${
-                    index === 0 ? 'bg-[#10b981] text-white' : 'bg-white text-black border-white hover:bg-green-50'
+                    index === 0 ? 'bg-[#005A3C] text-white' : 'bg-white text-black border-white hover:bg-green-50'
                 }`;
                 dateButton.setAttribute('data-date', dateObj.date);
                 dateButton.innerHTML = `
@@ -634,8 +634,8 @@
                 button.addEventListener('click', function() {
                     // Reset semua tombol ke warna default
                     document.querySelectorAll('.date-selector').forEach(btn => {
-                        btn.classList.remove('bg-[#10b981]', 'bg-blue-500', 'text-white',
-                            'border-[#34d399]', 'border-blue-600');
+                        btn.classList.remove('bg-[#005A3C]', 'bg-blue-500', 'text-white',
+                            'border-[#00704A]', 'border-blue-600');
                         btn.classList.add('bg-white', 'text-black', 'border-white',
                             'hover:bg-green-50');
                     });
@@ -643,7 +643,7 @@
                     // Ubah warna tombol yang diklik ke coklat keemasan
                     this.classList.remove('bg-white', 'text-black', 'border-white',
                         'hover:bg-green-50');
-                    this.classList.add('bg-[#10b981]', 'text-white', 'border-[#34d399]');
+                    this.classList.add('bg-[#005A3C]', 'text-white', 'border-[#00704A]');
 
                     // Update tanggal yang dipilih
                     currentDate = this.getAttribute('data-date');

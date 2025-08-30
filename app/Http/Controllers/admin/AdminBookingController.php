@@ -197,18 +197,28 @@ class AdminBookingController extends Controller
                 $current->addHour();
             }
 
-            // Hitung total harga dengan dynamic pricing
+            // Check if weekend
+            $isWeekend = Carbon::parse($request->booking_date)->isSaturday() ||
+                Carbon::parse($request->booking_date)->isSunday();
+
+            // Hitung total harga dengan dynamic pricing + weekend pricing
             $totalPrice = 0;
             foreach ($timeSlots as $slot) {
                 $hour = Carbon::parse($slot)->hour;
-                if ($hour >= 6 && $hour < 12) {
-                    $totalPrice += 40000; // Pagi
-                } elseif ($hour >= 12 && $hour < 17) {
-                    $totalPrice += 25000; // Siang
-                } elseif ($hour >= 17 && $hour < 23) {
-                    $totalPrice += 60000; // Malam (termasuk jam 17-19)
+
+                if ($isWeekend) {
+                    $totalPrice += 60000; // Weekend price
                 } else {
-                    $totalPrice += 40000; // Default
+                    // Weekday pricing
+                    if ($hour >= 6 && $hour < 12) {
+                        $totalPrice += 40000; // Pagi
+                    } elseif ($hour >= 12 && $hour < 17) {
+                        $totalPrice += 25000; // Siang
+                    } elseif ($hour >= 17 && $hour < 23) {
+                        $totalPrice += 60000; // Malam
+                    } else {
+                        $totalPrice += 40000; // Default
+                    }
                 }
             }
 
@@ -250,16 +260,24 @@ class AdminBookingController extends Controller
                     $slotStartTime = Carbon::parse($slot);
                     $slotEndTime = $slotStartTime->copy()->addHour();
 
-                    // Hitung harga per slot
+                    // Hitung harga per slot dengan weekend pricing
                     $hour = $slotStartTime->hour;
-                    if ($hour >= 6 && $hour < 12) {
-                        $pricePerSlot = 40000;
-                    } elseif ($hour >= 12 && $hour < 17) {
-                        $pricePerSlot = 25000;
-                    } elseif ($hour >= 17 && $hour < 23) {
-                        $pricePerSlot = 60000;
+                    $isWeekend = Carbon::parse($request->booking_date)->isSaturday() ||
+                        Carbon::parse($request->booking_date)->isSunday();
+
+                    if ($isWeekend) {
+                        $pricePerSlot = 60000; // Weekend price
                     } else {
-                        $pricePerSlot = 40000;
+                        // Weekday pricing
+                        if ($hour >= 6 && $hour < 12) {
+                            $pricePerSlot = 40000;
+                        } elseif ($hour >= 12 && $hour < 17) {
+                            $pricePerSlot = 25000;
+                        } elseif ($hour >= 17 && $hour < 23) {
+                            $pricePerSlot = 60000;
+                        } else {
+                            $pricePerSlot = 40000;
+                        }
                     }
 
                     BookingSlot::create([
@@ -593,12 +611,6 @@ class AdminBookingController extends Controller
         }
     }
 
-    /**
-     * Store member booking for slots 17-19
-     */
-    /**
-     * Store member booking for slots 17-19 with flexible duration
-     */
     /**
      * Store member booking for slots 17-19 with flexible duration
      */

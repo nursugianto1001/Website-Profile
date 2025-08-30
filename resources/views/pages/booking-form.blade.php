@@ -160,7 +160,6 @@
                     <span>hari ini Tanggal: <span class="font-medium" id="today-date">{{ date('d M, Y') }}</span></span>
                 </div>
             </div>
-
             <div class="flex flex-wrap gap-2 mb-4" id="date-selector-container">
                 <!-- Date buttons will be populated by JavaScript -->
             </div>
@@ -187,7 +186,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <p class="text-sm text-emerald-700">Klik pada slot waktu yang tersedia untuk memesan. <span
+                <p class="text-sm text-emerald-700">Khusus dihari Sabtu & Minggu Harga Otomatis Menjadi Rp60.000,00 <span
                         class="font-medium">Slot hijau tersedia</span>, <span class="font-medium">slot merah tidak
                         tersedia</span>.</p>
             </div>
@@ -278,7 +277,6 @@
                     </div>
                     <span class="text-red-500 text-sm customer_name-error"></span>
                 </div>
-
                 <div class="space-y-1">
                     <label for="customer_email" class="block text-sm font-medium text-gray-700">Email</label>
                     <div class="relative">
@@ -408,7 +406,6 @@
             const fieldPrices = {};
             let currentDate = '';
             let totalAmount = 0;
-
             fields.forEach(field => {
                 fieldPrices[field.id] = field.price_per_hour;
             });
@@ -563,7 +560,6 @@
                     forceRefreshAvailability(currentDate);
                 }, 500);
             });
-
             // Handle mobile touch events
             let touchStartTime = 0;
             document.addEventListener('touchstart', function() {
@@ -640,7 +636,7 @@
                             'hover:bg-green-50');
                     });
 
-                    // Ubah warna tombol yang diklik ke coklat keemasan
+                    // Ubah warna tombol yang diklik
                     this.classList.remove('bg-white', 'text-black', 'border-white',
                         'hover:bg-green-50');
                     this.classList.add('bg-[#005A3C]', 'text-white', 'border-[#00704A]');
@@ -660,7 +656,6 @@
 
             currentDate = monthlyDates[0].date;
             document.getElementById('booking_date').value = currentDate;
-
             // Membuat header tabel untuk lapangan
             const tableHeader = document.querySelector('.booking-table thead tr');
             fields.forEach(field => {
@@ -697,8 +692,19 @@
                 return `${hours}:${startMin}-${String(endHour).padStart(2, '0')}:${startMin}`;
             }
 
-            function getPriceByHour(hour) {
-                // Pastikan hour adalah integer
+            /**
+             * [UPDATED] Get price based on time slot and date (for weekend pricing)
+             */
+            function getPriceByDateAndTime(hour, dateString) {
+                const date = new Date(dateString);
+                const dayOfWeek = date.getDay(); // Sunday = 0, Saturday = 6
+
+                // Weekend pricing - flat rate 60,000
+                if (dayOfWeek === 0 || dayOfWeek === 6) {
+                    return 60000;
+                }
+
+                // Weekday pricing (original logic)
                 const hourInt = parseInt(hour);
 
                 if (isNaN(hourInt)) {
@@ -718,7 +724,6 @@
                 return 40000; // Default fallback
             }
 
-
             function renderTimeSlots() {
                 const tableBody = document.getElementById('booking-table-body');
                 tableBody.innerHTML = '';
@@ -726,8 +731,8 @@
                 slots.forEach(slot => {
                     const tr = document.createElement('tr');
                     const slotHour = parseInt(slot.time.split(':')[0]);
-                    const slotPrice = getPriceByHour(
-                        slotHour); // Pastikan fungsi ini return angka yang valid
+                    // [UPDATED] Use the new pricing function that considers the date
+                    const slotPrice = getPriceByDateAndTime(slotHour, currentDate);
 
                     // Kolom waktu dengan harga
                     const tdTime = document.createElement('td');
@@ -761,7 +766,7 @@
                         td.className = 'p-2 border';
                         td.setAttribute('data-field-id', field.id);
                         td.setAttribute('data-time-slot', slot.time);
-                        td.setAttribute('data-slot-price', slotPrice);
+                        td.setAttribute('data-slot-price', slotPrice); // Set correct price here
 
                         const div = document.createElement('div');
                         div.className =
@@ -805,7 +810,6 @@
                 `;
                             td.setAttribute('data-available', 'false');
                         }
-
                         td.appendChild(div);
                         tr.appendChild(td);
                     });
@@ -844,14 +848,14 @@
                 const slotElement = document.querySelector(
                     `[data-field-id="${fieldId}"][data-time-slot="${timeSlot}"]`);
                 const slotPriceAttr = slotElement.getAttribute('data-slot-price');
-                const slotPrice = parseInt(slotPriceAttr) || 0; // Validasi untuk mencegah NaN
+                const slotPrice = parseInt(slotPriceAttr) || 0;
 
-                // Debug log untuk memastikan harga valid
+                // Debug log
                 console.log('Slot Price:', slotPrice, 'Type:', typeof slotPrice);
 
                 if (isNaN(slotPrice) || slotPrice <= 0) {
                     console.error('Invalid slot price:', slotPriceAttr);
-                    return; // Jangan lanjutkan jika harga tidak valid
+                    return;
                 }
 
                 if (!selectedSlots[fieldId]) {
@@ -874,7 +878,7 @@
                     }
                 }
 
-                // Debug log untuk memastikan totalAmount valid
+                // Debug log
                 console.log('Total Amount:', totalAmount, 'Type:', typeof totalAmount);
 
                 renderTimeSlots();
@@ -889,7 +893,13 @@
                     const fieldId = parseInt(this.getAttribute("data-field-id"));
                     if (!this.checked) {
                         if (selectedSlots[fieldId]) {
-                            totalAmount -= selectedSlots[fieldId].length * fieldPrices[fieldId];
+                            // Recalculate price to subtract based on dynamic prices
+                            let amountToSubtract = 0;
+                            selectedSlots[fieldId].forEach(slot => {
+                                const hour = parseInt(slot.split(':')[0]);
+                                amountToSubtract += getPriceByDateAndTime(hour, currentDate);
+                            });
+                            totalAmount -= amountToSubtract;
                             delete selectedSlots[fieldId];
                         }
                     }
@@ -949,11 +959,11 @@
                     const fieldName = fieldCheckbox.getAttribute("data-field-name");
                     const slots = selectedSlots[fieldId].sort();
 
-                    // PERBAIKAN: Hitung subtotal berdasarkan harga dinamis per slot
+                    // [UPDATED] Calculate subtotal based on dynamic price per slot
                     let subtotal = 0;
                     slots.forEach(slot => {
                         const hour = parseInt(slot.split(':')[0]);
-                        const slotPrice = getPriceByHour(hour);
+                        const slotPrice = getPriceByDateAndTime(hour, currentDate);
                         subtotal += slotPrice;
                     });
 
@@ -984,7 +994,8 @@
                 <div class="space-y-1 text-sm text-gray-600 py-2 border-t border-gray-200">
                     ${slots.map(slot => {
                         const hour = parseInt(slot.split(':')[0]);
-                        const slotPrice = getPriceByHour(hour);
+                        // [UPDATED] Get correct price for the summary breakdown
+                        const slotPrice = getPriceByDateAndTime(hour, currentDate);
                         return `<div class="flex justify-between">
                                     <span>${formatTimeRange(slot)}:</span>
                                     <span>Rp ${slotPrice.toLocaleString("id-ID")}</span>
@@ -1002,7 +1013,6 @@
                 summaryHTML += "</div>";
                 summaryContainer.innerHTML = summaryHTML;
             }
-
 
             function updateTotalPrice() {
                 document.getElementById("total-price").textContent = `Rp ${totalAmount.toLocaleString("id-ID")}`;
@@ -1075,13 +1085,13 @@
                 }
             });
 
-            // Check for URL parameters yang menandakan pembatalan atau error
+            // Check for URL parameters
             const urlParams = new URLSearchParams(window.location.search);
             const isCancelled = urlParams.get('cancelled') === 'true';
             const hasError = urlParams.get('error') === 'payment';
             const forceRefresh = urlParams.get('refresh') === 'true';
 
-            // Show success message jika ada pembatalan
+            // Show success message
             if (isCancelled) {
                 const successDiv = document.createElement('div');
                 successDiv.className =
@@ -1090,7 +1100,7 @@
                     <div class="flex">
                         <div class="flex-shrink-0">
                             <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                             </svg>
                         </div>
                         <div class="ml-3">
@@ -1103,7 +1113,6 @@
                 `;
                 document.querySelector('form').insertBefore(successDiv, document.querySelector('form').firstChild);
 
-                // Auto-hide after 5 seconds
                 setTimeout(() => {
                     successDiv.style.transition = 'opacity 0.5s';
                     successDiv.style.opacity = '0';
@@ -1111,14 +1120,12 @@
                 }, 5000);
             }
 
-            // Force refresh jika ada parameter khusus
             if (isCancelled || hasError || forceRefresh) {
                 console.log('Special condition detected, force refreshing...');
                 setTimeout(() => {
                     forceRefreshAvailability(currentDate);
                 }, 1000);
 
-                // Clean URL parameters
                 if (window.history && window.history.replaceState) {
                     const cleanUrl = window.location.pathname;
                     window.history.replaceState({}, document.title, cleanUrl);
@@ -1128,14 +1135,14 @@
             // Setup auto-refresh
             setupAutoRefresh();
 
-            // Initial load dengan force refresh jika perlu
+            // Initial load
             if (isCancelled || hasError || forceRefresh) {
                 forceRefreshAvailability(currentDate);
             } else {
                 fetchAvailability(currentDate);
             }
 
-            // Debug functions - remove in production
+            // Debug functions
             window.debugBooking = {
                 clearCache: clearAllCaches,
                 forceRefresh: forceRefreshAvailability,
@@ -1143,7 +1150,6 @@
                 showSelections: () => console.log('Selected slots:', selectedSlots)
             };
 
-            // Console log untuk monitoring
             console.log('Booking form initialized with cache management');
         });
     </script>

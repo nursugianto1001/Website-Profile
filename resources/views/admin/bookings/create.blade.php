@@ -7,6 +7,7 @@
         <div>
             <h2 class="text-2xl font-bold text-indigo-800">Buat Booking Baru</h2>
             <p class="text-gray-500 mt-1">Tambahkan booking lapangan baru ke sistem</p>
+            <p class="text-gray-500 mt-1"> Khusus dihari Sabtu & Minggu Harga Otomatis Menjadi Rp60.000,00</p>
         </div>
         <a href="{{ route('admin.bookings.index') }}"
             class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-150 ease-in-out">

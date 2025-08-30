@@ -179,7 +179,7 @@ class BookingPageController extends Controller
 
             for ($hour = $openingHour; $hour < $closingHour; $hour++) {
                 $slotTime = sprintf('%02d:00:00', $hour);
-                $slotPrice = $this->getPriceByTimeSlot($hour);
+                $slotPrice = $this->getPriceByTimeSlot($hour, $date);
 
                 // Cek apakah slot sudah dibooking
                 $isBooked = false;
@@ -242,7 +242,7 @@ class BookingPageController extends Controller
     }
 
     /**
-     * Process booking submission 
+     * [REVISED] Process booking submission to handle non-contiguous slots.
      */
     public function processBooking(Request $request)
     {
@@ -279,45 +279,50 @@ class BookingPageController extends Controller
                 $timeSlots = $selectedSlots[$fieldId];
                 sort($timeSlots);
 
-                if (empty($timeSlots)) {
-                    Log::warning("Empty time slots for field {$fieldId}");
-                    continue;
+                // **BUG FIX: Group consecutive time slots into blocks**
+                $slotGroups = $this->groupConsecutiveSlots($timeSlots);
+
+                foreach ($slotGroups as $group) {
+                    if (empty($group)) {
+                        continue;
+                    }
+
+                    $startTime = $group[0];
+                    $endTime = Carbon::parse(end($group))->addHour()->format('H:i:s');
+
+                    $isAvailable = $this->bookingService->areSlotsAvailable(
+                        $fieldId,
+                        $bookingDate,
+                        $startTime,
+                        $endTime
+                    );
+
+                    if (!$isAvailable) {
+                        return redirect()->back()
+                            ->with('error', 'Salah satu slot yang dipilih tidak tersedia. Silakan pilih waktu lain.')
+                            ->withInput();
+                    }
+
+                    $field = Field::findOrFail($fieldId);
+                    // Calculate subtotal for this specific group
+                    $subtotal = $field->calculateTotalPrice($group, $bookingDate);
+                    $totalPrice += $subtotal;
+
+                    $pendingBookings[] = [
+                        'field_id' => $fieldId,
+                        'field_name' => $field->name,
+                        'customer_name' => $request->customer_name,
+                        'customer_email' => $request->customer_email,
+                        'customer_phone' => $request->customer_phone,
+                        'booking_date' => $bookingDate,
+                        'start_time' => $startTime,
+                        'end_time' => $endTime,
+                        'duration_hours' => count($group),
+                        'total_price' => $subtotal,
+                        'payment_method' => $paymentMethod,
+                        'time_slots' => $group, // Use the group of slots
+                    ];
                 }
-
-                $startTime = $timeSlots[0];
-                $endTime = Carbon::parse($timeSlots[count($timeSlots) - 1])->addHour()->format('H:i:s');
-
-                $isAvailable = $this->bookingService->areSlotsAvailable(
-                    $fieldId,
-                    $bookingDate,
-                    $startTime,
-                    $endTime
-                );
-
-                if (!$isAvailable) {
-                    return redirect()->back()
-                        ->with('error', 'Slot tidak tersedia untuk lapangan yang dipilih. Silakan pilih waktu lain.')
-                        ->withInput();
-                }
-
-                $field = Field::findOrFail($fieldId);
-                $subtotal = $field->calculateTotalPrice($timeSlots);
-                $totalPrice += $subtotal;
-
-                $pendingBookings[] = [
-                    'field_id' => $fieldId,
-                    'field_name' => $field->name,
-                    'customer_name' => $request->customer_name,
-                    'customer_email' => $request->customer_email,
-                    'customer_phone' => $request->customer_phone,
-                    'booking_date' => $bookingDate,
-                    'start_time' => $startTime,
-                    'end_time' => $endTime,
-                    'duration_hours' => count($timeSlots),
-                    'total_price' => $subtotal,
-                    'payment_method' => $paymentMethod,
-                    'time_slots' => $timeSlots,
-                ];
             }
 
             if (empty($pendingBookings)) {
@@ -381,6 +386,39 @@ class BookingPageController extends Controller
         }
     }
 
+    /**
+     * [HELPER FUNCTION] Groups an array of time slots into consecutive blocks.
+     * e.g., ["07:00", "08:00", "10:00"] becomes [["07:00", "08:00"], ["10:00"]]
+     */
+    private function groupConsecutiveSlots(array $timeSlots): array
+    {
+        if (empty($timeSlots)) {
+            return [];
+        }
+
+        sort($timeSlots);
+        $groups = [];
+        $currentGroup = [$timeSlots[0]];
+
+        for ($i = 1; $i < count($timeSlots); $i++) {
+            $previousHour = (int) Carbon::parse($timeSlots[$i - 1])->format('H');
+            $currentHour = (int) Carbon::parse($timeSlots[$i])->format('H');
+
+            // If the current slot is exactly one hour after the previous one, it's consecutive
+            if ($currentHour === $previousHour + 1) {
+                $currentGroup[] = $timeSlots[$i];
+            } else {
+                // Otherwise, end the current group and start a new one
+                $groups[] = $currentGroup;
+                $currentGroup = [$timeSlots[$i]];
+            }
+        }
+
+        // Add the last group
+        $groups[] = $currentGroup;
+
+        return $groups;
+    }
 
     private function sendWhatsAppConfirmation($data)
     {
@@ -654,8 +692,24 @@ class BookingPageController extends Controller
     /**
      * Get price based on time slot
      */
-    private function getPriceByTimeSlot($hour)
+    /**
+     * Get price based on time slot dengan weekend pricing
+     */
+    private function getPriceByTimeSlot($hour, $date = null)
     {
+        // Check if weekend
+        $isWeekend = false;
+        if ($date) {
+            $carbonDate = \Carbon\Carbon::parse($date);
+            $isWeekend = $carbonDate->isSaturday() || $carbonDate->isSunday();
+        }
+
+        // Weekend pricing - flat rate 60,000
+        if ($isWeekend) {
+            return 60000;
+        }
+
+        // Weekday pricing
         if ($hour >= 6 && $hour < 12) {
             return 40000; // Pagi: 06:00-12:00
         } elseif ($hour >= 12 && $hour < 17) {
@@ -663,6 +717,7 @@ class BookingPageController extends Controller
         } elseif ($hour >= 17 && $hour < 23) {
             return 60000; // Malam: 17:00-23:00
         }
+
         return 40000; // Default price
     }
 

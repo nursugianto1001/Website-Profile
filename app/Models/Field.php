@@ -33,10 +33,23 @@ class Field extends Model
     ];
 
     /**
-     * Get price based on time slot (sistem harga dinamis)
+     * Get price based on time slot (sistem harga dinamis + weekend pricing)
      */
-    public function getPriceByTimeSlot($hour)
+    public function getPriceByTimeSlot($hour, $date = null)
     {
+        // Cek apakah hari weekend (Sabtu atau Minggu)
+        $isWeekend = false;
+        if ($date) {
+            $carbonDate = \Carbon\Carbon::parse($date);
+            $isWeekend = $carbonDate->isSaturday() || $carbonDate->isSunday();
+        }
+
+        // Harga weekend: Rp 60.000 untuk semua jam
+        if ($isWeekend) {
+            return 60000;
+        }
+
+        // Harga weekdays (Senin-Jumat) - sistem existing
         if ($hour >= 6 && $hour < 12) {
             return $this->price_morning ?? 40000; // Pagi: 06:00-12:00
         } elseif ($hour >= 12 && $hour < 17) {
@@ -44,6 +57,7 @@ class Field extends Model
         } elseif ($hour >= 17 && $hour < 23) {
             return $this->price_evening ?? 60000; // Malam: 17:00-23:00
         }
+
         return $this->price_per_hour; // Default fallback
     }
 
@@ -62,12 +76,12 @@ class Field extends Model
     /**
      * Calculate total price for multiple time slots
      */
-    public function calculateTotalPrice($timeSlots)
+    public function calculateTotalPrice($timeSlots, $bookingDate = null)
     {
         $totalPrice = 0;
         foreach ($timeSlots as $slot) {
             $hour = (int) \Carbon\Carbon::parse($slot)->format('H');
-            $totalPrice += $this->getPriceByTimeSlot($hour);
+            $totalPrice += $this->getPriceByTimeSlot($hour, $bookingDate);
         }
         return $totalPrice;
     }

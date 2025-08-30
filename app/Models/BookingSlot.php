@@ -34,14 +34,14 @@ class BookingSlot extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
         static::creating(function ($bookingSlot) {
             // Auto-calculate price jika belum diset dan ada slot_time
             if (!$bookingSlot->price_per_slot && $bookingSlot->slot_time) {
                 $hour = (int) Carbon::parse($bookingSlot->slot_time)->format('H');
                 $field = $bookingSlot->field;
                 if ($field) {
-                    $bookingSlot->price_per_slot = $field->getPriceByTimeSlot($hour);
+                    $bookingSlot->price_per_slot = $field->getPriceByTimeSlot($hour, $bookingSlot->booking_date);
                 }
             }
         });
@@ -52,7 +52,7 @@ class BookingSlot extends Model
                 $hour = (int) Carbon::parse($bookingSlot->slot_time)->format('H');
                 $field = $bookingSlot->field;
                 if ($field) {
-                    $bookingSlot->price_per_slot = $field->getPriceByTimeSlot($hour);
+                    $bookingSlot->price_per_slot = $field->getPriceByTimeSlot($hour, $bookingSlot->booking_date);
                 }
             }
         });
@@ -87,6 +87,15 @@ class BookingSlot extends Model
      */
     public function getPriceCategoryAttribute()
     {
+        // Check if weekend
+        if ($this->booking_date) {
+            $isWeekend = Carbon::parse($this->booking_date)->isSaturday() ||
+                Carbon::parse($this->booking_date)->isSunday();
+            if ($isWeekend && $this->price_per_slot == 60000) {
+                return 'weekend';
+            }
+        }
+
         if ($this->price_per_slot == 40000) {
             return 'morning';
         } elseif ($this->price_per_slot == 25000) {
@@ -94,6 +103,7 @@ class BookingSlot extends Model
         } elseif ($this->price_per_slot == 60000) {
             return 'evening';
         }
+
         return 'custom';
     }
 
@@ -176,11 +186,11 @@ class BookingSlot extends Model
     {
         $query = static::where('status', 'booked')
             ->whereBetween('booking_date', [$startDate, $endDate]);
-        
+
         if ($fieldId) {
             $query->where('field_id', $fieldId);
         }
-        
+
         return $query->sum('price_per_slot');
     }
 
@@ -191,11 +201,11 @@ class BookingSlot extends Model
     {
         $query = static::where('status', 'booked')
             ->whereBetween('booking_date', [$startDate, $endDate]);
-        
+
         if ($fieldId) {
             $query->where('field_id', $fieldId);
         }
-        
+
         return [
             'morning' => $query->clone()->where('price_per_slot', 40000)->sum('price_per_slot'),
             'afternoon' => $query->clone()->where('price_per_slot', 25000)->sum('price_per_slot'),

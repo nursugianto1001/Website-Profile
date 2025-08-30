@@ -96,6 +96,25 @@
                             </div>
                         </div>
 
+                        <!-- TAMBAHAN: Customer Type untuk harga pelatih -->
+                        <div>
+                            <label for="customer_type" class="block text-sm font-medium text-gray-700 mb-1">Jenis Customer <span class="text-red-600">*</span></label>
+                            <div class="flex space-x-4 mt-1">
+                                <div class="flex items-center">
+                                    <input type="radio" name="customer_type" id="customer_type_regular" value="regular"
+                                        {{ old('customer_type', 'regular') == 'regular' ? 'checked' : '' }}
+                                        class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                                    <label for="customer_type_regular" class="ml-2 block text-sm text-gray-700">Customer Biasa</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="customer_type" id="customer_type_coach" value="coach"
+                                        {{ old('customer_type') == 'coach' ? 'checked' : '' }}
+                                        class="h-4 w-4 text-green-600 border-gray-300 focus:ring-green-500">
+                                    <label for="customer_type_coach" class="ml-2 block text-sm text-green-700 font-medium">Pelatih (Diskon Khusus)</label>
+                                </div>
+                            </div>
+                        </div>
+
                         <div>
                             <label for="payment_method" class="block text-sm font-medium text-gray-700 mb-1">Metode Pembayaran <span class="text-red-600">*</span></label>
                             <div class="flex space-x-4 mt-1">
@@ -238,7 +257,7 @@
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-sm font-medium text-green-800">Total Harga</p>
-                                    <p class="text-xs text-green-600">Harga per jam × Durasi</p>
+                                    <p class="text-xs text-green-600">Harga per jam Ã— Durasi</p>
                                 </div>
                                 <div class="text-right">
                                     <p class="text-lg font-bold text-green-800" id="member_total_price_display">Rp 0</p>
@@ -324,25 +343,55 @@
         const startTimeSelect = document.getElementById('start_time');
         const endTimeSelect = document.getElementById('end_time');
         const fieldSelect = document.getElementById('field_id');
+        const bookingDateSelect = document.getElementById('booking_date');
+        const customerTypeRadios = document.querySelectorAll('input[name="customer_type"]');
 
-        // Dynamic pricing calculation
-        function getPriceByHour(hour) {
+        // Dynamic pricing calculation - DIPERBAIKI: Tambah harga pelatih
+        function getPriceByHour(hour, bookingDate, isCoach = false) {
             const hourInt = parseInt(hour);
-            if (hourInt >= 6 && hourInt < 12) {
-                return 40000; // Pagi: 06:00-12:00
-            } else if (hourInt >= 12 && hourInt < 17) {
-                return 25000; // Siang: 12:00-17:00
-            } else if (hourInt >= 17 && hourInt < 23) {
-                return 60000; // Malam: 17:00-23:00
+            const date = new Date(bookingDate);
+            const isWeekend = date.getDay() === 0 || date.getDay() === 6; // Sunday = 0, Saturday = 6
+
+            if (isWeekend) {
+                // Weekend pricing
+                if (isCoach) {
+                    return 40000; // Pelatih: weekend semua jam 40k
+                } else {
+                    return 60000; // Customer biasa: weekend semua jam 60k
+                }
+            } else {
+                // Weekday pricing
+                if (isCoach) {
+                    // Harga pelatih weekday
+                    if (hourInt >= 6 && hourInt < 12) {
+                        return 30000; // Pagi: 06:00-12:00
+                    } else if (hourInt >= 12 && hourInt < 17) {
+                        return 25000; // Siang: 12:00-17:00
+                    } else if (hourInt >= 17 && hourInt < 23) {
+                        return 40000; // Malam: 17:00-23:00
+                    }
+                    return 30000; // Default untuk pelatih
+                } else {
+                    // Harga customer biasa weekday
+                    if (hourInt >= 6 && hourInt < 12) {
+                        return 40000; // Pagi: 06:00-12:00
+                    } else if (hourInt >= 12 && hourInt < 17) {
+                        return 25000; // Siang: 12:00-17:00
+                    } else if (hourInt >= 17 && hourInt < 23) {
+                        return 60000; // Malam: 17:00-23:00
+                    }
+                    return 40000; // Default untuk customer biasa
+                }
             }
-            return 40000; // Default
         }
 
         function calculateTotalPrice() {
             const startTime = startTimeSelect.value;
             const endTime = endTimeSelect.value;
+            const bookingDate = bookingDateSelect.value;
+            const isCoach = document.querySelector('input[name="customer_type"]:checked')?.value === 'coach';
 
-            if (startTime && endTime) {
+            if (startTime && endTime && bookingDate) {
                 const startHour = parseInt(startTime.split(':')[0]);
                 const endHour = parseInt(endTime.split(':')[0]);
 
@@ -350,19 +399,19 @@
                 let priceBreakdown = '';
 
                 for (let hour = startHour; hour < endHour; hour++) {
-                    const slotPrice = getPriceByHour(hour);
+                    const slotPrice = getPriceByHour(hour, bookingDate, isCoach);
                     totalPrice += slotPrice;
                     const nextHour = hour + 1;
                     priceBreakdown += `${hour.toString().padStart(2, '0')}:00-${nextHour.toString().padStart(2, '0')}:00: Rp ${slotPrice.toLocaleString('id-ID')}\n`;
                 }
 
-                updatePriceDisplay(totalPrice, priceBreakdown);
+                updatePriceDisplay(totalPrice, priceBreakdown, isCoach);
             } else {
-                updatePriceDisplay(0, '');
+                updatePriceDisplay(0, '', false);
             }
         }
 
-        function updatePriceDisplay(totalPrice, breakdown) {
+        function updatePriceDisplay(totalPrice, breakdown, isCoach) {
             let priceContainer = document.getElementById('price-display');
             if (!priceContainer) {
                 priceContainer = document.createElement('div');
@@ -374,16 +423,20 @@
             }
 
             if (totalPrice > 0) {
+                const customerTypeText = isCoach ? 'Pelatih (Diskon Khusus)' : 'Customer Biasa';
+                const customerTypeColor = isCoach ? 'text-green-600' : 'text-blue-600';
+
                 priceContainer.innerHTML = `
-                    <h4 class="text-sm font-medium text-blue-800 mb-2">Estimasi Harga</h4>
-                    <div class="text-xs text-blue-600 space-y-1 mb-2">
+                    <h4 class="text-sm font-medium text-blue-800 mb-2">Estimasi Harga - ${customerTypeText}</h4>
+                    <div class="text-xs ${customerTypeColor} space-y-1 mb-2">
                         ${breakdown.split('\n').filter(line => line.trim()).map(line => `<div>${line}</div>`).join('')}
                     </div>
                     <div class="border-t border-blue-200 pt-2">
                         <div class="flex justify-between items-center">
                             <span class="text-sm font-medium text-blue-800">Total:</span>
-                            <span class="text-lg font-bold text-blue-900">Rp ${totalPrice.toLocaleString('id-ID')}</span>
+                            <span class="text-lg font-bold ${isCoach ? 'text-green-900' : 'text-blue-900'}">Rp ${totalPrice.toLocaleString('id-ID')}</span>
                         </div>
+                        ${isCoach ? '<div class="text-xs text-green-600 mt-1">✓ Harga khusus pelatih</div>' : ''}
                     </div>
                 `;
                 priceContainer.style.display = 'block';
@@ -407,6 +460,12 @@
         });
 
         endTimeSelect.addEventListener('change', calculateTotalPrice);
+        bookingDateSelect.addEventListener('change', calculateTotalPrice);
+
+        // Event listener untuk customer type
+        customerTypeRadios.forEach(radio => {
+            radio.addEventListener('change', calculateTotalPrice);
+        });
 
         // JavaScript untuk form member booking - DIPERBAIKI: Gunakan dynamic pricing
         const memberStartTimeSelect = document.getElementById('member_start_time');
